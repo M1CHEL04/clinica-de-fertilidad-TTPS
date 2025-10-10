@@ -1,0 +1,112 @@
+
+        :root {
+            --azul-oscuro: #1e3a8a;
+            --celeste-pastel: #e0f2fe;
+            --blanco: #ffffff;
+            --gris-oscuro: #64748b;
+            --azul-medio: #2563eb;
+        }
+        
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--celeste-pastel) 0%, var(--blanco) 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}        .header-gradient {
+            background: linear-gradient(90deg, var(--azul-oscuro) 0%, var(--azul-medio) 100%);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 10px 25px rgba(30, 58, 138, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--azul-oscuro), var(--azul-medio));
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.3);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--celeste-pastel) !important;
+            background: rgba(224, 242, 254, 0.1);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 50%;
+            background-color: var(--celeste-pastel);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-link:hover::after {
+            width: 80%;
+        }
+        
+        .service-card {
+            background: var(--blanco);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(224, 242, 254, 0.5);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(30, 58, 138, 0.15);
+        }
+        
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--celeste-pastel), rgba(224, 242, 254, 0.5));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--azul-oscuro);
+            font-size: 2rem;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--blanco) 0%, var(--celeste-pastel) 100%);
+            border-radius: 24px;
+            padding: 3rem;
+            margin: 2rem 0;
+        }
+        
+        .footer-gradient {
+            background: linear-gradient(90deg, var(--azul-oscuro) 0%, var(--gris-oscuro) 100%);
+        }
+        
+        /* Tratamientos hover effect */
+        .treatment-item {
+            transition: all 0.3s ease;
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+        
+        .treatment-item:hover {
+            background: rgba(224, 242, 254, 0.1);
+            transform: translateY(-2px);
+        }
