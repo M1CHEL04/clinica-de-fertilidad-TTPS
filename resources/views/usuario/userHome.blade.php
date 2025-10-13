@@ -74,7 +74,7 @@
         <div class="treatment-item bg-blue-50 rounded-lg p-6">
             <i class="fas fa-baby text-blue-600 text-3xl mb-3"></i>
             <h4 class="font-semibold text-gray-800 mb-2">Embarazo con Gametos Propios</h4>
-            <p class="text-gray-600 text-sm">Fertilización in vitro utilizando óvulos y espermatozoides de la pareja.</p>
+            <p class="text-gray-600 text-sm">Técnicas de reproducción asistida utilizando óvulos y espermatozoides de la pareja.</p>
         </div>
         
         <div class="treatment-item bg-pink-50 rounded-lg p-6">

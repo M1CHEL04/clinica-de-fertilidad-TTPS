@@ -37,9 +37,9 @@
                 
                 <!-- Navigation Menu - Perfectly Centered -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="#" class="nav-link text-white hover:text-blue-100 font-medium px-4 py-2 rounded-lg transition-all">Inicio</a>
-                    <a href="#" class="nav-link text-white hover:text-blue-100 font-medium px-4 py-2 rounded-lg transition-all">Servicios</a>
-                    <a href="#" class="nav-link text-white hover:text-blue-100 font-medium px-4 py-2 rounded-lg transition-all">Tratamientos</a>
+                    <a href="{{ route('home') }}" class="nav-link text-white hover:text-blue-100 font-medium px-4 py-2 rounded-lg transition-all">Inicio</a>
+                    <a href="{{ route('servicios') }}" class="nav-link text-white hover:text-blue-100 font-medium px-4 py-2 rounded-lg transition-all">Servicios</a>
+                    <a href="{{ route('tratamientos') }}" class="nav-link text-white hover:text-blue-100 font-medium px-4 py-2 rounded-lg transition-all">Tratamientos</a>
                 </div>
                 
                 <!-- User Menu - Positioned absolutely to right -->
