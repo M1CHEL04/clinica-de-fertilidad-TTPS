@@ -66,10 +66,10 @@
                             </div>
                         </div>
                     @else
-                        <a href="#" class="text-white hover:text-blue-100 font-medium text-sm">
+                        <a href="{{ route('login') }}" class="text-white hover:text-blue-100 font-medium text-sm">
                             Iniciar Sesión
                         </a>
-                        <a href="#" class="bg-white text-blue-800 px-3 py-1.5 rounded-full font-medium hover:bg-blue-50 transition-colors text-sm">
+                        <a href="{{ route('registro') }}" class="bg-white text-blue-800 px-3 py-1.5 rounded-full font-medium hover:bg-blue-50 transition-colors text-sm">
                             Registrarse
                         </a>
                     @endauth
