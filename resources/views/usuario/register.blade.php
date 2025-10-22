@@ -18,7 +18,7 @@
 <!-- Registration Form -->
 <div class="max-w-2xl mx-auto">
     <div class="register-card">
-        <form method="POST" action="#" class="space-y-6">
+        <form method="POST" action="{{ route('register.store') }}" class="space-y-6">
             @csrf
             
             <!-- Nombre y Apellido -->
@@ -62,13 +62,13 @@
                     <i class="fas fa-envelope mr-2 text-blue-600"></i>Correo Electrónico
                 </label>
                 <input type="email" 
-                       id="email" 
-                       name="email" 
-                       value="{{ old('email') }}"
+                       id="mail" 
+                       name="mail" 
+                       value="{{ old('mail') }}"
                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors @error('email') border-red-500 @enderror"
                        placeholder="correo@ejemplo.com"
                        required>
-                @error('email')
+                @error('mail')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RegistroController;
 
 Route::get('/', function () {
     return view('usuario.userHome');
@@ -17,4 +18,7 @@ Route::get('/registro', function () {
 Route::get('/login', function () {
     return view('usuario.login');
 })->name('login');
+
+Route::get('/register', [RegistroController::class, 'show'])->name('register');
+Route::post('/register', [RegistroController::class, 'store'])->name('register.store');
 
