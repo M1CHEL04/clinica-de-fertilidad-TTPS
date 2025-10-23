@@ -8,16 +8,15 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('trabajadores', function (Blueprint $table) {
+        Schema::create('roles_trabajadores', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('usuario_id')->constrained('usuarios')->onDelete('cascade');
-            $table->string('rol');
+            $table->string('nombre'); // ej: 'paciente', 'administrativo', 'medico'
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('trabajadores');
+        Schema::dropIfExists('roles_trabajadores');
     }
 };
