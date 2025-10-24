@@ -45,12 +45,23 @@
                 <!-- User Menu - Positioned absolutely to right -->
                 <div class="absolute right-0 flex items-center space-x-3">
                     @auth
+                    
                         <div class="relative group">
                             <button class="flex items-center text-white hover:text-blue-100 font-medium">
-                                <i class="fas fa-user-circle text-xl mr-2"></i>
-                                <span class="text-sm">{{ Auth::user()->name }}</span>
-                                <i class="fas fa-chevron-down ml-1 text-xs"></i>
-                            </button>
+                            <i class="fas fa-user-circle text-xl mr-2"></i>
+
+                            <div class="flex flex-col leading-tight text-left">
+                                <span class="text-sm font-semibold">
+                                    {{ Auth::user()->nombre }}
+                                </span>
+                                <span class="text-xs text-blue-100">
+                                    {{ ucfirst(Auth::user()->rol->nombre ?? 'Sin rol') }}
+                                </span>
+                            </div>
+
+                            <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                        </button>
+
                             
                             <!-- Dropdown Menu -->
                             <div class="absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
@@ -59,9 +70,13 @@
                                         <i class="fas fa-user mr-2"></i>Mi Perfil
                                     </a>
                                     <div class="border-t border-gray-100"></div>
-                                    <a href="#" class="w-full text-left block px-3 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 text-sm">
-                                        <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
-                                    </a>
+                                    <form method="POST" action="{{ route('logout') }}" class="w-full">
+    @csrf
+    <button type="submit" 
+        class="w-full text-left block px-3 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 text-sm">
+        <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
+    </button>
+</form>
                                 </div>
                             </div>
                         </div>
@@ -103,36 +118,38 @@
     <!-- Main Content -->
     <main class="container mx-auto px-6 py-6">
         @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6" role="alert">
-                <div class="flex items-center">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    <span>{{ session('success') }}</span>
-                </div>
-            </div>
-        @endif
-        
-        @if(session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
-                <div class="flex items-center">
-                    <i class="fas fa-exclamation-circle mr-2"></i>
-                    <span>{{ session('error') }}</span>
-                </div>
-            </div>
-        @endif
-        
-        @if($errors->any())
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
-                <div class="flex items-center mb-2">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                    <span class="font-medium">Por favor, corrige los siguientes errores:</span>
-                </div>
-                <ul class="list-disc list-inside">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6 flex flex-col items-center text-center" role="alert">
+        <div class="flex items-center justify-center mb-2">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span>{{ session('success') }}</span>
+        </div>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex flex-col items-center text-center" role="alert">
+        <div class="flex items-center justify-center mb-2">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span>{{ session('error') }}</span>
+        </div>
+    </div>
+@endif
+
+@if($errors->any())
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex flex-col items-center text-center" role="alert">
+        <div class="flex items-center justify-center mb-2">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            <span class="font-medium">Por favor, corrige los siguientes errores:</span>
+        </div>
+        <ul class="list-disc list-inside text-center">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+
         
         @yield('content')
     </main>
