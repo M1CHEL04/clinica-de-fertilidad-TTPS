@@ -24,7 +24,7 @@ Route::get('/registro', function () {
 Route::get('/login', function () {
     return view('usuario.login');
 })->name('login');
-Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login');
+Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('loginBack');
 Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 Route::post('/register', [RegistroController::class, 'store'])->name('register.store');
 

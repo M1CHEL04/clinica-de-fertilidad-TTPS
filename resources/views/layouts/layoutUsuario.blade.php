@@ -71,12 +71,12 @@
                                     </a>
                                     <div class="border-t border-gray-100"></div>
                                     <form method="POST" action="{{ route('logout') }}" class="w-full">
-    @csrf
-    <button type="submit" 
-        class="w-full text-left block px-3 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 text-sm">
-        <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
-    </button>
-</form>
+                                        @csrf
+                                        <button type="submit" 
+                                        class="w-full text-left block px-3 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 text-sm">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
