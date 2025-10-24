@@ -31,7 +31,7 @@ Route::post('/register', [RegistroController::class, 'store'])->name('register.s
 ###########################################################
 # Rutas para el medico
 ###########################################################
-Route::prefix('medico')->middleware(['auth.rol:medico'])->group(function () {
+Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(function () {
     Route::get('/home', function () {
         return view('medico.home');
     })->name('medico.home');
@@ -39,7 +39,7 @@ Route::prefix('medico')->middleware(['auth.rol:medico'])->group(function () {
 ###########################################################
 # Rutas para el admin
 ###########################################################
-Route::prefix('admin')->middleware(['auth.rol:admin'])->group(function () {
+Route::prefix('admin')->middleware([AuthMiddleware::class . ':admin'])->group(function () {
     Route::get('/home', function () {
         return view('admin.home');  
     })->name('admin.home');
