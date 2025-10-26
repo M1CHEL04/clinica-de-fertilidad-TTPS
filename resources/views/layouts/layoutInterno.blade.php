@@ -32,25 +32,19 @@
                 
                 <!-- User Menu -->
                 <div class="flex items-center">
-                    <!-- User Dropdown -->
                     <div class="relative group">
-                        <button class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100">
-                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                                <span class="text-white text-sm font-medium">
-                                    {{ Auth::check() ? strtoupper(substr(Auth::user()->name, 0, 1)) : 'U' }}
+                        <button class="flex items-center text-blue-800 hover:text-blue-600 font-medium">
+                            <i class="fas fa-user-circle text-xl mr-2"></i>
+                            <div class="flex flex-col leading-tight text-left">
+                                <span class="text-sm font-semibold">
+                                    {{ Auth::check() ? (Auth::user()->nombre ?? Auth::user()->name) : 'Usuario' }}
+                                </span>
+                                <span class="text-xs text-blue-500">
+                                    {{ Auth::check() ? ucfirst(Auth::user()->rol->nombre ?? Auth::user()->role ?? 'Médico') : 'Médico' }}
                                 </span>
                             </div>
-                            <div class="hidden sm:block text-left">
-                                <p class="text-sm font-medium text-gray-700">
-                                    {{ Auth::check() ? Auth::user()->name : 'Usuario' }}
-                                </p>
-                                <p class="text-xs text-gray-500">
-                                    {{ Auth::check() ? (Auth::user()->role ?? 'Médico') : 'Médico' }}
-                                </p>
-                            </div>
-                            <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                            <i class="fas fa-chevron-down ml-2 text-xs"></i>
                         </button>
-                        
                         <!-- Dropdown Menu -->
                         <div class="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                             <div class="py-2">
@@ -129,7 +123,7 @@
         </div>
     </footer>
 
-    <script src="{{ asset('js/hideAlerts.js') }}"></script>
+    <script src="{{ asset('js/hideAlert.js') }}"></script>
     
     @yield('scripts')
 </body>

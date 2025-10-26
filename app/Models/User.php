@@ -41,13 +41,18 @@ class User extends Authenticatable
     }
 
     public function esPaciente()
-{
-    return $this->rol && $this->rol_id == 1;
-}
+    {
+        return $this->rol && $this->rol_id == 1;
+    }
 
     // Hash automático al asignar password
     public function setPasswordAttribute($password)
     {
         $this->attributes['password'] = Hash::make($password);
+    }
+
+    public function historiasClinicas()
+    {
+        return $this->hasOne(HistoriaClinica::class, 'paciente_id');
     }
 }

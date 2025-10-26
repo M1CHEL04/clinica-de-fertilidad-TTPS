@@ -40,9 +40,29 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
 # Rutas para el admin
 ###########################################################
 Route::prefix('admin')->middleware([AuthMiddleware::class . ':admin'])->group(function () {
+    Route::get('/home', [App\Http\Controllers\AdminController::class, 'home'])->name('admin.home');
+    Route::get('/create_user', [App\Http\Controllers\AdminController::class, 'create_user'])->name('admin.create_user');
+    Route::post('/create_user', [App\Http\Controllers\AdminController::class, 'store_user'])->name('admin.store_user');
+    Route::post('/baja_user', [App\Http\Controllers\AdminController::class, 'baja_user'])->name('admin.baja_user');
+    Route::post('/alta_user', [App\Http\Controllers\AdminController::class, 'alta_user'])->name('admin.alta_user');
+});
+
+###########################################################
+# Rutas para el operador
+###########################################################
+Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->group(function () {
     Route::get('/home', function () {
-        return view('admin.home');  
-    })->name('admin.home');
+        return view('operador.home');  
+    })->name('operador.home');
+});
+
+###########################################################
+# Rutas para el jefe
+###########################################################
+Route::prefix('jefe')->middleware([AuthMiddleware::class . ':jefe'])->group(function () {
+    Route::get('/home', function () {
+        return view('jefe.home');  
+    })->name('jefe.home');
 });
 
 

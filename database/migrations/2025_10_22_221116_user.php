@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('nombre');
             $table->string('apellido');
             $table->string('telefono')->nullable();
+            $table->boolean('activo')->default(true);
+            $table->boolean('cambio_password')->default(true);
 
             // 🔥 Nuevos campos unificados
             $table->string('dni')->unique()->nullable();

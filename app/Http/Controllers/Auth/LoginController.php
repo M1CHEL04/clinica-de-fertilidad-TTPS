@@ -36,6 +36,28 @@ class LoginController extends Controller
 
         // Guardar rol en sesión
         session(['rol' => $user->rol_id]);
+        session(['user_id' => $user->id]);
+        session(['nombre' => $user->nombre]);
+        session(['apellido' => $user->apellido]);
+
+        switch ($user->rol_id) {
+            case 1:
+                return redirect()->route('home') ->with('success', 'Bienvenido, '.$user->nombre.'!');
+                break;
+            case 2:
+                return redirect()->route('medico.home') ->with('success', 'Bienvenido, '.$user->nombre.'!');
+                break;
+            case 3:
+                return redirect()->route('operador.home') ->with('success', 'Bienvenido, '.$user->nombre.'!');
+                break;
+            case 4:
+                return redirect()->route('admin.home') ->with('success', 'Bienvenido, '.$user->nombre.'!');
+                break;
+            default:
+                return redirect()->route('jefe.home')->with('success', 'Bienvenido, '.$user->nombre.'!');
+                break;
+        }
+
 
         return redirect()->route('home')->with('success', 'Bienvenido, '.$user->nombre.'!');
     }
