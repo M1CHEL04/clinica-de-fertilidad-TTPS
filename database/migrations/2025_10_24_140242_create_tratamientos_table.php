@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignIdFor(\App\Models\HistoriaClinica::class, 'historia_clinica_id');
             $table->foreignIdFor(\App\Models\Objetivo::class, 'objetivo_id');
             $table->foreignIdFor(\App\Models\EstadoTratamiento::class, 'estado_tratamiento_id');
+            $table->foreignIdFor(\App\Models\User::class, 'medico_id');
             $table->timestamps();
         });
     }

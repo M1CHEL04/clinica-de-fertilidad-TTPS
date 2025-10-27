@@ -3,20 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Tratamiento;
 
-class Estudio extends Model
+class AntecedenteGenital extends Model
 {
-    protected $table = 'estudios';
+    protected $table = 'antecedentes_genitales';
 
     protected $fillable = [
         'tratamiento_id',
-        'nombre',
-        'resultado',
+        'descripcion',
     ];
 
     public function tratamiento()
     {
         return $this->belongsTo(Tratamiento::class, 'tratamiento_id');
     }
-    
 }
