@@ -14,6 +14,8 @@ use App\Models\AntecedentePersonal;
 use App\Models\AntecedenteGinecologico;
 use App\Models\AntecedenteGenital;
 use App\Models\AntecedenteFenotipo;
+use App\Models\ProtocoloEstimulacion;
+use App\Models\Embrion;
 
 class Tratamiento extends Model
 {
@@ -76,5 +78,15 @@ class Tratamiento extends Model
     public function antecedentesFenotipos()
     {
         return $this->hasOne(AntecedenteFenotipo::class, 'tratamiento_id');
+    }
+
+    public function protocolosEstimulacion()
+    {
+        return $this->hasMany(ProtocoloEstimulacion::class, 'tratamiento_id');
+    }
+
+    public function embriones()
+    {
+        return $this->hasMany(Embrion::class, 'tratamiento_id');
     }
 }

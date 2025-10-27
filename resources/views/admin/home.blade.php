@@ -62,17 +62,17 @@
         <div class="flex-1">
             <label class="form-label">Buscar Personal</label>
             <div class="relative">
-                <input type="text" 
-                       name="search"
-                       value="{{ request('search') }}"
-                       class="form-input pl-10" 
-                       placeholder="Buscar por nombre o email...">
+                <input type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    class="form-input pl-10"
+                    placeholder="Buscar por nombre o email...">
                 <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
             </div>
         </div>
-        
+
         <!-- Filtro por Rol -->
         <div class="w-full md:w-48">
             <label class="form-label">Rol</label>
@@ -83,7 +83,7 @@
                 <option value="admin" {{ request('rol') == 'admin' ? 'selected' : '' }}>Administrador</option>
             </select>
         </div>
-        
+
         <!-- Filtro por Estado -->
         <div class="w-full md:w-48">
             <label class="form-label">Estado</label>
@@ -93,7 +93,7 @@
                 <option value="inactivo" {{ request('estado') == 'inactivo' ? 'selected' : '' }}>Inactivo</option>
             </select>
         </div>
-        
+
         <!-- Botón Limpiar y Buscar -->
         <div class="flex items-end gap-2">
             <button type="submit" class="btn-primary">
@@ -147,13 +147,13 @@
                     <td class="text-center align-middle w-20">
                         <div class="flex items-center justify-center h-full min-h-[48px]">
                             @if($usuario->activo)
-                                <button type="button" class="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 transition-colors duration-150 shadow-sm border border-red-100 text-base" title="Dar de Baja" onclick="openModalBajaPersonal('{{ $usuario->id }}', '{{ route('admin.baja_user', $usuario->id) }}', '{{ $usuario->nombre }}', '{{ $usuario->apellido }}', '{{ $usuario->rol->nombre ?? 'Sin rol' }}')">
-                                    <i class="fas fa-user-slash text-red-600"></i>
-                                </button>
+                            <button type="button" class="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 transition-colors duration-150 shadow-sm border border-red-100 text-base" title="Dar de Baja" onclick="openModalBajaPersonal('{{ $usuario->id }}', '{{ route('admin.baja_user', $usuario->id) }}', '{{ $usuario->nombre }}', '{{ $usuario->apellido }}', '{{ $usuario->rol->nombre ?? 'Sin rol' }}')">
+                                <i class="fas fa-user-slash text-red-600"></i>
+                            </button>
                             @else
-                                <button type="button" class="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 transition-colors duration-150 shadow-sm border border-red-100 text-base" title="Dar de Alta" onclick="openModalAltaPersonal('{{ $usuario->id }}', '{{ route('admin.alta_user', $usuario->id) }}', '{{ $usuario->nombre }}', '{{ $usuario->apellido }}', '{{ $usuario->rol->nombre ?? 'Sin rol' }}')">
-                                    <i class="fas fa-user-check text-green-600 text-lg"></i>
-                                </button>
+                            <button type="button" class="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 transition-colors duration-150 shadow-sm border border-red-100 text-base" title="Dar de Alta" onclick="openModalAltaPersonal('{{ $usuario->id }}', '{{ route('admin.alta_user', $usuario->id) }}', '{{ $usuario->nombre }}', '{{ $usuario->apellido }}', '{{ $usuario->rol->nombre ?? 'Sin rol' }}')">
+                                <i class="fas fa-user-check text-green-600 text-lg"></i>
+                            </button>
                             @endif
                         </div>
                     </td>
@@ -162,7 +162,7 @@
             </tbody>
         </table>
     </div>
-    
+
     <!-- Paginación real -->
     <div class="flex items-center justify-between px-6 py-4 border-t border-gray-200">
         <div class="text-sm text-gray-500">
