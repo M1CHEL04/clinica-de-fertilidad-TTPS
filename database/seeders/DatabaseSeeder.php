@@ -15,5 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call(\Database\Seeders\ObjetivoSeeder::class);
         $this->call(\Database\Seeders\trabajadoresSeeder::class);
         $this->call(\Database\Seeders\TipoMedicacionSeeder::class);
+        $this->call(\Database\Seeders\TipoEstadoOvocitoSeeder::class);
+        $this->call(\Database\Seeders\TipoFertilizacionSeeder::class);
     }
 }

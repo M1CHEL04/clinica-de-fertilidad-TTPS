@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('guardados', function (Blueprint $table) {
+        Schema::create('tipos_fertilizacion', function (Blueprint $table) {
             $table->id();
-            $table->string('id_tanque')->unique();
-            $table->string('id_rack')->unique();
-            $table->timestamps();
+            $table->string('nombre')->unique();
         });
     }
 
@@ -24,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('guardados');
+        Schema::dropIfExists('tipos_fertilizacion');
     }
 };

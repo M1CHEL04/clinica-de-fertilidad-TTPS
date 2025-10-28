@@ -1,9 +1,7 @@
 <?php
 
-use App\Models\EstadoEmbrion;
 use App\Models\Guardado;
-use App\Models\Semen;
-use App\Models\Tratamiento;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,16 +13,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('embriones', function (Blueprint $table) {
+        Schema::create('ovocitos', function (Blueprint $table) {
             $table->id();
             $table->string('identificador')->unique();
-            $table->foreignIdFor(Guardado::class);
-            $table->foreignIdFor(Tratamiento::class);
-            $table->foreignIdFor(EstadoEmbrion::class);
-            $table->string('dni_donante')->nullable();
-
-            //hay que ver como se guarda el PGT
-            $table->string('urlPGT')->nullable();
+            $table->string('calidad_morfologica');
+            $table->foreignIdFor(Guardado::class)->nullable();
+            $table->foreignIdFor(User::class, 'paciente_id');
+            $table->foreignIdFor(\App\Models\Puncion::class, 'puncion_id');
+            $table->foreignIdFor(\App\Models\EstadoOvocito::class, 'estado_ovocito_id')->nullable();
             $table->timestamps();
         });
     }
@@ -34,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('embriones');
+        Schema::dropIfExists('ovocitos');
     }
 };

@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
+use App\Models\RolTrabajador;
+use App\Models\HistoriaClinica;
+use App\Models\Ovocito;
+use App\Models\Puncion;
 
 class User extends Authenticatable
 {
@@ -55,4 +59,24 @@ class User extends Authenticatable
     {
         return $this->hasOne(HistoriaClinica::class, 'paciente_id');
     }
-}
+
+    public function ovocitos()
+    {
+        return $this->hasMany(Ovocito::class, 'paciente_id');
+    }
+
+    function puncionesOperador()
+    {
+        return $this->hasMany(Puncion::class, 'operador_id');
+    }
+
+    public function fertilizacionesPaciente()
+    {
+        return $this->hasMany(Fertilizacion::class, 'paciente_id');
+    }
+
+    public function fertilizacionesMedico()
+    {
+        return $this->hasMany(Fertilizacion::class, 'medico_id');
+    }
+};
