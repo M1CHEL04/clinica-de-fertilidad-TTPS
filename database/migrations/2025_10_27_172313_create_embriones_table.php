@@ -21,6 +21,8 @@ return new class extends Migration
             $table->foreignIdFor(Guardado::class);
             $table->foreignIdFor(Tratamiento::class);
             $table->foreignIdFor(EstadoEmbrion::class);
+            $table->enum('calidad_morfologica', [1, 2, 3, 4, 5]);
+
             $table->string('dni_donante')->nullable();
 
             //hay que ver como se guarda el PGT
