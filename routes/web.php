@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegistroController;
 use App\Http\Middleware\AuthMiddleware;
+use App\Http\Controllers\MedicoController;
 
 ## Web Routes
 
@@ -35,6 +36,15 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
     Route::get('/home', function () {
         return view('medico.home');
     })->name('medico.home');
+
+    
+    Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
+        ->name('medico.tratamiento.detalle');
+
+        
+Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\MedicoController::class, 'tratamientosDeUnPaciente']);
+
+
 });
 ###########################################################
 # Rutas para el admin
@@ -50,11 +60,13 @@ Route::prefix('admin')->middleware([AuthMiddleware::class . ':admin'])->group(fu
 ###########################################################
 # Rutas para el operador
 ###########################################################
-Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->group(function () {
-    Route::get('/home', function () {
-        return view('operador.home');  
-    })->name('operador.home');
+
+
+Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(function () {
+    Route::get('/home', [MedicoController::class, 'misPacientes'])->name('medico.home');
 });
+
+
 
 ###########################################################
 # Rutas para el jefe
@@ -67,4 +79,3 @@ Route::prefix('jefe')->middleware([AuthMiddleware::class . ':jefe'])->group(func
 
 
 Route::get('/register', [RegistroController::class, 'show'])->name('register');
-

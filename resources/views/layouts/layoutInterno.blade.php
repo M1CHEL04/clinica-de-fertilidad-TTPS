@@ -51,10 +51,13 @@
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                     <i class="fas fa-user mr-2 text-gray-400"></i>Mi Perfil
                                 </a>
-                                <div class="border-t border-gray-100 my-1"></div>
-                                <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                    <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
-                                </a>
+                               <form method="POST" action="{{ route('logout') }}" class="w-full">
+                                        @csrf
+                                        <button type="submit" 
+                                        class="w-full text-left block px-3 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 text-sm">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
+                                        </button>
+                                    </form>
                             </div>
                         </div>
                     </div>
