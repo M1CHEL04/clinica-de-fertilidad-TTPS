@@ -16,15 +16,15 @@ class AdminController extends Controller
         // Filtros
         if ($request->filled('search')) {
             $search = $request->input('search');
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'like', "%$search%")
-                  ->orWhere('apellido', 'like', "%$search%")
-                  ->orWhere('mail', 'like', "%$search%");
+                    ->orWhere('apellido', 'like', "%$search%")
+                    ->orWhere('mail', 'like', "%$search%");
             });
         }
         if ($request->filled('rol')) {
             $rol = $request->input('rol');
-            $query->whereHas('rol', function($q) use ($rol) {
+            $query->whereHas('rol', function ($q) use ($rol) {
                 $q->where('nombre', $rol);
             });
         }
@@ -37,19 +37,27 @@ class AdminController extends Controller
 
         // Estadísticas generales (sin filtros)
         $totalActivo = User::where('activo', 1)->count();
-        $medicos = User::whereHas('rol', function($q){ $q->where('nombre', 'medico'); })->where('activo', 1)->count();
-        $operadores = User::whereHas('rol', function($q){ $q->where('nombre', 'operador'); })->where('activo', 1)->count();
-        $admins = User::whereHas('rol', function($q){ $q->where('nombre', 'admin'); })->where('activo', 1)->count();
+        $medicos = User::whereHas('rol', function ($q) {
+            $q->where('nombre', 'medico');
+        })->where('activo', 1)->count();
+        $operadores = User::whereHas('rol', function ($q) {
+            $q->where('nombre', 'operador');
+        })->where('activo', 1)->count();
+        $admins = User::whereHas('rol', function ($q) {
+            $q->where('nombre', 'admin');
+        })->where('activo', 1)->count();
 
         return view('admin.home', compact('usuarios', 'totalActivo', 'medicos', 'operadores', 'admins'));
     }
 
-    public function create_user(){
+    public function create_user()
+    {
         $roles = RolTrabajador::where('id', '!=', 1)->get();
         return view('admin.createUser', compact('roles'));
     }
 
-    public function store_user(Request $request){
+    public function store_user(Request $request)
+    {
         $request->validate([
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
@@ -57,7 +65,7 @@ class AdminController extends Controller
             'rol' => 'required',
         ]);
 
-        try{
+        try {
             if (User::where('mail', $request->input('email'))->exists()) {
                 return redirect()->back()->withErrors(['email' => 'El correo electrónico ya está en uso.'])->withInput();
             }
@@ -73,14 +81,13 @@ class AdminController extends Controller
 
             // Enviar correo al usuario con su contraseña temporal
             return redirect()->route('admin.home')->with('success', 'Usuario creado exitosamente.');
-
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             return redirect()->route('admin.home')->with('error', 'Ocurrió un error al crear el usuario.');
         }
-
     }
 
-    public function baja_user(Request $request){
+    public function baja_user(Request $request)
+    {
         try {
             $user = User::find($request->user_id);
             if ($user) {
@@ -90,10 +97,11 @@ class AdminController extends Controller
             }
         } catch (\Exception $e) {
             return redirect()->route('admin.home')->with('error', 'Ocurrió un error al dar de baja el usuario.');
-        }   
+        }
     }
-    
-    public function alta_user(Request $request){
+
+    public function alta_user(Request $request)
+    {
         try {
             $user = User::find($request->user_id);
             if ($user) {
@@ -103,6 +111,6 @@ class AdminController extends Controller
             }
         } catch (\Exception $e) {
             return redirect()->route('admin.home')->with('error', 'Ocurrió un error al dar de alta el usuario.');
-        }   
+        }
     }
 }
