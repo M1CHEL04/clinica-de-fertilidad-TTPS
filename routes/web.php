@@ -41,8 +41,14 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
     Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
         ->name('medico.tratamiento.detalle');
 
+    Route::get('/tratamientos/{id}/monitoreos', [MedicoController::class, 'monitoreos'])
+     ->name('monitoreos');
+    
+     Route::post('/tratamientos/monitoreos', [MedicoController::class, 'storeMonitoreo'])
+     ->name('monitoreos.store');
+
         
-Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\MedicoController::class, 'tratamientosDeUnPaciente']);
+    Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\MedicoController::class, 'tratamientosDeUnPaciente']);
 
 
 });

@@ -56,12 +56,7 @@
                         {{ \Carbon\Carbon::parse($tratamiento->fecha_inicio)->format('d/m/Y') }}
                     </p>
                 </div>
-                <div>
-                    <p class="font-medium text-gray-600">Última actualización:</p>
-                    <p class="text-gray-800">
-                        {{ \Carbon\Carbon::parse($tratamiento->ultima_actualizacion)->format('d/m/Y') }}
-                    </p>
-                </div>
+                
             </div>
         </div>
 
@@ -78,48 +73,14 @@
                     <p class="text-gray-800">{{$tratamiento->objetivo}}</p>
                 </div>
                 <div>
-                    <p class="font-medium text-gray-600">Otra info:</p>
-                    <p class="text-gray-800">Agregar Info</p>
+                    <p class="font-medium text-gray-600">Etapa:</p>
+                    <p class="text-gray-800">{{$tratamiento->etapa}}</p>
                 </div>
                 
             </div>
         </div>
 
-        <!-- 📅 Consultas realizadas -->
-        <div class="card p-6">
-            <h3 class="text-lg font-semibold mb-4 text-gray-900 flex items-center">
-                <i class="fas fa-notes-medical text-green-600 mr-2"></i> Consultas y Seguimiento
-            </h3>
-
-            <div class="overflow-x-auto">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Tipo</th>
-                            <th>Notas</th>
-                            <th>Profesional</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($consultas as $consulta)
-                            <tr>
-                                <td>{{ \Carbon\Carbon::parse($consulta->fecha)->format('d/m/Y') }}</td>
-                                <td>{{ $consulta->tipo }}</td>
-                                <td>{{ $consulta->notas }}</td>
-                                <td>{{ $consulta->profesional }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="text-center text-gray-500">
-                                    No hay consultas registradas.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        
 
         <!-- 🔮 Próximas acciones -->
         
@@ -163,11 +124,13 @@
                     <i class="fas fa-user-md"></i> Cargar antecedentes
                 </button>
 
-                <button class="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50" disabled>
-                    <i class="fas fa-heartbeat"></i> Cargar monitoreos
-                </button>
+                <a href="{{ route('monitoreos', $tratamiento->id) }}"
+                class="btn-primary w-full flex items-center justify-center gap-2">
+                    <i class="fas fa-heartbeat"></i> Seccion de monitoreos
+                </a>
 
-                <button class="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50" disabled>
+
+                <button class="btn-primary w-full flex items-center justify-center gap-2" >
                     <i class="fas fa-seedling"></i> Cargar post-transferencia
                 </button>
 

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
+use App\Models\Tratamiento;
+use App\Models\Monitoreo;
+use Illuminate\Http\Request;
 
 class MedicoController extends Controller
 {
@@ -44,6 +47,7 @@ class MedicoController extends Controller
             ->join('usuarios', 'historias_clinica.paciente_id', '=', 'usuarios.id')
             ->join('estados_tratamiento', 'tratamientos.estado_tratamiento_id', '=', 'estados_tratamiento.id')
             ->join('objetivos', 'objetivos.id', '=', 'tratamientos.objetivo_id')
+            ->join('etapa', 'etapa.id', '=', 'tratamientos.etapa_id')
             ->select(
                 'tratamientos.id',
                 'objetivos.nombre as objetivo',
@@ -53,6 +57,7 @@ class MedicoController extends Controller
                 'usuarios.dni',
                 'usuarios.fecha_nacimiento',
                 'estados_tratamiento.nombre as estado_tratamiento',
+                'etapa.nombre as etapa',
                 'tratamientos.created_at as fecha_inicio',
                 'tratamientos.updated_at as ultima_actualizacion'
             )
@@ -93,4 +98,31 @@ class MedicoController extends Controller
 
     return response()->json(['tratamientos' => $tratamientos]);
     }
+
+    public function monitoreos($id)
+{
+    $tratamiento = Tratamiento::findOrFail($id);
+
+    // ejemplo: traer monitoreos asociados
+    $monitoreos = Monitoreo::where('tratamiento_id', $id)->orderBy('created_at', 'desc')->get();
+
+    return view('medico.monitoreos', compact('tratamiento', 'monitoreos'));
+}
+
+public function storeMonitoreo(Request $request)
+{
+    $validated = $request->validate([
+        'tratamiento_id' => 'required|exists:tratamientos,id',
+        'observacion'    => 'required|string',
+    ]);
+
+    Monitoreo::create([
+        'tratamiento_id' => $validated['tratamiento_id'],
+        'observacion'    => $validated['observacion'],
+    ]);
+
+    return back()->with('success', 'Monitoreo cargado correctamente');
+}
+
+
 }

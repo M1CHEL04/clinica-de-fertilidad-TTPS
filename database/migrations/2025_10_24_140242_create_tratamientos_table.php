@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignIdFor(\App\Models\Objetivo::class, 'objetivo_id');
             $table->foreignIdFor(\App\Models\EstadoTratamiento::class, 'estado_tratamiento_id');
             $table->foreignIdFor(\App\Models\User::class, 'medico_id');
+            $table->foreignIdFor(\App\Models\Etapa::class, 'etapa_id')->nullable();
             $table->boolean('beta')->nullable();
             $table->boolean('saco')->nullable();
             $table->boolean('embrion')->nullable();
