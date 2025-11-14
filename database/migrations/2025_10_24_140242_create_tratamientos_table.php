@@ -22,6 +22,7 @@ return new class extends Migration
             $table->boolean('saco')->nullable();
             $table->boolean('embrion')->nullable();
             $table->boolean('vivo')->nullable();
+            $table->string('consentimiento_pdf')->nullable();
             $table->timestamps();
         });
     }

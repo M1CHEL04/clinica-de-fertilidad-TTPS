@@ -116,9 +116,10 @@
                     <i class="fas fa-vials"></i> Recetar estudios
                 </button>
 
-                <button class="btn-primary w-full flex items-center justify-center gap-2">
-                    <i class="fas fa-file-upload"></i> Cargar estudios
-                </button>
+                <a href="{{ route('tratamiento.cargar-estudios', $tratamiento->id) }}"
+                class="btn-primary w-full flex items-center justify-center gap-2">
+                    <i class="fas fa-file-upload"></i> Seccion Estudios
+                </a>
 
                 <button class="btn-primary w-full flex items-center justify-center gap-2">
                     <i class="fas fa-user-md"></i> Cargar antecedentes
@@ -137,6 +138,10 @@
                 <button class="btn-primary w-full flex items-center justify-center gap-2">
                     <i class="fas fa-bullseye"></i> Cargar objetivo
                 </button>
+                <a href="{{ route('tratamiento.protocolo', $tratamiento->id) }}"
+                class="btn-primary w-full flex items-center justify-center gap-2">
+                    <i class="fas fa-dna"></i> Protocolo De Estimulacion
+                </a>
             </div>
         </div>
 

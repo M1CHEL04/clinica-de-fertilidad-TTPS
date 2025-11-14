@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignIdFor(TipoMedicacion::class);
             $table->string('dosis');
             $table->string('tiempo');
+            $table->string('droga');
             $table->timestamps();
         });
     }
