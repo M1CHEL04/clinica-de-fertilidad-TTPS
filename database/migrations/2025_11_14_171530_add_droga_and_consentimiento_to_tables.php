@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        // Agregar columna 'droga' a protocolos_estimulacion
+        Schema::table('protocolos_estimulacion', function (Blueprint $table) {
+            $table->string('droga')->nullable()->after('tiempo');
+        });
+
+        // Agregar columna 'consentimiento_pdf' a tratamientos
+        Schema::table('tratamientos', function (Blueprint $table) {
+            $table->string('consentimiento_pdf')->nullable()->after('updated_at');
+        });
+    }
+
+    public function down(): void
+    {
+        // Quitar columna 'droga'
+        Schema::table('protocolos_estimulacion', function (Blueprint $table) {
+            $table->dropColumn('droga');
+        });
+
+        // Quitar columna 'consentimiento_pdf'
+        Schema::table('tratamientos', function (Blueprint $table) {
+            $table->dropColumn('consentimiento_pdf');
+        });
+    }
+};

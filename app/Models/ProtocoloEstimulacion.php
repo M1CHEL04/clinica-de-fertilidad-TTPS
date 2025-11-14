@@ -15,6 +15,7 @@ class ProtocoloEstimulacion extends Model
         'tipo_medicacion_id',
         'dosis',
         'tiempo',
+        'droga'
     ];
 
     public function tipoMedicacion()

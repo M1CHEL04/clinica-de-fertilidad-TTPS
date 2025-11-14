@@ -41,6 +41,20 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
     Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
         ->name('medico.tratamiento.detalle');
 
+    Route::get('/tratamiento/{id}/cargar-estudios', [MedicoController::class, 'cargarEstudios'])
+    ->name('tratamiento.cargar-estudios');
+
+    Route::post('/tratamientos/{id}/estudios/guardar', [MedicoController::class, 'guardarEstudios'])
+    ->name('tratamiento.guardar-estudios');
+
+    Route::get('/tratamiento/{id}/protocolo', [MedicoController::class, 'protocolo'])
+    ->name('tratamiento.protocolo');
+
+    Route::post('/tratamiento/{id}/protocolo', [MedicoController::class, 'guardarProtocolo'])
+    ->name('tratamiento.guardar-protocolo');
+
+    Route::post('/tratamiento/{id}/consentimiento', [MedicoController::class, 'subirConsentimiento'])
+    ->name('tratamiento.subir-consentimiento');
         
 Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\MedicoController::class, 'tratamientosDeUnPaciente']);
 

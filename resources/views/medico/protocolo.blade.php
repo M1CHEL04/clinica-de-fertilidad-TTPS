@@ -1,0 +1,142 @@
+@extends('layouts.layoutInterno')
+
+@section('content')
+<a href="{{ route('medico.tratamiento.detalle', $tratamiento->id) }}"
+   class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold mb-4">
+    <i class="fas fa-arrow-left"></i>
+    Volver
+</a>
+<div class="max-w-4xl mx-auto mt-10 space-y-10">
+
+    {{-- ========================= --}}
+    {{--       PROTOCOLO           --}}
+    {{-- ========================= --}}
+    <div class="bg-white shadow-md rounded-xl p-6 border">
+        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <i class="fas fa-bolt text-yellow-500"></i>
+            Protocolo de Estimulación
+        </h2>
+
+        {{-- Si ya existe un protocolo, mostrarlo --}}
+        @if($protocolo)
+            <div class="bg-green-100 p-4 rounded-md mb-4">
+                <p><strong>Tipo de medicación:</strong> {{ $protocolo->tipoMedicacion->nombre }}</p>
+                <p><strong>Dosis:</strong> {{ $protocolo->dosis }}</p>
+                <p><strong>Tiempo:</strong> {{ $protocolo->tiempo }}</p>
+                <p><strong>Droga:</strong> {{ $protocolo->droga }}</p>
+            </div>
+        @endif
+
+        {{-- Formulario para cargar protocolo --}}
+        <form method="POST" action="{{ route('tratamiento.guardar-protocolo', $tratamiento->id) }}" class="space-y-4">
+            @csrf
+
+            <div>
+                <label class="font-semibold">Tipo de medicación</label>
+                <select name="tipo_medicacion_id" class="w-full mt-1 border rounded-md p-2">
+                    <option value="">Seleccione…</option>
+                    @foreach($tiposMedicacion as $tipo)
+                        <option value="{{ $tipo->id }}"
+                            @if($protocolo && $protocolo->tipo_medicacion_id == $tipo->id) selected @endif>
+                            {{ $tipo->nombre }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label class="font-semibold">Dosis</label>
+                <input type="text" name="dosis" class="w-full mt-1 border rounded-md p-2"
+                    value="{{ $protocolo->dosis ?? '' }}">
+            </div>
+
+            <div>
+                <label class="font-semibold">Tiempo (días)</label>
+                <input type="number" name="tiempo" class="w-full mt-1 border rounded-md p-2"
+                    value="{{ $protocolo->tiempo ?? '' }}">
+            </div>
+
+            <div>
+                <label class="font-semibold">Droga</label>
+                <input type="text" name="droga" class="w-full mt-1 border rounded-md p-2"
+                    value="{{ $protocolo->droga ?? '' }}">
+            </div>
+
+            <button 
+                class="bg-blue-600 text-white px-4 py-2 rounded-lg w-full 
+                    @if($protocolo) opacity-50 cursor-not-allowed @endif"
+                @if($protocolo) disabled @endif
+            >
+                Guardar protocolo
+            </button>
+        </form>
+    </div>
+
+
+
+    {{-- ========================= --}}
+    {{--  CONSENTIMIENTO INFORMADO --}}
+    {{-- ========================= --}}
+    <div class="bg-white shadow-md rounded-xl p-6 border">
+        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <i class="fas fa-file-pdf text-red-500"></i>
+            Consentimiento Informado
+        </h2>
+
+        @if($tratamiento->consentimiento_pdf)
+            <div class="bg-green-100 p-4 rounded-md mb-4">
+                <p class="font-semibold">PDF cargado correctamente.</p>
+                <a href="{{ asset('storage/'.$tratamiento->consentimiento_pdf) }}"
+                   target="_blank"
+                   class="text-blue-600 underline">
+                    Ver PDF
+                </a>
+            </div>
+        @else
+            <p class="mb-4 text-gray-600">Aún no se ha cargado el consentimiento.</p>
+        @endif
+
+        <form action="{{ route('tratamiento.subir-consentimiento', $tratamiento->id) }}"
+              method="POST"
+              enctype="multipart/form-data"
+              class="space-y-4">
+            @csrf
+
+            <div>
+                <label class="font-semibold">Subir PDF firmado</label>
+                <input type="file" name="consentimiento"
+                       accept="application/pdf"
+                       class="w-full mt-1 border rounded-md p-2">
+            </div>
+
+            <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg w-full">
+                Subir consentimiento
+            </button>
+        </form>
+    </div>
+
+
+
+    {{-- ========================= --}}
+    {{--    ORDEN MÉDICA (LOCK)    --}}
+    {{-- ========================= --}}
+    <div class="bg-white shadow-md rounded-xl p-6 border">
+        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <i class="fas fa-prescription-bottle-alt text-blue-500"></i>
+            Orden Médica
+        </h2>
+
+        @if(!$tratamiento->consentimiento_pdf)
+            <button class="bg-gray-400 text-white px-4 py-2 rounded-lg w-full opacity-60 cursor-not-allowed">
+                Subí el consentimiento informado para habilitar la orden médica
+            </button>
+        @else
+            <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg w-full">
+                Generar orden médica
+            </button>
+        @endif
+    </div>
+
+</div>
+
+@endsection
