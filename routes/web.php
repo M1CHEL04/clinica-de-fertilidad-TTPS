@@ -5,6 +5,7 @@ use App\Http\Controllers\RegistroController;
 use App\Http\Middleware\AuthMiddleware;
 use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\TerminosController;
+use App\Http\Controllers\EstudiosController;
 
 ## Web Routes
 
@@ -106,11 +107,12 @@ Route::get('/register', [RegistroController::class, 'show'])->name('register');
 # Rutas de prueba primer consulta
 ############################################################
 
-Route::get('/consulta', function () {
-    return view('medico.primerConsulta'); 
-})->name('consulta.index');
+Route::get('/consulta', [EstudiosController::class, 'index'])->name('consulta.index');
 
 Route::post('/consulta', [App\Http\Controllers\ConsultaController::class, 'store'])
     ->name('consulta.store');
 
 Route::get('/terminos/search', [TerminosController::class, 'search'])->name('terminos.search');
+
+
+Route::get('/estudios', [EstudiosController::class, 'index']);

@@ -10,15 +10,14 @@
         <!-- Objetivo de la consulta -->
         <div class="mb-3">
             <label for="objetivo" class="form-label">Objetivo de la consulta</label>
-            <textarea name="objetivo" id="objetivo" class="form-control" required></textarea>
+                <select name="objetivo" id="objetivo" class="form-select">
+                    <option value="Gametos Propios">Gametos propios</option>
+                    <option value="Esperma Donado">Esperma donado</option>
+                    <option value="Ropa">Ropa</option>
+                    <option value="Preservar">Preservar</option>
+                </select>
         </div>
 
-        <!-- Historia clínica -->
-        <h3>Historia Clínica</h3>
-        <div class="mb-3">
-            <label for="historia_clinica" class="form-label">Acceso a historia clínica</label>
-            <textarea name="historia_clinica" id="historia_clinica" class="form-control"></textarea>
-        </div>
 
         <!-- Antecedentes -->
         <h3>Antecedentes</h3>
@@ -53,11 +52,14 @@
         </div>
 
         <!-- Antecedentes familiares -->
-        <h3>Antecedentes Familiares</h3>
         <div class="mb-3">
-            <label for="familiares" class="form-label">Árbol familiar / patologías</label>
-            <textarea name="familiares" id="familiares" class="form-control"></textarea>
+            <h3>Antecedentes Familiares</h3>
+            <div id="familiares-container"></div>
+            <button type="button" id="add-familiar" class="btn btn-secondary mt-2">Añadir familiar</button>
         </div>
+
+
+
 
         <!-- Antecedentes ginecológicos -->
         <h3>Antecedentes Ginecológicos</h3>
@@ -131,25 +133,68 @@
 
         <!-- Estudios médicos -->
         <h3>Estudios Médicos</h3>
+
+
+         {{-- Estudios Ginecológicos --}}
         <div class="mb-3">
-            <label class="form-label">Seleccione estudios</label><br>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="estudios[]" value="prequirurgico" id="prequirurgico">
-                <label class="form-check-label" for="prequirurgico">Prequirúrgico</label>
+            <label for="ginecologicos" class="form-label">Estudios Ginecológicos</label>
+            <div class="d-flex">
+                <select id="ginecologicos-select" class="form-select me-2">
+                    @foreach($ginecologicos as $estudio)
+                        <option value="{{ $estudio['id'] }}">{{ $estudio['nombre'] }}</option>
+                    @endforeach
+                </select>
+                <button type="button" id="add-ginecologico" class="btn btn-outline-primary">Agregar</button>
             </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="estudios[]" value="hormonales" id="hormonales">
-                <label class="form-check-label" for="hormonales">Hormonales</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="estudios[]" value="ginecologicos" id="ginecologicos">
-                <label class="form-check-label" for="ginecologicos">Ginecológicos</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="estudios[]" value="semen" id="semen">
-                <label class="form-check-label" for="semen">Estudio de semen (si aplica)</label>
-            </div>
+            <ul id="ginecologicos-list" class="list-group mt-2"></ul>
         </div>
+
+
+
+        {{-- Estudios Hormonales --}}
+        <div class="mb-3">
+            <label for="hormonales" class="form-label">Estudios Hormonales</label>
+            <div class="d-flex">
+                <select id="hormonales-select" class="form-select me-2">
+                    @foreach($hormonales as $estudio)
+                        <option value="{{ $estudio['id'] }}">{{ $estudio['nombre'] }}</option>
+                    @endforeach
+                </select>
+                <button type="button" id="add-hormonal" class="btn btn-outline-primary">Agregar</button>
+            </div>
+            <ul id="hormonales-list" class="list-group mt-2"></ul>
+        </div>
+
+        {{-- Estudios Prequirúrgicos --}}
+        <div class="mb-3">
+            <label for="prequirurgicos" class="form-label">Estudios Prequirúrgicos</label>
+            <div class="d-flex">
+                <select id="prequirurgicos-select" class="form-select me-2">
+                    @foreach($prequirurgicos as $estudio)
+                        <option value="{{ $estudio['id'] }}">{{ $estudio['nombre'] }}</option>
+                    @endforeach
+                </select>
+                <button type="button" id="add-prequirurgico" class="btn btn-outline-primary">Agregar</button>
+            </div>
+            <ul id="prequirurgicos-list" class="list-group mt-2"></ul>
+        </div>
+
+        {{-- Estudios de Semen --}}
+        <div class="mb-3">
+            <label for="semen" class="form-label">Estudios de Semen</label>
+            <div class="d-flex">
+                <select id="semen-select" class="form-select me-2">
+                    @foreach($semen as $estudio)
+                        <option value="{{ $estudio['id'] }}">{{ $estudio['nombre'] }}</option>
+                    @endforeach
+                </select>
+                <button type="button" id="add-semen" class="btn btn-outline-primary">Agregar</button>
+            </div>
+            <ul id="semen-list" class="list-group mt-2"></ul>
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">Enviar</button>
 
         <!-- Botón enviar -->
         <button type="submit" class="btn btn-primary">Guardar Consulta</button>
@@ -158,56 +203,13 @@
 @endsection
 
 @section('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const input = document.getElementById('antecedente-input');
-    const dropdown = document.getElementById('antecedente-dropdown');
-
-    input.addEventListener('input', function () {
-        const q = input.value;
-
-        if (q.length < 3) {
-            dropdown.innerHTML = '';
-            dropdown.classList.remove('show');
-            return;
-        }
-
-        fetch(`/terminos/search?q=${encodeURIComponent(q)}&limit=10`)
-            .then(res => res.json())
-            .then(data => {
-                dropdown.innerHTML = '';
-                if (data.rows && data.rows.length > 0) {
-                    data.rows.forEach(item => {
-                        const card = document.createElement('div');
-                        card.classList.add('border', 'rounded', 'p-2', 'mb-2', 'bg-light', 'text-dark', 'cursor-pointer');
-                        card.style.cursor = 'pointer';
-                        card.textContent = item;
-                        card.addEventListener('click', () => {
-                            input.value = item;
-                            dropdown.innerHTML = '';
-                            dropdown.classList.remove('show');
-                        });
-                        dropdown.appendChild(card);
-                    });
-                    dropdown.classList.add('show');
-                } else {
-                    dropdown.classList.remove('show');
-                }
-            })
-            .catch(err => {
-                console.error("Error en fetch:", err);
-                dropdown.classList.remove('show');
-            });
-    });
-
-    document.addEventListener('click', function (e) {
-        if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-            dropdown.classList.remove('show');
-        }
-    });
-});
-</script>
+<script src="{{ asset('js/terminos.js') }}"></script>
+<script src="{{ asset('js/familiares.js') }}"></script>
+<script src="{{ asset('js/estudios.js')}}"></script>
 @endsection
+
+
+
 
 
 
