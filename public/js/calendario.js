@@ -237,7 +237,7 @@ function showAvailableTimesForDate(date) {
         timeButton.dataset.hora = horaStr; // HH:MM:SS format
 
         timeButton.addEventListener('click', function() {
-            selectTime(horaStr, timeButton);
+            selectTime(horaStr, timeButton, turno.id);
         });
 
         grid.appendChild(timeButton);
@@ -245,7 +245,7 @@ function showAvailableTimesForDate(date) {
 }
 
 // Seleccionar hora
-function selectTime(time, element) {
+function selectTime(time, element, turnoId) {
     // Limpiar selección anterior
     document.querySelectorAll('#horarios-grid button').forEach(btn => {
         btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
@@ -258,6 +258,9 @@ function selectTime(time, element) {
 
     selectedTime = time;
     document.getElementById('hora-seleccionada').value = time;
+    
+    // Establecer el ID del turno seleccionado
+    document.getElementById('turno-seleccionado').value = turnoId;
 }
 
 // Ocultar horarios
@@ -268,6 +271,7 @@ function ocultarHorarios() {
     // Limpiar selecciones
     document.getElementById('fecha-seleccionada').value = '';
     document.getElementById('hora-seleccionada').value = '';
+    document.getElementById('turno-seleccionado').value = '';
     selectedDate = null;
     selectedTime = null;
 }

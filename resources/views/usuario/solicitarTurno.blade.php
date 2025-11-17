@@ -140,6 +140,8 @@
                     </div>
 
                     <input type="hidden" name="fecha_turno" id="fecha-seleccionada" required>
+                    <input type="hidden" name="turno_id" id="turno-seleccionado" required>
+                    <input type="hidden" name="paciente_id" value="{{ Auth::user()->id }}" required>
                 </div>
 
                 <!-- Horarios disponibles -->
