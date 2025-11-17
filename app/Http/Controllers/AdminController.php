@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\RolTrabajador;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class AdminController extends Controller
 {
@@ -111,6 +113,38 @@ class AdminController extends Controller
             }
         } catch (\Exception $e) {
             return redirect()->route('admin.home')->with('error', 'Ocurrió un error al dar de alta el usuario.');
+        }
+    }
+
+    public function set_horarios(Request $request)
+    {
+        try {
+            $user = User::find($request->medico_id);
+            if ($user) {
+                $token = env('TOKEN_TURNERO');
+                $dia = $request->integer('dia_semana');
+                $response = Http::withToken($token)->post(
+                    'https://ahlnfxipnieoihruewaj.supabase.co/functions/v1/post_turnos',
+                    [
+                        'id_medico' => $user->id,
+                        'hora_inicio' => $request->hora_inicio,
+                        'hora_fin' => $request->hora_fin,
+                        'dia_semana' => $dia,
+                    ]
+                );
+
+                if (! $response->successful()) {
+                    return redirect()->route('admin.home')->with('error', 'Ocurrió un error al cargar los horarios del medico');
+                    Log::error('Error al llamar a la API', ['response' => $response->body()]);
+                }
+
+                return redirect()->route('admin.home')->with('success', 'Horarios actualizados exitosamente.');
+            } else {
+                return redirect()->route('admin.home')->with('error', 'Usuario no encontrado.');
+            }
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar horarios: ' . $e->getMessage());
+            return redirect()->route('admin.home')->with('error', 'Ocurrió un error al actualizar los horarios.');
         }
     }
 }

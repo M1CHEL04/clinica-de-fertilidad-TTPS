@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegistroController;
 use App\Http\Middleware\AuthMiddleware;
@@ -84,6 +85,7 @@ Route::prefix('admin')->middleware([AuthMiddleware::class . ':admin'])->group(fu
     Route::post('/create_user', [App\Http\Controllers\AdminController::class, 'store_user'])->name('admin.store_user');
     Route::post('/baja_user', [App\Http\Controllers\AdminController::class, 'baja_user'])->name('admin.baja_user');
     Route::post('/alta_user', [App\Http\Controllers\AdminController::class, 'alta_user'])->name('admin.alta_user');
+    Route::post('/set_horarios', [AdminController::class, 'set_horarios'])->name('admin.set_horarios');
 });
 
 ###########################################################
