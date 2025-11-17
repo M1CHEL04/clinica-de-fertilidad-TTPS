@@ -39,6 +39,7 @@ Route::post('/register', [RegistroController::class, 'store'])->name('register.s
 Route::prefix('paciente')->middleware([AuthMiddleware::class . ':paciente'])->group(function () {
     Route::get('/solicitar-turno', [TurnoController::class, 'showSolicitarTurnoForm'])->name('paciente.solicitar-turno');
     Route::post('/solicitar-turno-store', [TurnoController::class, 'storeTurno'])->name('paciente.store-turno');
+    Route::get('/turnos-libres/{id_medico}', [TurnoController::class, 'listarTurnosLibres'])->name('paciente.turnos-libres');
 });
 
 ###########################################################

@@ -133,9 +133,9 @@ class AdminController extends Controller
                     ]
                 );
 
-                if (! $response->successful()) {
-                    return redirect()->route('admin.home')->with('error', 'Ocurrió un error al cargar los horarios del medico');
+                if ($response->failed()) {
                     Log::error('Error al llamar a la API', ['response' => $response->body()]);
+                    return redirect()->route('admin.home')->with('error', 'Ocurrió un error al cargar los horarios del medico');
                 }
 
                 return redirect()->route('admin.home')->with('success', 'Horarios actualizados exitosamente.');

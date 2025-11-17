@@ -92,7 +92,7 @@
                 <!-- Selección de Profesional -->
                 <div class="mt-6">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Profesional *</label>
-                    <select name="medico_id"
+                    <select name="medico_id" id="medico_id"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         required>
                         <option value="">Seleccionar profesional</option>
@@ -164,135 +164,10 @@
     </div>
 
     <script>
-        // Variables globales
-        let currentDate = new Date();
-        let selectedDate = null;
-        let selectedTime = null;
-
-        // Horarios disponibles (se pueden obtener del backend)
-        const availableTimes = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '14:00', '14:30', '15:00', '15:30',
-            '16:00', '16:30'
-        ];
-
-        // Inicializar calendario
-        document.addEventListener('DOMContentLoaded', function() {
-            renderCalendar();
-
-            document.getElementById('prev-month').addEventListener('click', function() {
-                currentDate.setMonth(currentDate.getMonth() - 1);
-                renderCalendar();
-            });
-
-            document.getElementById('next-month').addEventListener('click', function() {
-                currentDate.setMonth(currentDate.getMonth() + 1);
-                renderCalendar();
-            });
-        });
-
-        // Renderizar calendario
-        function renderCalendar() {
-            const monthNames = [
-                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-            ];
-
-            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-            const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-            const today = new Date();
-
-            document.getElementById('calendar-month-year').textContent =
-                `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-
-            const daysContainer = document.getElementById('calendar-days');
-            daysContainer.innerHTML = '';
-
-            // Días vacíos al inicio
-            for (let i = 0; i < firstDay.getDay(); i++) {
-                const emptyDay = document.createElement('div');
-                emptyDay.className = 'h-10';
-                daysContainer.appendChild(emptyDay);
-            }
-
-            // Días del mes
-            for (let day = 1; day <= lastDay.getDate(); day++) {
-                const dayElement = document.createElement('button');
-                dayElement.type = 'button';
-                dayElement.className = 'h-10 w-10 rounded-lg text-sm font-medium transition-colors hover:bg-blue-100';
-                dayElement.textContent = day;
-
-                const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-
-                // Deshabilitar días pasados y fines de semana
-                if (dayDate < today.setHours(0, 0, 0, 0) || dayDate.getDay() === 0 || dayDate.getDay() === 6) {
-                    dayElement.disabled = true;
-                    dayElement.className += ' text-gray-400 cursor-not-allowed';
-                } else {
-                    dayElement.className += ' text-gray-700 hover:text-blue-600';
-                    dayElement.addEventListener('click', function() {
-                        selectDate(dayDate, dayElement);
-                    });
-                }
-
-                daysContainer.appendChild(dayElement);
-            }
-        }
-
-        // Seleccionar fecha
-        function selectDate(date, element) {
-            // Limpiar selección anterior
-            document.querySelectorAll('#calendar-days button').forEach(btn => {
-                btn.classList.remove('bg-blue-600', 'text-white');
-                btn.classList.add('text-gray-700');
-            });
-
-            // Marcar nueva selección
-            element.classList.add('bg-blue-600', 'text-white');
-            element.classList.remove('text-gray-700');
-
-            selectedDate = date;
-            document.getElementById('fecha-seleccionada').value = date.toISOString().split('T')[0];
-
-            // Mostrar horarios
-            showAvailableTimes();
-        }
-
-        // Mostrar horarios disponibles
-        function showAvailableTimes() {
-            const container = document.getElementById('horarios-container');
-            const grid = document.getElementById('horarios-grid');
-
-            container.classList.remove('hidden');
-            grid.innerHTML = '';
-
-            availableTimes.forEach(time => {
-                const timeButton = document.createElement('button');
-                timeButton.type = 'button';
-                timeButton.className =
-                    'p-2 text-sm border border-gray-300 rounded-lg hover:border-blue-500 hover:text-blue-600 transition-colors';
-                timeButton.textContent = time;
-
-                timeButton.addEventListener('click', function() {
-                    selectTime(time, timeButton);
-                });
-
-                grid.appendChild(timeButton);
-            });
-        }
-
-        // Seleccionar hora
-        function selectTime(time, element) {
-            // Limpiar selección anterior
-            document.querySelectorAll('#horarios-grid button').forEach(btn => {
-                btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
-                btn.classList.add('border-gray-300');
-            });
-
-            // Marcar nueva selección
-            element.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
-            element.classList.remove('border-gray-300');
-
-            selectedTime = time;
-            document.getElementById('hora-seleccionada').value = time;
-        }
+        // Variable global para la URL base de turnos libres
+        window.turnosLibresBaseUrl = '{{ url('/paciente/turnos-libres') }}';
     </script>
+
+    <!-- Importar archivo JavaScript del calendario -->
+    <script src="{{ asset('js/calendario.js') }}"></script>
 @endsection
