@@ -9,7 +9,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-       
+
         // Tabla de usuarios (unificada)
         Schema::create('usuarios', function (Blueprint $table) {
             $table->id();
@@ -24,6 +24,11 @@ return new class extends Migration
             // 🔥 Nuevos campos unificados
             $table->string('dni')->unique()->nullable();
             $table->date('fecha_nacimiento')->nullable();
+            $table->string('ocupacion')->nullable();
+
+            // 🏥 Campos de obra social
+            $table->unsignedBigInteger('obra_social_id')->nullable();
+            $table->string('numero_afiliado')->nullable();
 
             // 🔗 Relación al rol
             $table->foreignId('rol_id')->nullable()

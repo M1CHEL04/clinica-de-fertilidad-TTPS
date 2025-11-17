@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegistroController;
 use App\Http\Middleware\AuthMiddleware;
 use App\Http\Controllers\MedicoController;
-
+use App\Http\Controllers\TurnoController;
+use Illuminate\Support\Facades\Http;
 ## Web Routes
 
 ###########################################################
@@ -20,7 +21,9 @@ Route::get('/tratamientos', function () {
     return view('usuario.tratamientos');
 })->name('tratamientos');
 Route::get('/registro', function () {
-    return view('usuario.register');
+    $response = Http::withoutVerifying()->get('https://ueozxvwsckonkqypfasa.supabase.co/functions/v1/getObrasSociales');
+    $obrasSociales = $response->json()['data'];
+    return view('usuario.register', compact('obrasSociales'));
 })->name('registro');
 Route::get('/login', function () {
     return view('usuario.login');
@@ -30,6 +33,14 @@ Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logou
 Route::post('/register', [RegistroController::class, 'store'])->name('register.store');
 
 ###########################################################
+# Rutas para el paciente
+###########################################################
+Route::prefix('paciente')->middleware([AuthMiddleware::class . ':paciente'])->group(function () {
+    Route::get('/solicitar-turno', [TurnoController::class, 'showSolicitarTurnoForm'])->name('paciente.solicitar-turno');
+    Route::post('/solicitar-turno-store', [TurnoController::class, 'storeTurno'])->name('paciente.store-turno');
+});
+
+###########################################################
 # Rutas para el medico
 ###########################################################
 Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(function () {
@@ -37,34 +48,32 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
         return view('medico.home');
     })->name('medico.home');
 
-    
+
     Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
         ->name('medico.tratamiento.detalle');
 
     Route::get('/tratamientos/{id}/monitoreos', [MedicoController::class, 'monitoreos'])
-     ->name('monitoreos');
-    
-     Route::post('/tratamientos/monitoreos', [MedicoController::class, 'storeMonitoreo'])
-     ->name('monitoreos.store');
+        ->name('monitoreos');
+
+    Route::post('/tratamientos/monitoreos', [MedicoController::class, 'storeMonitoreo'])
+        ->name('monitoreos.store');
 
     Route::get('/tratamiento/{id}/cargar-estudios', [MedicoController::class, 'cargarEstudios'])
-    ->name('tratamiento.cargar-estudios');
+        ->name('tratamiento.cargar-estudios');
 
     Route::post('/tratamientos/{id}/estudios/guardar', [MedicoController::class, 'guardarEstudios'])
-    ->name('tratamiento.guardar-estudios');
+        ->name('tratamiento.guardar-estudios');
 
     Route::get('/tratamiento/{id}/protocolo', [MedicoController::class, 'protocolo'])
-    ->name('tratamiento.protocolo');
+        ->name('tratamiento.protocolo');
 
     Route::post('/tratamiento/{id}/protocolo', [MedicoController::class, 'guardarProtocolo'])
-    ->name('tratamiento.guardar-protocolo');
+        ->name('tratamiento.guardar-protocolo');
 
     Route::post('/tratamiento/{id}/consentimiento', [MedicoController::class, 'subirConsentimiento'])
-    ->name('tratamiento.subir-consentimiento');
-        
+        ->name('tratamiento.subir-consentimiento');
+
     Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\MedicoController::class, 'tratamientosDeUnPaciente']);
-
-
 });
 ###########################################################
 # Rutas para el admin
@@ -93,7 +102,7 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
 ###########################################################
 Route::prefix('jefe')->middleware([AuthMiddleware::class . ':jefe'])->group(function () {
     Route::get('/home', function () {
-        return view('jefe.home');  
+        return view('jefe.home');
     })->name('jefe.home');
 });
 
