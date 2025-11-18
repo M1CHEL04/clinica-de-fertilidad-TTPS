@@ -142,7 +142,7 @@ class MedicoController extends Controller
     public function protocolo($id)
     {
         $tratamiento = Tratamiento::findOrFail($id);
-        $protocolo = ProtocoloEstimulacion::where('tratamiento_id', $id)->first();
+        $protocolo = ProtocoloEstimulacion::where('tratamiento_id', $id)->get();
         $tiposMedicacion = TipoMedicacion::all();
 
         return view('medico.protocolo', compact('tratamiento', 'protocolo', 'tiposMedicacion'));

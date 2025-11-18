@@ -18,12 +18,16 @@
         </h2>
 
         {{-- Si ya existe un protocolo, mostrarlo --}}
-        @if($protocolo)
-            <div class="bg-green-100 p-4 rounded-md mb-4">
-                <p><strong>Tipo de medicación:</strong> {{ $protocolo->tipoMedicacion->nombre }}</p>
-                <p><strong>Dosis:</strong> {{ $protocolo->dosis }}</p>
-                <p><strong>Tiempo:</strong> {{ $protocolo->tiempo }}</p>
-                <p><strong>Droga:</strong> {{ $protocolo->droga }}</p>
+        @if($protocolo->count() > 0)
+            <div class="space-y-3 mb-4">
+                @foreach($protocolo as $med)
+                    <div class="bg-green-100 p-4 rounded-md border border-green-300">
+                        <p><strong>Tipo:</strong> {{ $med->tipoMedicacion->nombre }}</p>
+                        <p><strong>Dosis:</strong> {{ $med->dosis }}</p>
+                        <p><strong>Tiempo:</strong> {{ $med->tiempo }}</p>
+                        <p><strong>Droga:</strong> {{ $med->droga }}</p>
+                    </div>
+                @endforeach
             </div>
         @endif
 
@@ -36,38 +40,28 @@
                 <select name="tipo_medicacion_id" class="w-full mt-1 border rounded-md p-2">
                     <option value="">Seleccione…</option>
                     @foreach($tiposMedicacion as $tipo)
-                        <option value="{{ $tipo->id }}"
-                            @if($protocolo && $protocolo->tipo_medicacion_id == $tipo->id) selected @endif>
-                            {{ $tipo->nombre }}
-                        </option>
+                        <option value="{{ $tipo->id }}">{{ $tipo->nombre }}</option>
                     @endforeach
                 </select>
             </div>
 
             <div>
                 <label class="font-semibold">Dosis</label>
-                <input type="text" name="dosis" class="w-full mt-1 border rounded-md p-2"
-                    value="{{ $protocolo->dosis ?? '' }}">
+                <input type="text" name="dosis" class="w-full mt-1 border rounded-md p-2">
             </div>
 
             <div>
                 <label class="font-semibold">Tiempo (días)</label>
-                <input type="number" name="tiempo" class="w-full mt-1 border rounded-md p-2"
-                    value="{{ $protocolo->tiempo ?? '' }}">
+                <input type="number" name="tiempo" class="w-full mt-1 border rounded-md p-2">
             </div>
 
             <div>
                 <label class="font-semibold">Droga</label>
-                <input type="text" name="droga" class="w-full mt-1 border rounded-md p-2"
-                    value="{{ $protocolo->droga ?? '' }}">
+                <input type="text" name="droga" class="w-full mt-1 border rounded-md p-2">
             </div>
 
-            <button 
-                class="bg-blue-600 text-white px-4 py-2 rounded-lg w-full 
-                    @if($protocolo) opacity-50 cursor-not-allowed @endif"
-                @if($protocolo) disabled @endif
-            >
-                Guardar protocolo
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg w-full">
+                Agregar medicación
             </button>
         </form>
     </div>
