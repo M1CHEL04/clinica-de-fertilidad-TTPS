@@ -15,7 +15,8 @@ class MedicoController extends Controller
     public function misPacientes()
     {
         $medicoId = session('user_id');
-    
+        $rol_id = session('rol');
+        
 
         // Trae pacientes con tratamientos del médico logueado
         $pacientes = DB::table('tratamientos')
@@ -39,12 +40,13 @@ class MedicoController extends Controller
 
         
 
-        return view('medico.home', compact('pacientes'));
+        return view('medico.home', compact('pacientes', 'rol_id'));
     }
 
     public function detalleTratamiento($id)
     {
         // ✅ Trae la info completa del tratamiento
+        $rol_id = session('rol');
         $tratamiento = DB::table('tratamientos')
             ->join('historias_clinica', 'tratamientos.historia_clinica_id', '=', 'historias_clinica.id')
             ->join('usuarios', 'historias_clinica.paciente_id', '=', 'usuarios.id')
@@ -77,7 +79,7 @@ class MedicoController extends Controller
         }
 
         // ✅ Evita error si no hay consultas (pasa array vacío)
-        return view('medico.detalleTratamiento', compact('tratamiento', 'consultas'));
+        return view('medico.detalleTratamiento', compact('tratamiento', 'consultas', 'rol_id'));
     }
 
     public function tratamientosDeUnPaciente($pacienteId)

@@ -142,7 +142,9 @@
                 class="btn-primary w-full flex items-center justify-center gap-2">
                     <i class="fas fa-dna"></i> Protocolo De Estimulacion
                 </a>
+              
             </div>
+           
         </div>
 
         <div class="card p-4 bg-blue-50 border border-blue-200">

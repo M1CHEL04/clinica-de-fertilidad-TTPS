@@ -7,6 +7,8 @@ use App\Http\Middleware\AuthMiddleware;
 use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\TurnoController;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\OperadorController;
+
 ## Web Routes
 
 ###########################################################
@@ -46,9 +48,9 @@ Route::prefix('paciente')->middleware([AuthMiddleware::class . ':paciente'])->gr
 # Rutas para el medico
 ###########################################################
 Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(function () {
-    Route::get('/home', function () {
-        return view('medico.home');
-    })->name('medico.home');
+    
+        
+    Route::get('/home', [MedicoController::class, 'misPacientes'])->name('medico.home');
 
 
     Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
@@ -92,13 +94,28 @@ Route::prefix('admin')->middleware([AuthMiddleware::class . ':admin'])->group(fu
 ###########################################################
 # Rutas para el operador
 ###########################################################
+Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->group(function () {
+        Route::get('/home', [OperadorController::class, 'Pacientes'])->name('operador.home');
+        Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\OperadorController::class, 'tratamientosDeUnPaciente']);
+        Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
+        ->name('operador.tratamiento.detalle');
+        Route::get('paciente/{id}/puncion', [App\Http\Controllers\OperadorController::class, 'puncion'])
+        ->name('tratamiento.puncion');
+        // 1. Formulario general de punción
+    Route::get('/puncion/{paciente_id}', 
+        [App\Http\Controllers\OperadorController::class, 'formPuncion'])
+        ->name('puncion.form');
 
+    // 2. Buscar paciente por nombre+apellido o DNI
+    Route::post('/puncion/buscar-paciente',
+        [App\Http\Controllers\OperadorController::class, 'buscarPaciente'])
+        ->name('puncion.buscarPaciente');
 
-Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(function () {
-    Route::get('/home', [MedicoController::class, 'misPacientes'])->name('medico.home');
+    // 3. Guardar punción
+    Route::post('/puncion/guardar',
+        [App\Http\Controllers\OperadorController::class, 'guardarPuncion'])
+        ->name('puncion.guardar');
 });
-
-
 
 ###########################################################
 # Rutas para el jefe

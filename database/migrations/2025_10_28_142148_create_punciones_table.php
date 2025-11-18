@@ -17,6 +17,7 @@ return new class extends Migration
             $table->date('fecha_hora');
             $table->string('nro_quirofano');
             $table->foreignIdFor(User::class, 'operador_id');
+            $table->foreignIdFor(User::class, 'paciente_id');
             $table->timestamps();
         });
     }
