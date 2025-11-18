@@ -32,57 +32,57 @@
                 <div class="grid md:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                        <input type="text" name="nombre" value="{{ Auth::user()->nombre }}"
+                        <input type="text" name="nombre" value="{{ $usuario->nombre }}"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50"
                             readonly>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
-                        <input type="text" name="apellido" value="{{ Auth::user()->apellido }}"
+                        <input type="text" name="apellido" value="{{ $usuario->apellido }}"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50"
                             readonly>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" name="email" value="{{ Auth::user()->mail }}"
+                        <input type="email" name="email" value="{{ $usuario->mail }}"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50"
                             readonly>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">DNI</label>
-                        <input type="text" name="dni" value="{{ Auth::user()->dni }}"
+                        <input type="text" name="dni" value="{{ $usuario->dni }}"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50"
                             readonly>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de nacimiento</label>
-                        <input type="date" name="fecha_nacimiento" value="{{ Auth::user()->fecha_nacimiento }}"
+                        <input type="date" name="fecha_nacimiento" value="{{ $usuario->fecha_nacimiento }}"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50"
                             readonly>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-                        <input type="tel" name="telefono" value="{{ Auth::user()->telefono }}"
+                        <input type="tel" name="telefono" value="{{ $usuario->telefono }}"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50"
                             readonly>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Ocupación</label>
-                        <input type="text" name="ocupacion" value="{{ Auth::user()->ocupacion }}"
+                        <input type="text" name="ocupacion" value="{{ $usuario->ocupacion }}"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50"
                             readonly>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Obra Social</label>
                         <input type="text" name="obra_social"
-                            value="{{ Auth::user()->obra_social_nombre ?? 'Sin obra social' }}"
+                            value="{{ $usuario->obra_social_sigla ?? 'Sin obra social' }}"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50"
                             readonly>
                     </div>
-                    @if (Auth::user()->obra_social_id)
+                    @if ($usuario->obra_social_id)
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Número de afiliado</label>
-                            <input type="text" name="numero_afiliado" value="{{ Auth::user()->numero_afiliado }}"
+                            <input type="text" name="numero_afiliado" value="{{ $usuario->numero_afiliado }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50"
                                 readonly>
                         </div>
@@ -141,7 +141,7 @@
 
                     <input type="hidden" name="fecha_turno" id="fecha-seleccionada" required>
                     <input type="hidden" name="turno_id" id="turno-seleccionado" required>
-                    <input type="hidden" name="paciente_id" value="{{ Auth::user()->id }}" required>
+                    <input type="hidden" name="paciente_id" value="{{ $usuario->id }}" required>
                 </div>
 
                 <!-- Horarios disponibles -->
