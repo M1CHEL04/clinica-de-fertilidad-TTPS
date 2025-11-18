@@ -32,7 +32,7 @@
         <span class="nav-step" data-step="2">Antecedentes familiares</span>
         <span class="nav-step" data-step="3">Antecedentes ginecológicos</span>
         <span class="nav-step" data-step="4">Fenotipo</span>
-        <span class="nav-step" data-step="5">Estudios médicos</span>
+
     </div>
 
     <form action="{{ route('consulta.store') }}" method="POST">
@@ -41,18 +41,32 @@
         {{-- STEP 1 --}}
         <div class="step active" id="step-1">
 
-            <h2>Objetivo de la consulta</h2>
+           <h2>Objetivo de la consulta</h2>
+
             <div class="mb-3">
                 <select name="objetivo" id="objetivo" class="form-select">
-                    <option value="Embarazo con gametos propios">Gametos propios</option>
-                    <option value="Embarazo con esperma donado">Esperma donado</option>
-                    <option value="Metodo ROPA">ROPA</option>
-                </select>
+                    <option value="">Seleccione...</option>
 
+                    @foreach ($objetivos as $obj)
+                        <option value="{{ $obj->id }}">{{ $obj->nombre }}</option>
+                    @endforeach
+                </select>
             </div>
 
 
+
             <h3>Datos personales</h3>
+
+            <h3>Antecedentes</h3>
+            <div class="mb-3">
+                <label for="antecedente" class="form-label">Antecedente</label>
+                <div class="dropdown">
+                    <input type="text" id="antecedente-input" class="form-control dropdown-toggle" data-bs-toggle="dropdown" placeholder="Ingresar 3 letras...">
+                    <div id="antecedente-dropdown" class="dropdown-menu p-2" style="max-height: 180px; overflow-y: auto;"></div>
+                </div>
+            </div>
+
+            
 
             {{-- FUMA --}}
             <div class="mb-3">
@@ -150,11 +164,15 @@
             <div class="row">
                 <div class="col-md-4">
                     <label for="ciclos" class="form-label">Ciclos menstruales</label>
-                    <input type="text" name="ciclos" id="ciclos" class="form-control" placeholder="regular/irregular">
+                    <select name="ciclos" id="ciclos" class="form-select">
+                    <option value="">Seleccione...</option>
+                    <option value="regular">Regular</option>
+                    <option value="irregular">Irregular</option>
+                </select>
                 </div>
                 <div class="col-md-4">
                     <label for="duracion" class="form-label">Duracion del ciclo</label>
-                    <input type="text" name="duracion" id="duracion" class="form-control" placeholder="Ej: 21 dias">
+                    <input type="number" name="duracion" id="duracion" class="form-control" placeholder="Ej: 21 dias">
                 </div>
                 <div class="col-md-4">
                     <label for="caracteristica" class="form-label">Caracteristica del sangrado</label>
@@ -201,19 +219,38 @@
             <div class="row">
                 <div class="col-md-4">
                     <label for="color-ojos" class="form-label">Color de ojos</label>
-                    <input type="text" name="color-ojos" id="color-ojos" class="form-control" placeholder="Ej: marron, azul">
+                    <select name="color-ojos" id="color-ojos" class="form-select">
+                        <option value="">Seleccione...</option>
+                        <option value="ambar">Ambar</option>
+                        <option value="castaño">Castaño</option>
+                        <option value="avellana">Avellana</option>
+                        <option value="azul">Azul</option>
+                        <option value="verde">Verde</option>
+                        <option value="gris">Gris</option>
+                    </select>
                 </div>
                 <div class="col-md-4">
                     <label for="color-pelo" class="form-label">Color de pelo</label>
-                    <input type="text" name="color-pelo" id="color-pelo" class="form-control" placeholder="Ej: rubio, morocho">
+                    <select name="color-pelo" id="color-pelo" class="form-select">
+                        <option value="">Seleccione...</option>
+                        <option value="negro">Negro</option>
+                        <option value="castaño">Castaño</option>
+                        <option value="rubio">Rubio</option>
+                        <option value="pelirrojo">Pelirrojo</option>
+                    </select>
                 </div>
                 <div class="col-md-4">
                     <label for="tipo-pelo" class="form-label">Tipo de pelo</label>
-                    <input type="text" name="tipo-pelo" id="tipo-pelo" class="form-control" placeholder="Ej: rizado, lacio">
+                    <select name="tipo-pelo" id="tipo-pelo" class="form-select">
+                        <option value="">Seleccione...</option>
+                        <option value="rizado">Rizado</option>
+                        <option value="liso">Liso</option>
+                        <option value="ondulado">Ondulado</option>
+                    </select>
                 </div>
                 <div class="col-md-4">
                     <label for="altura" class="form-label">Altura</label>
-                    <input type="text" name="altura" id="altura" class="form-control" placeholder="Ej: 1,72">
+                    <input type="number" name="altura" id="altura" class="form-control" placeholder="Ej: 1,72">
                 </div>
                 <div class="col-md-4">
                     <label for="complexion" class="form-label">Complexion</label>
@@ -227,74 +264,9 @@
 
             <br>
             <button type="button" onclick="prevStep()" class="btn btn-secondary">← Atrás</button>
-            <button type="button" onclick="nextStep()" class="btn btn-primary float-end">Siguiente →</button>
+            
         </div>
 
-
-
-        {{-- STEP 5 --}}
-        <div class="step" id="step-5">
-
-            <h3>Estudios Médicos</h3>
-
-            {{-- Reutilizo tus selects dinámicos --}}
-
-            <div class="mb-3">
-                <label>Estudios Ginecológicos</label>
-                <div class="d-flex">
-                    <select id="ginecologicos-select" class="form-select me-2">
-                        @foreach($ginecologicos as $estudio)
-                            <option value="{{ $estudio['id'] }}">{{ $estudio['nombre'] }}</option>
-                        @endforeach
-                    </select>
-                    <button type="button" id="add-ginecologico" class="btn btn-outline-primary">Agregar</button>
-                </div>
-                <ul id="ginecologicos-list" class="list-group mt-2"></ul>
-            </div>
-
-            <div class="mb-3">
-                <label>Estudios Hormonales</label>
-                <div class="d-flex">
-                    <select id="hormonales-select" class="form-select me-2">
-                        @foreach($hormonales as $estudio)
-                            <option value="{{ $estudio['id'] }}">{{ $estudio['nombre'] }}</option>
-                        @endforeach
-                    </select>
-                    <button type="button" id="add-hormonal" class="btn btn-outline-primary">Agregar</button>
-                </div>
-                <ul id="hormonales-list" class="list-group mt-2"></ul>
-            </div>
-
-            <div class="mb-3">
-                <label>Prequirúrgicos</label>
-                <div class="d-flex">
-                    <select id="prequirurgicos-select" class="form-select me-2">
-                        @foreach($prequirurgicos as $estudio)
-                            <option value="{{ $estudio['id'] }}">{{ $estudio['nombre'] }}</option>
-                        @endforeach
-                    </select>
-                    <button type="button" id="add-prequirurgico" class="btn btn-outline-primary">Agregar</button>
-                </div>
-                <ul id="prequirurgicos-list" class="list-group mt-2"></ul>
-            </div>
-
-            <div class="mb-3">
-                <label>Estudios de Semen</label>
-                <div class="d-flex">
-                    <select id="semen-select" class="form-select me-2">
-                        @foreach($semen as $estudio)
-                            <option value="{{ $estudio['id'] }}">{{ $estudio['nombre'] }}</option>
-                        @endforeach
-                    </select>
-                    <button type="button" id="add-semen" class="btn btn-outline-primary">Agregar</button>
-                </div>
-                <ul id="semen-list" class="list-group mt-2"></ul>
-            </div>
-
-            <br>
-            <button type="button" onclick="prevStep()" class="btn btn-secondary">← Atrás</button>
-            <button type="submit" class="btn btn-success float-end">Guardar consulta</button>
-        </div>
 
     </form>
 </div>
@@ -305,7 +277,6 @@
 @section('scripts')
 <script src="{{ asset('js/terminos.js') }}"></script>
 <script src="{{ asset('js/familiares.js') }}"></script>
-<script src="{{ asset('js/estudios.js')}}"></script>
 <script src="{{ asset('js/wizard.js')}}"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {

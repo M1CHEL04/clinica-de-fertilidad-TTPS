@@ -12,7 +12,7 @@ function showStep(step) {
 }
 
 function nextStep() {
-    if (currentStep < 5) showStep(currentStep + 1);
+    if (currentStep < 4) showStep(currentStep + 1);
 }
 
 function prevStep() {

@@ -9,6 +9,7 @@ use App\Http\Controllers\TerminosController;
 use App\Http\Controllers\EstudiosController;
 use App\Http\Controllers\TurnoController;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\ConsultaController;
 ## Web Routes
 
 ###########################################################
@@ -119,12 +120,17 @@ Route::get('/register', [RegistroController::class, 'show'])->name('register');
 # Rutas de prueba primer consulta
 ############################################################
 
-Route::get('/consulta', [EstudiosController::class, 'index'])->name('consulta.index');
-
-Route::post('/consulta', [App\Http\Controllers\ConsultaController::class, 'store'])
-    ->name('consulta.store');
 
 Route::get('/terminos/search', [TerminosController::class, 'search'])->name('terminos.search');
 
 
-Route::get('/estudios', [EstudiosController::class, 'index']);
+    // Primer consulta
+Route::get('/consulta', [ConsultaController::class, 'create'])->name('medico.primerConsulta.create');
+Route::post('/consulta', [ConsultaController::class, 'store'])->name('consulta.store');
+
+// Nueva página de estudios
+Route::post('/estudios', [EstudiosController::class, 'store'])->name('estudios.store');
+Route::get('/estudios', [EstudiosController::class, 'estudios'])
+    ->name('estudios.index');
+
+
