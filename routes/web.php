@@ -50,6 +50,7 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
         return view('medico.home');
     })->name('medico.home');
 
+    Route::get('/home', [MedicoController::class, 'misPacientes'])->name('medico.home');
 
     Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
         ->name('medico.tratamiento.detalle');
@@ -76,6 +77,12 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
         ->name('tratamiento.subir-consentimiento');
 
     Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\MedicoController::class, 'tratamientosDeUnPaciente']);
+
+    Route::get('/tratamiento/{id}/post-transferencia', [MedicoController::class, 'postTransferenciaForm']
+        )->name('tratamiento.post');
+
+    Route::post('/tratamiento/{id}/post-transferencia', [MedicoController::class, 'guardarPostTransferencia']
+        )->name('tratamiento.guardar-post');
 });
 ###########################################################
 # Rutas para el admin
@@ -93,10 +100,6 @@ Route::prefix('admin')->middleware([AuthMiddleware::class . ':admin'])->group(fu
 # Rutas para el operador
 ###########################################################
 
-
-Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(function () {
-    Route::get('/home', [MedicoController::class, 'misPacientes'])->name('medico.home');
-});
 
 
 

@@ -210,4 +210,32 @@ public function storeMonitoreo(Request $request)
 }
 
 
+//POST TRANSFERENCIA
+
+public function postTransferenciaForm($id)
+{
+    $tratamiento = Tratamiento::findOrFail($id);
+    return view('medico.post-transferencia', compact('tratamiento'));
+}
+
+public function guardarPostTransferencia(Request $request, $id)
+{
+    $request->validate([
+        'beta'    => 'nullable|boolean',
+        'saco'    => 'nullable|boolean',
+        'embrion' => 'nullable|boolean',
+        'vivo'    => 'nullable|boolean',
+    ]);
+
+    $tratamiento = Tratamiento::findOrFail($id);
+
+    $tratamiento->beta = $request->beta;
+    $tratamiento->saco = $request->saco;
+    $tratamiento->embrion = $request->embrion;
+    $tratamiento->vivo = $request->vivo;
+    $tratamiento->save();
+
+    return back()->with('success', 'Post transferencia cargada correctamente ✔');
+}
+
 }

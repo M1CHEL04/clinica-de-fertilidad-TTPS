@@ -142,6 +142,11 @@
                 class="btn-primary w-full flex items-center justify-center gap-2">
                     <i class="fas fa-dna"></i> Protocolo De Estimulacion
                 </a>
+                <a href="{{ route('tratamiento.post', $tratamiento->id) }}"
+                class="btn-primary w-full flex items-center justify-center gap-2">
+                    <i class="fas fa-leaf"></i> Post-Transferencia
+                </a>
+
             </div>
         </div>
 
