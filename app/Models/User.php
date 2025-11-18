@@ -24,6 +24,9 @@ class User extends Authenticatable
         'password',
         'dni',
         'fecha_nacimiento',
+        'ocupacion',
+        'obra_social_id',
+        'numero_afiliado',
         'rol_id', // FK al rol
     ];
 
@@ -47,6 +50,11 @@ class User extends Authenticatable
     public function esPaciente()
     {
         return $this->rol && $this->rol_id == 1;
+    }
+
+    public function tieneObraSocial()
+    {
+        return !is_null($this->obra_social_id);
     }
 
     // Hash automático al asignar password
