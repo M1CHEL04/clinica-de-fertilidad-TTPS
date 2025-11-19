@@ -8,6 +8,7 @@ use App\Models\Estudio;
 use App\Models\ProtocoloEstimulacion;
 use App\Models\TipoMedicacion;
 use App\Models\Monitoreo;
+use App\Models\PostTransferencia;
 use Illuminate\Http\Request;
 
 class MedicoController extends Controller
@@ -213,29 +214,36 @@ public function storeMonitoreo(Request $request)
 //POST TRANSFERENCIA
 
 public function postTransferenciaForm($id)
-{
-    $tratamiento = Tratamiento::findOrFail($id);
-    return view('medico.post-transferencia', compact('tratamiento'));
-}
+    {
+        $tratamiento = Tratamiento::findOrFail($id);
+
+        // Si ya existe, lo traemos. Si no, generamos uno vacío.
+        $post = PostTransferencia::where('tratamiento_id', $id)->first();
+
+        return view('medico.post-transferencia', compact('tratamiento', 'post'));
+    }
 
 public function guardarPostTransferencia(Request $request, $id)
-{
-    $request->validate([
-        'beta'    => 'nullable|boolean',
-        'saco'    => 'nullable|boolean',
-        'embrion' => 'nullable|boolean',
-        'vivo'    => 'nullable|boolean',
-    ]);
+    {
+        $post = PostTransferencia::firstOrNew(['tratamiento_id' => $id]);
 
-    $tratamiento = Tratamiento::findOrFail($id);
+        // Validaciones simples según etapa
+        $rules = [
+            'beta' => 'nullable|numeric',
+            'saco' => 'nullable|boolean',
+            'embarazo' => 'nullable|boolean',
+            'vivo' => 'nullable|boolean',
+            'fecha_nacimiento' => 'nullable|date',
+            'causa_no_nacido' => 'nullable|string|max:255',
+        ];
 
-    $tratamiento->beta = $request->beta;
-    $tratamiento->saco = $request->saco;
-    $tratamiento->embrion = $request->embrion;
-    $tratamiento->vivo = $request->vivo;
-    $tratamiento->save();
+        $validated = $request->validate($rules);
 
-    return back()->with('success', 'Post transferencia cargada correctamente ✔');
-}
+        // Guardar
+        $post->fill($validated);
+        $post->save();
+
+        return redirect()->back()->with('success', 'Datos guardados correctamente');
+    }
 
 }

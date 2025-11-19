@@ -16,6 +16,7 @@ use App\Models\AntecedenteGenital;
 use App\Models\AntecedenteFenotipo;
 use App\Models\ProtocoloEstimulacion;
 use App\Models\Embrion;
+use App\Models\PostTransferencia;
 
 class Tratamiento extends Model
 {
@@ -92,5 +93,10 @@ class Tratamiento extends Model
     public function embriones()
     {
         return $this->hasMany(Embrion::class, 'tratamiento_id');
+    }
+
+    public function postTransferencia()
+    {
+        return $this->hasOne(PostTransferencia::class);
     }
 }
