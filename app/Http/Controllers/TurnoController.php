@@ -69,15 +69,22 @@ class TurnoController extends Controller
                 //aca implementar el cobro
                 $pago_id = $this->registrarOrdenPago($paciente->id, $paciente->obra_social_id);
 
-                Tratamiento::create([
-                    'historia_clinica_id' => $HistoriaClinica->id,
-                    'estado_tratamiento_id' => 1,
-                    'medico_id' => $request->medico_id,
-                    'pago_id' => $pago_id,
-                ]);
+                Log::info('Resultado de registrar orden de pago: ' . ($pago_id ? $pago_id : 'NULL/FALSE'));
 
                 if (!$pago_id) {
                     Log::error('Error al procesar pago para paciente: ' . $paciente->id);
+                    return redirect()->back()->with('error', 'Error al procesar el pago. Por favor, intente nuevamente.');
+                }
+
+                try {
+                    Tratamiento::create([
+                        'historia_clinica_id' => $HistoriaClinica->id,
+                        'estado_tratamiento_id' => 1,
+                        'medico_id' => $request->medico_id,
+                        'pago_id' => $pago_id,
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Error al crear tratamiento: ' . $e->getMessage());
                     return redirect()->back()->with('error', 'Error al solicitar el turno. Por favor, intente nuevamente.');
                 }
             } else if ($tieneHistoriaClinica && !$tieneTratamientoActivo) {
@@ -87,17 +94,19 @@ class TurnoController extends Controller
                 //aca implementar el cobro
                 $pago_id = $this->registrarOrdenPago($paciente->id, $paciente->obra_social_id);
 
+                Log::info('Resultado de registrar orden de pago (caso 2): ' . ($pago_id ? $pago_id : 'NULL/FALSE'));
+
+                if (!$pago_id) {
+                    Log::error('Error al procesar pago para paciente: ' . $paciente->id);
+                    return redirect()->back()->with('error', 'Error al procesar el pago. Por favor, intente nuevamente.');
+                }
+
                 Tratamiento::create([
                     'historia_clinica_id' => $HistoriaClinica->id,
                     'estado_tratamiento_id' => 1,
                     'medico_id' => $request->medico_id,
                     'pago_id' => $pago_id,
                 ]);
-
-                if (!$pago_id) {
-                    Log::error('Error al procesar pago para paciente: ' . $paciente->id);
-                    return redirect()->back()->with('error', 'Error al solicitar el turno. Por favor, intente nuevamente.');
-                }
             } else {
                 // aca lo dejamos por si hay que hacer algo especial para los sobre turnos.
 
@@ -240,6 +249,8 @@ class TurnoController extends Controller
     private function registrarOrdenPago($pacienteId, $obraSocialId)
     {
         try {
+            Log::info('Iniciando registro de orden de pago para paciente: ' . $pacienteId . ' con obra social: ' . $obraSocialId);
+
             $response = Http::post('https://ueozxvwsckonkqypfasa.supabase.co/functions/v1/registrar-orden-pago', [
                 'grupo' => 5,
                 'id_paciente' => $pacienteId,
@@ -249,12 +260,16 @@ class TurnoController extends Controller
 
             if ($response->successful()) {
                 $data = $response->json();
+                Log::info('Respuesta exitosa de orden de pago: ', $data);
 
                 // Retornar el ID del pago si está presente en la respuesta
                 if (isset($data['pago']['id'])) {
+                    Log::info('ID de pago encontrado: ' . $data['pago']['id']);
                     return $data['pago']['id'];
                 }
-                Log::info('Orden de pago registrada exitosamente: ', $data);
+
+                Log::error('No se encontró ID de pago en la respuesta exitosa', $data);
+                return false;
             } else {
                 Log::error('Error al registrar orden de pago - Status: ' . $response->status() . ' - Body: ' . $response->body());
                 return false;
