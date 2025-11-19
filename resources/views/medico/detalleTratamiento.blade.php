@@ -115,13 +115,42 @@
 
     
     
+      @php
+    $deshabilitado = $tratamiento->etapa !== "Monitoreos";
+@endphp
 
-            <div class="mt-6 flex justify-end">
-                <button class="btn-primary">
-                    <i class="fas fa-plus mr-2"></i> Agendar nueva consulta
-                </button>
+<button 
+    class="btn-primary {{ $deshabilitado ? 'btn-disabled' : '' }}"
+    @if($deshabilitado) disabled @else onclick="abrirModal()" @endif
+>
+    <i class="fas fa-plus mr-2"></i> Agendar nueva consulta
+</button>
+
+<div id="modal-agendar" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <h2 class="modal-title">Agendar consulta</h2>
+
+        <form method="POST" action="{{ route('tratamiento.agendar-consulta', $tratamiento->id) }}">
+            @csrf
+
+            <label>Fecha Inicio Tentativa</label>
+            <input type="date" name="fecha_inicio" required>
+
+            <label>Fecha Fin Tentativa</label>
+            <input type="date" name="fecha_fin" required>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                <button type="submit" class="btn-primary">Guardar</button>
             </div>
+        </form>
+    </div>
+</div>
+
+
+
         </div>
+        
         @endif
     </div>
     
@@ -268,3 +297,71 @@
 </div>
     
 @endsection
+
+<script>
+    function abrirModal() {
+        document.getElementById("modal-agendar").style.display = "flex";
+    }
+
+    function cerrarModal() {
+        document.getElementById("modal-agendar").style.display = "none";
+    }
+</script>
+
+
+<style>
+    .btn-disabled {
+    opacity: 0.5;           /* más transparente */
+    cursor: not-allowed;    /* cursor prohibido */
+    background-color: #999; /* color más apagado */
+    color: #fff;            /* asegura legibilidad */
+}
+
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    width: 400px;
+}
+
+.modal-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.modal-content label {
+    display: block;
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+.modal-content input[type="date"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+
+</style>

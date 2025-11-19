@@ -239,13 +239,22 @@ public function avanzarEtapa($id)
 
     $nuevoId = $actual + 1;
 
-    DB::table('tratamientos')->where('id', $id)->update([
+    $updateData = [
         'etapa_id' => $nuevoId,
         'updated_at' => now(),
-    ]);
+    ];
+
+    // Si la etapa actual es "Monitoreos", limpiar fechas
+    if ($actual === 3) { // 3 = Monitoreos
+        $updateData['fecha_sugerida_inicio'] = null;
+        $updateData['fecha_sugerida_fin'] = null;
+    }
+
+    DB::table('tratamientos')->where('id', $id)->update($updateData);
 
     return back()->with('success', 'Etapa actualizada a: ' . $this->etapas[$nuevoId]);
 }
+
 
 
 
@@ -271,6 +280,33 @@ public function retrocederEtapa($id)
     ]);
 
     return back()->with('success', 'Etapa actualizada a: ' . $this->etapas[$nuevoId]);
+}
+
+
+
+
+public function agendarConsulta(Request $request, $id)
+{
+    $fechaHoy = date('Y-m-d');
+    $fechaInicio = date('Y-m-d', strtotime($request->fecha_inicio));
+    $fechaFin = date('Y-m-d', strtotime($request->fecha_fin));
+
+    // Validaciones
+    if ($fechaInicio < $fechaHoy) {
+        return redirect()->back()->with('error', 'La fecha de inicio no puede ser anterior a hoy.');
+    }
+
+    if ($fechaInicio > $fechaFin) {
+        return redirect()->back()->with('error', 'La fecha de inicio no puede ser mayor que la fecha de fin.');
+    }
+
+    DB::table('tratamientos')->where('id', $id)->update([
+        'fecha_sugerida_inicio' => $fechaInicio,
+        'fecha_sugerida_fin' => $fechaFin,
+        'updated_at' => now(),
+    ]);
+
+    return redirect()->back()->with('success', 'Consulta agendada correctamente.');
 }
 
 

@@ -68,14 +68,14 @@ class TurnoController extends Controller
 
                 //aca implementar el cobro
                 $pago_id = $this->registrarOrdenPago($paciente->id, $paciente->obra_social_id);
-
+                
                 Tratamiento::create([
                     'historia_clinica_id' => $HistoriaClinica->id,
                     'estado_tratamiento_id' => 1,
                     'medico_id' => $request->medico_id,
                     'pago_id' => $pago_id,
                 ]);
-
+                
                 if (!$pago_id) {
                     Log::error('Error al procesar pago para paciente: ' . $paciente->id);
                     return redirect()->back()->with('error', 'Error al solicitar el turno. Por favor, intente nuevamente.');

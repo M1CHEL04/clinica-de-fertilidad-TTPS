@@ -51,6 +51,9 @@ Route::post('/tratamiento/{id}/avanzar', [MedicoController::class, 'avanzarEtapa
 Route::post('/tratamiento/{id}/retroceder', [MedicoController::class, 'retrocederEtapa'])
     ->name('tratamiento.retroceder-etapa');
 
+    Route::post('/tratamiento/{id}/agendar-consulta', [MedicoController::class, 'agendarConsulta'])
+     ->name('tratamiento.agendar-consulta');
+
 
 ###########################################################
 # Rutas para el medico
