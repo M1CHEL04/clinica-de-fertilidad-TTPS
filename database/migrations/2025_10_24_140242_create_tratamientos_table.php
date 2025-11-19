@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignIdFor(\App\Models\EstadoTratamiento::class, 'estado_tratamiento_id');
             $table->foreignIdFor(\App\Models\User::class, 'medico_id');
             $table->foreignIdFor(\App\Models\Etapa::class, 'etapa_id')->nullable();
-            $table->unsignedBigInteger('pago_id')->nullable();
+            $table->unsignedBigInteger('pago_id');
             $table->date('fecha_sugerida_inicio')->nullable();
             $table->date('fecha_sugerida_fin')->nullable();
             $table->boolean('beta')->nullable();

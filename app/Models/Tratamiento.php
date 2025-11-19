@@ -27,6 +27,7 @@ class Tratamiento extends Model
         'estado_tratamiento_id',
         'medico_id',
         'etapa_id',
+        'pago_id',
         'fecha_sugerida_inicio',
         'fecha_sugerida_fin',
         'beta',
