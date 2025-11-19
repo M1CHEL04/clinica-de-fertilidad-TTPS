@@ -82,18 +82,39 @@
 
         
 
+        <!-- ➡️ Avanzar etapa -->
+    
+
         <!-- 🔮 Próximas acciones -->
-        
+       
         <div class="card p-6">
+             
             <h3 class="text-lg font-semibold mb-4 text-gray-900 flex items-center">
                 <i class="fas fa-calendar-plus text-blue-600 mr-2"></i> Próximas Acciones
             </h3>
+ @if (session('rol') == 2)
+    <div class="flex space-x-2">
+    @if (strtolower($tratamiento->etapa) !== 'finalizado')
+        <form method="POST" action="{{ route('tratamiento.avanzar-etapa', $tratamiento->id) }}">
+            @csrf
+            <button class="btn-primary">
+                <i class="fas fa-arrow-right mr-1"></i> Avanzar etapa
+            </button>
+        </form>
+    @endif
 
-            <ul class="space-y-3 text-gray-800">
-                <li>📅 Próxima consulta: <strong>No programada</strong></li>
-                <li>💊 Revisar respuesta al tratamiento.</li>
-                <li>🧪 Control hormonal si aplica.</li>
-            </ul>
+    @if (strtolower($tratamiento->etapa) !== 'primera consulta')
+        <form method="POST" action="{{ route('tratamiento.retroceder-etapa', $tratamiento->id) }}">
+            @csrf
+            <button class="btn-secondary">
+                <i class="fas fa-arrow-left mr-1"></i> Retroceder etapa
+            </button>
+        </form>
+    @endif
+</div>
+
+    
+    
 
             <div class="mt-6 flex justify-end">
                 <button class="btn-primary">
@@ -101,7 +122,9 @@
                 </button>
             </div>
         </div>
+        @endif
     </div>
+    
 
     <!-- 🧰 Panel lateral -->
     @if ($tratamiento->estado_tratamiento == 'Activo') 
@@ -110,42 +133,130 @@
             <h3 class="text-lg font-semibold mb-4 text-gray-900 flex items-center">
                 <i class="fas fa-tasks text-indigo-600 mr-2"></i> Acciones del Tratamiento
             </h3>
-
+            
             <div class="space-y-3">
-                <button class="btn-primary w-full flex items-center justify-center gap-2">
-                    <i class="fas fa-vials"></i> Recetar estudios
-                </button>
 
-                <a href="{{ route('tratamiento.cargar-estudios', $tratamiento->id) }}"
-                class="btn-primary w-full flex items-center justify-center gap-2">
-                    <i class="fas fa-file-upload"></i> Seccion Estudios
-                </a>
+    {{-- Normalizar el nombre de etapa para comparación --}}
+    @php
+        $etapa = trim(strtolower($tratamiento->etapa));
+    @endphp
 
-                <button class="btn-primary w-full flex items-center justify-center gap-2">
-                    <i class="fas fa-user-md"></i> Cargar antecedentes
-                </button>
+    {{-- PRIMERA CONSULTA --}}
+    @php
+        $etapa1 = in_array($etapa, [
+            'primera consulta',
+            'segunda consulta',
+            'monitoreos',
+            'control de embarazo',
+            'puncion',
+            'finalizado',
+            'transferencia'
+        ]);
+    @endphp
 
-                <a href="{{ route('monitoreos', $tratamiento->id) }}"
-                class="btn-primary w-full flex items-center justify-center gap-2">
-                    <i class="fas fa-heartbeat"></i> Seccion de monitoreos
-                </a>
+    {{-- SEGUNDA CONSULTA --}}
+    @php
+        $etapa2 = in_array($etapa, [
+            'segunda consulta',
+            'monitoreos',
+            'control de embarazo',
+            'puncion',
+            'finalizado',
+            'transferencia'
+        ]);
+    @endphp
+
+    @php
+        $etapa3 = in_array($etapa, [
+            'monitoreos',
+            'control de embarazo',
+            'puncion',
+            'finalizado',
+            'transferencia'
+        ]);
+    @endphp
+
+    {{-- CONTROL DE EMBARAZO --}}
+    @php
+        $etapa4 = in_array($etapa, [
+            'control de embarazo',
+            'finalizado'
+        ]);
+    @endphp
 
 
-                <button class="btn-primary w-full flex items-center justify-center gap-2" >
-                    <i class="fas fa-seedling"></i> Cargar post-transferencia
-                </button>
+    {{-- 6️⃣ Cargar objetivo (desde etapa 1) --}}
+    <button class="btn-primary w-full flex items-center justify-center gap-2 {{ !$etapa1 ? 'opacity-50 cursor-not-allowed' : '' }}"
+            {{ !$etapa1 ? 'disabled' : '' }}>
+        <i class="fas fa-bullseye"></i> Cargar objetivo
+    </button>
 
-                <button class="btn-primary w-full flex items-center justify-center gap-2">
-                    <i class="fas fa-bullseye"></i> Cargar objetivo
-                </button>
-                <a href="{{ route('tratamiento.protocolo', $tratamiento->id) }}"
-                class="btn-primary w-full flex items-center justify-center gap-2">
-                    <i class="fas fa-dna"></i> Protocolo De Estimulacion
-                </a>
-              
-            </div>
-           
-        </div>
+    {{-- 1️⃣ Recetar estudios (desde etapa 1) --}}
+    <button class="btn-primary w-full flex items-center justify-center gap-2 {{ !$etapa1 ? 'opacity-50 cursor-not-allowed' : '' }}"
+            {{ !$etapa1 ? 'disabled' : '' }}>
+        <i class="fas fa-vials"></i> Recetar estudios
+    </button>
+
+   
+
+    {{-- 3️⃣ Cargar antecedentes (desde etapa 1) --}}
+    <button class="btn-primary w-full flex items-center justify-center gap-2 {{ !$etapa1 ? 'opacity-50 cursor-not-allowed' : '' }}"
+            {{ !$etapa1 ? 'disabled' : '' }}>
+        <i class="fas fa-user-md"></i> Cargar antecedentes
+    </button>
+    
+     @if ($etapa2)
+        <a href="{{ route('tratamiento.cargar-estudios', $tratamiento->id) }}"
+           class="btn-primary w-full flex items-center justify-center gap-2">
+            <i class="fas fa-file-upload"></i> Sección Estudios
+        </a>
+    @else
+        <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+            <i class="fas fa-file-upload"></i> Sección Estudios
+        </a>
+    @endif
+    
+
+   
+    {{--  Protocolo de Estimulación (desde etapa 2) --}}
+    @if ($etapa2)
+        <a href="{{ route('tratamiento.protocolo', $tratamiento->id) }}"
+           class="btn-primary w-full flex items-center justify-center gap-2">
+            <i class="fas fa-dna"></i> Protocolo de Estimulación
+        </a>
+    @else
+        <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+            <i class="fas fa-dna"></i> Protocolo de Estimulación
+        </a>
+    @endif
+
+     {{-- 4️⃣ Monitoreos (desde etapa 3) --}}
+    @if ($etapa3)
+        <a href="{{ route('monitoreos', $tratamiento->id) }}"
+           class="btn-primary w-full flex items-center justify-center gap-2">
+            <i class="fas fa-heartbeat"></i> Sección de Monitoreos
+        </a>
+    @else
+        <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+            <i class="fas fa-heartbeat"></i> Sección de Monitoreos
+        </a>
+    @endif
+
+   
+    @if ($etapa4)
+    <button class="btn-primary w-full flex items-center justify-center gap-2">
+        <i class="fas fa-seedling"></i> Cargar post-transferencia
+    </button>
+    @else
+        <button class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+        <i class="fas fa-seedling"></i> Cargar post-transferencia
+    </button>
+    @endif
+
+    
+
+</div>
+
 
         <div class="card p-4 bg-blue-50 border border-blue-200">
             <p class="text-sm text-gray-700">

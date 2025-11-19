@@ -44,7 +44,8 @@ class MedicoController extends Controller
     }
 
     public function detalleTratamiento($id)
-    {
+    {   
+        
         // ✅ Trae la info completa del tratamiento
         $rol_id = session('rol');
         $tratamiento = DB::table('tratamientos')
@@ -68,7 +69,7 @@ class MedicoController extends Controller
             )
             ->where('tratamientos.id', $id)
             ->first();
-
+        
         // ✅ Intentamos traer consultas si existe la tabla (por si aún no la tenés creada)
         $consultas = [];
         if (DB::getSchemaBuilder()->hasTable('consultas')) {
@@ -77,7 +78,7 @@ class MedicoController extends Controller
                 ->orderBy('fecha', 'asc')
                 ->get();
         }
-
+        
         // ✅ Evita error si no hay consultas (pasa array vacío)
         return view('medico.detalleTratamiento', compact('tratamiento', 'consultas', 'rol_id'));
     }
@@ -210,6 +211,68 @@ public function storeMonitoreo(Request $request)
 
     return back()->with('success', 'Monitoreo cargado correctamente');
 }
+
+private $etapas = [
+    1 => 'Primera Consulta',
+    2 => 'Segunda Consulta',
+    3 => 'Monitoreos',
+    4 => 'Punción',
+    5 => 'Transferencia',
+    6 => 'Control de embarazo',
+    7 => 'Finalizado',
+];
+
+
+public function avanzarEtapa($id)
+{
+    $tratamiento = DB::table('tratamientos')->where('id', $id)->first();
+
+    if (!$tratamiento) {
+        return back()->with('error', 'Tratamiento no encontrado.');
+    }
+
+    $actual = (int) $tratamiento->etapa_id;
+
+    if ($actual >= 7) {
+        return back()->with('error', 'No se puede avanzar más la etapa.');
+    }
+
+    $nuevoId = $actual + 1;
+
+    DB::table('tratamientos')->where('id', $id)->update([
+        'etapa_id' => $nuevoId,
+        'updated_at' => now(),
+    ]);
+
+    return back()->with('success', 'Etapa actualizada a: ' . $this->etapas[$nuevoId]);
+}
+
+
+
+public function retrocederEtapa($id)
+{
+    $tratamiento = DB::table('tratamientos')->where('id', $id)->first();
+
+    if (!$tratamiento) {
+        return back()->with('error', 'Tratamiento no encontrado.');
+    }
+
+    $actual = (int) $tratamiento->etapa_id;
+
+    if ($actual <= 1) {
+        return back()->with('error', 'No se puede retroceder más la etapa.');
+    }
+
+    $nuevoId = $actual - 1;
+
+    DB::table('tratamientos')->where('id', $id)->update([
+        'etapa_id' => $nuevoId,
+        'updated_at' => now(),
+    ]);
+
+    return back()->with('success', 'Etapa actualizada a: ' . $this->etapas[$nuevoId]);
+}
+
 
 
 }

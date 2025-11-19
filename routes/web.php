@@ -44,6 +44,13 @@ Route::prefix('paciente')->middleware([AuthMiddleware::class . ':paciente'])->gr
     Route::get('/turnos-libres/{id_medico}', [TurnoController::class, 'listarTurnosLibres'])->name('paciente.turnos-libres');
 });
 
+Route::post('/tratamiento/{id}/avanzar', [MedicoController::class, 'avanzarEtapa'])
+    ->name('tratamiento.avanzar-etapa');
+
+Route::post('/tratamiento/{id}/retroceder', [MedicoController::class, 'retrocederEtapa'])
+    ->name('tratamiento.retroceder-etapa');
+
+
 ###########################################################
 # Rutas para el medico
 ###########################################################

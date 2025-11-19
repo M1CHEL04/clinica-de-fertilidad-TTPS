@@ -112,7 +112,7 @@
                             <div class="flex items-center">
                                 <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-3">
                                     <span class="text-white text-sm font-medium">
-                                        {{ strtoupper(substr($paciente->nombre, 0, 1)) }}{{ strtoupper(substr($paciente->apellido, 0, 1)) }}
+                                        {{ strtoupper(substr($paciente->nombre ?? '', 0, 1)) }}{{ strtoupper(substr($paciente->apellido ?? '', 0, 1)) }}
                                     </span>
                                 </div>
                                 <div>
@@ -146,7 +146,7 @@
                                 <!-- Ver Historial -->
                                 <button 
                                     @click="
-                                        fetch('/medico/paciente/{{ $paciente->paciente_id }}/tratamientos')
+                                        fetch('/operador/paciente/{{ $paciente->paciente_id }}/tratamientos')
                                             .then(res => res.json())
                                             .then(data => {
                                                 tratamientos = data.tratamientos;
