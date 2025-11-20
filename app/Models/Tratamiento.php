@@ -23,11 +23,7 @@ class Tratamiento extends Model
     protected $table = 'tratamientos';
 
     protected $fillable = [
-        'historia_clinica_id',
-        'beta',
-        'saco',
-        'embrion',
-        'vivo'
+        'consentimiento_pdf'
     ];
 
     public function historiaClinica()

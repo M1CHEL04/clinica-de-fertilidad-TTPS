@@ -125,9 +125,12 @@
                 Subí el consentimiento informado para habilitar la orden médica
             </button>
         @else
-            <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg w-full">
-                Generar orden médica
-            </button>
+            <form action="{{ route('tratamiento.enviar-orden-medica', $tratamiento->id) }}" method="POST">
+                @csrf
+                <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg w-full">
+                    Enviar orden médica por email
+                </button>
+            </form>
         @endif
     </div>
 

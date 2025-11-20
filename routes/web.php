@@ -6,6 +6,7 @@ use App\Http\Controllers\RegistroController;
 use App\Http\Middleware\AuthMiddleware;
 use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\TurnoController;
+use App\Http\Controllers\AvisosController;
 use Illuminate\Support\Facades\Http;
 ## Web Routes
 
@@ -83,6 +84,9 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
 
     Route::post('/tratamiento/{id}/post-transferencia', [MedicoController::class, 'guardarPostTransferencia']
         )->name('tratamiento.guardar-post');
+    
+    Route::post('/tratamiento/{id}/enviar-orden-medica', [AvisosController::class, 'enviarOrdenMedica'])
+    ->name('tratamiento.enviar-orden-medica');
 });
 ###########################################################
 # Rutas para el admin
