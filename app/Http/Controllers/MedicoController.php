@@ -103,25 +103,30 @@ class MedicoController extends Controller
     return response()->json(['tratamientos' => $tratamientos]);
     }
 
-    public function cargarEstudios($id)
-    {
-        $tratamiento = Tratamiento::findOrFail($id);
+public function cargarEstudios($id)
+{
+    $tratamiento = Tratamiento::findOrFail($id);
 
-        // Estudios pendientes
-        $estudiosPendientes = Estudio::where('tratamiento_id', $id)
-            ->whereNull('resultado')
-            ->get();
+    // Estudios pendientes agrupados por tipo_estudio
+    $estudiosPendientes = Estudio::where('tratamiento_id', $id)
+        ->whereNull('resultado')
+        ->orderBy('tipo_estudio')
+        ->get()
+        ->groupBy('tipo_estudio');
 
-        // Estudios finalizados
-        $estudiosCompletados = Estudio::where('tratamiento_id', $id)
-            ->whereNotNull('resultado')
-            ->get();
+    // Estudios completados agrupados por tipo_estudio
+    $estudiosCompletados = Estudio::where('tratamiento_id', $id)
+        ->whereNotNull('resultado')
+        ->orderBy('tipo_estudio')
+        ->get()
+        ->groupBy('tipo_estudio');
 
-        return view(
-            'medico.cargarEstudios',
-            compact('tratamiento', 'estudiosPendientes', 'estudiosCompletados')
-        );
-    }
+    return view(
+        'medico.cargarEstudios',
+        compact('tratamiento', 'estudiosPendientes', 'estudiosCompletados')
+    );
+}
+
 
     public function guardarEstudios($id)
     {
@@ -136,7 +141,7 @@ class MedicoController extends Controller
         }
 
         return redirect()
-            ->route('medico.tratamiento.detalle', $id)
+            ->route('tratamiento.cargar-estudios', $id)
             ->with('success', 'Resultados cargados correctamente.');
     }
 
