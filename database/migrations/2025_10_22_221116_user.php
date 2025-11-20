@@ -28,6 +28,7 @@ return new class extends Migration
 
             // 🏥 Campos de obra social
             $table->unsignedBigInteger('obra_social_id')->nullable();
+            $table->string('obra_social_sigla')->nullable();
             $table->string('numero_afiliado')->nullable();
 
             // 🔗 Relación al rol
