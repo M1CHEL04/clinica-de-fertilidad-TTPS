@@ -23,13 +23,16 @@ class HistorialOvocito extends Model
         return $this->belongsTo(Ovocito::class);
     }
 
-    public function estadoAnterior() {
-        return $this->belongsTo(EstadoOvocito::class,'estado_anterior_id');
-    }
+    public function estadoAnterior()
+{
+    return $this->belongsTo(TipoEstadoOvocito::class, 'estado_anterior_id');
+}
 
-    public function estadoNuevo() {
-        return $this->belongsTo(EstadoOvocito::class,'estado_nuevo_id');
-    }
+public function estadoNuevo()
+{
+    return $this->belongsTo(TipoEstadoOvocito::class, 'estado_nuevo_id');
+}
+
 
     public function operador() {
         return $this->belongsTo(User::class,'operador_id');

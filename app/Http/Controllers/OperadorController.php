@@ -168,14 +168,8 @@ class OperadorController extends Controller
         */
 
         // Estado inicial
-        HistorialOvocito::create([
-            'ovocito_id'        => $ovocito->id,
-            'estado_ovocito_id' => $estado->id,
-            'accion'            => 'Estado inicial',
-            'descripcion'       => 'Estado inicial: ' . $ovo['estado_inicial'],
-            'usuario_id'        => $rol,
-        ]);
-
+       
+        
         // Maduración
         if (!empty($ovo['tiempo_maduracion'])) {
             HistorialOvocito::create([
@@ -184,6 +178,8 @@ class OperadorController extends Controller
                 'accion'            => 'Maduración',
                 'descripcion'       => 'Tiempo de maduración: ' . $ovo['tiempo_maduracion'] . ' horas.',
                 'usuario_id'        => $rol,
+                'estado_anterior_id' => $estado->TipoEstadoOvocito->id,
+                'estado_nuevo_id' => $estado->TipoEstadoOvocito->id,
             ]);
         }
 
@@ -195,6 +191,8 @@ class OperadorController extends Controller
                 'accion'            => 'Descarte',
                 'descripcion'       => 'Motivo: ' . $ovo['motivo_descarte'],
                 'usuario_id'        => $rol,
+                'estado_anterior_id' => $estado->TipoEstadoOvocito->id,
+                'estado_nuevo_id' => $estado->TipoEstadoOvocito->id,
             ]);
         }
 
@@ -208,13 +206,15 @@ class OperadorController extends Controller
                 $ovocito->update([
                     'guardado_id' => $guardadoId
                 ]);
-
+                
                 HistorialOvocito::create([
                     'ovocito_id'        => $ovocito->id,
                     'estado_ovocito_id' => $estado->id,
-                    'accion'            => 'Criopreservación',
+                    'accion'            => 'criopreservar',
                     'descripcion'       => 'El ovocito ha sido criopreservado.',
                     'usuario_id'        => $rol,
+                    'estado_anterior_id' => $estado->TipoEstadoOvocito->id,
+                    'estado_nuevo_id' => $estado->TipoEstadoOvocito->id,
                 ]);
             }
         }
@@ -274,6 +274,149 @@ public function registrarCriopreservacion($ovocito_id)
     }
 }
 
+private function deallocateOvocyte($ovocito)
+{
+    try {
+        Log::info("Iniciando retiro de  ovocito $ovocito");
+    if (!$ovocito->guardado_id || !$ovocito->guardado) {
+        return false; // nada que liberar
+    }
+
+    $datos = $ovocito->guardado;
+
+    $payload = [
+        "ovocito_id" => (string)$ovocito->id,
+        "nro_grupo"  => '5',
+        "id_tanque"  => $datos->id_tanque,
+        "id_rack"    => $datos->id_rack,
+    ];
+   
+
+    $response = Http::withHeaders([
+        'Content-Type' => 'application/json',
+    ])->post(
+        'https://ssewaxrnlmnyizqsbzxe.supabase.co/functions/v1/deallocate-ovocyte',
+        $payload
+    );
+
+    if ($response->successful()) {
+        // Liberado correctamente
+        $ovocito->update(['guardado_id' => null]);
+        $ovocito->guardado->delete();
+        Log::info("Retiro exitoso");
+        return true;
+    }
+
+    return false;
+    }catch(\Exception $e) {
+        Log::error('Excepción registrando retiro de ovocito: ' . $e->getMessage());
+        return false;
+    }
+}
+
+
+public function getJson($id)
+{
+    $ovocito = Ovocito::with('estado_ovocito.TipoEstadoOvocito', 'guardado')->findOrFail($id);
+
+    // Convertimos en JSON y devolvemos solo lo necesario
+    return response()->json([
+        'id' => $ovocito->id,
+        'identificador' => $ovocito->identificador,
+        'calidad_morfologica' => $ovocito->calidad_morfologica,
+        'guardado' => [
+            'id_tanque' => $ovocito->guardado->id_tanque ?? null,
+            'id_rack' => $ovocito->guardado->id_rack ?? null,
+        ],
+        'estado_ovocito' => [
+            'tipo' => $ovocito->estado_ovocito->TipoEstadoOvocito->nombre ?? null,
+            'tiempo_maduracion' => $ovocito->estado_ovocito->tiempo_maduracion ?? null,
+            'motivo_descarte' => $ovocito->estado_ovocito->motivo_descarte ?? null,
+        ],
+    ]);
+}
+
+
+public function updateOvocito(Request $request)
+{
+    // 1️⃣ Tomar el ID desde el formulario
+    $id = $request->input('ovocito_id');
+    $ovocito = Ovocito::with('estado_ovocito')->findOrFail($id);
+
+    // 2️⃣ Guardar datos actuales para historial
+    $estadoAnterior = $ovocito->estado_ovocito 
+    ? $ovocito->estado_ovocito->replicate() 
+    : null;
+    
+    // 3️⃣ Determinar estado nuevo
+    $estadoInicial = $request->input('estado_inicial'); // muy_inmaduro, inmaduro, maduro
+    $motivoDescarte = $request->input('motivo_descarte');
+    $tiempoMaduracion = $request->input('tiempo_maduracion');
+    
+    if ($estadoInicial == 'muy_inmaduro') $estadoInicial = "Muy inmaduro";
+    
+    // Buscar el tipo de estado
+    $tipoEstado = TipoEstadoOvocito::where('nombre', ucfirst($estadoInicial))->first();
+    if (!$tipoEstado) {
+        return redirect()->back()->with('error', 'Estado inválido.');
+    }
+
+    // 4️⃣ Crear o actualizar el EstadoOvocito
+    $estado = $ovocito->estado_ovocito ?? new EstadoOvocito();
+    $estado->tipo_estado_ovocito_id = $tipoEstado->id;
+    $estado->motivo_descarte = $motivoDescarte ?? null;
+    $estado->tiempo_maduracion = $tiempoMaduracion ?? null;
+    $estado->save();
+
+    // Asociar al ovocito
+    $ovocito->estado_ovocito_id = $estado->id;
+
+    // 5️⃣ Calidad morfológica si corresponde
+    if ($request->has('calidad_morfologica')) {
+        $ovocito->calidad_morfologica = $request->input('calidad_morfologica');
+    }
+
+    $ovocito->save();
+
+    $isOK = false;
+    $eraMaduro = $estadoAnterior?->TipoEstadoOvocito?->nombre === 'Maduro';
+    $estaCriopreservado = $ovocito->guardado;
+    if ($eraMaduro && $estaCriopreservado) {
+        $isOK = $this->deallocateOvocyte($ovocito);
+         
+        if (!$isOK) {
+            return redirect()->back()->with('error', 'No se pudo liberar la posición del ovocito.');
+        }
+    }
+
+
+    
+    // 6️⃣ Crear historial
+    $ovocito->historial()->create([
+        'fecha_cambio' => now(),
+        'accion' => $request->accion,
+        'estado_anterior_id' => $estadoAnterior->tipo_estado_ovocito_id,
+        'estado_nuevo_id' => $estado->tipo_estado_ovocito_id,
+        'motivo_descarte' => $motivoDescarte,
+        'tiempo_maduracion' => $tiempoMaduracion,
+    ]);
+    if($isOK) return redirect()->back()->with('success', "Ovocito {$ovocito->identificador} actualizado correctamente. Ademas se retiro el ovocito de la zona de criopreservacion");
+    if ($request->accion == 'criopreservar' && !$estaCriopreservado){
+        $guardadoId = $this->registrarCriopreservacion($id);
+
+            if ($guardadoId) {
+
+                $ovocito->update([
+                    'guardado_id' => $guardadoId
+                ]);
+
+            }
+        }
+        elseif ($estaCriopreservado){
+            return redirect()->back()->with('error', "Este ovocito ya se encuentra criopreservado");
+        }
+    return redirect()->back()->with('success', "Ovocito {$ovocito->identificador} actualizado correctamente.");
+}
 
 
 

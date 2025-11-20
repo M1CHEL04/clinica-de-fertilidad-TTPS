@@ -143,8 +143,9 @@
                     <div class="border-b py-2">
                         <p><strong>Fecha:</strong> {{ $h->fecha_cambio }}</p>
                         <p><strong>Acción:</strong> {{ $h->accion }}</p>
-                        <p><strong>Estado anterior:</strong> {{ optional($h->estadoAnterior)->TipoEstadoOvocito->nombre ?? 'N/A' }}</p>
-                        <p><strong>Estado nuevo:</strong> {{ optional($h->estadoNuevo)->TipoEstadoOvocito->nombre ?? 'N/A' }}</p>
+                      
+                        <p><strong>Estado anterior:</strong> {{ $h->estadoAnterior->nombre ?? 'N/A' }}</p>
+                        <p><strong>Estado nuevo:</strong> {{ $h->estadoNuevo->nombre ?? 'N/A' }}</p>
                         @if($h->motivo_descarte)
                             <p><strong>Motivo de descarte:</strong> {{ $h->motivo_descarte }}</p>
                         @endif
@@ -164,6 +165,53 @@
             </div>
         </div>
     </div>
+
+    <!-- MODAL EDITAR OVOCITO -->
+<div id="modalEditOvocito" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-3xl p-6 max-h-[90vh] flex flex-col">
+
+        <h3 class="text-xl font-semibold mb-4 flex items-center text-gray-900">
+            <i class="fas fa-edit text-green-600 mr-2"></i> Editar Ovocito
+        </h3>
+        
+
+        <form id="formEditOvocito" method="POST" action="{{ route('ovocito.actualizar') }}" class="flex flex-col h-full">
+            @csrf
+            <input type="hidden" name="ovocito_id" id="editOvocitoId">
+            <input type="hidden" name="criopreservar" id="is_criopreservar" value="false">
+            <input type="hidden" name="accion" id="accion" value="false">
+            <div class="flex-1 overflow-y-auto max-h-[65vh] pr-2">
+
+                <!-- Identificador -->
+                <div class="mb-4">
+                    <label class="font-medium text-gray-700">Identificador</label>
+                    <input type="text" id="editIdentificador" name="identificador" class="input bg-gray-100 cursor-not-allowed" readonly>
+                </div>
+
+                <!-- Estado inicial -->
+                <div class="mb-4">
+                    <label class="font-medium text-gray-700">Estado inicial</label>
+                    <select id="editEstadoInicial" name="estado_inicial" class="input mt-1" onchange="actualizarCamposEdit()" required>
+                        <option value="">Seleccione</option>
+                        <option value="muy_inmaduro">Muy inmaduro</option>
+                        <option value="inmaduro">Inmaduro</option>
+                        <option value="maduro">Maduro</option>
+                    </select>
+                </div>
+
+                <div id="editExtra" class="mt-3"></div>
+
+            </div>
+
+            <div class="flex justify-end gap-3 mt-4">
+                <button type="button" onclick="cerrarModalEdit()" class="btn-secondary">Cancelar</button>
+                <button type="submit" class="btn-primary">Guardar Cambios</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
 
 @endforeach
 
@@ -331,9 +379,6 @@
 @section('scripts')
 <script>
 
-
-
-
 let contador = 0;
 
 /* -------------------------
@@ -356,6 +401,152 @@ function cerrarConfirmacion() {
     document.getElementById('confirmModal').classList.add('hidden');
 }
 
+function abrirModalEdit(ovocitoId) {
+    // Traer la info del ovocito desde el servidor
+    fetch(`/ovocito/${ovocitoId}/json`)
+        .then(response => {
+            if (!response.ok) throw new Error("Error al traer el ovocito");
+            return response.json();
+        })
+        .then(ovocito => {
+            console.log(ovocito)
+            // Cargar datos en el modal
+            document.getElementById("editOvocitoId").value = ovocito.id;
+            document.getElementById("editIdentificador").value = ovocito.identificador;
+
+            // Estado inicial
+            
+            let estado = ovocito.estado_ovocito?.tipo || ""; // "Muy inmaduro"
+
+            // Normalizamos a value del select
+            estado = estado.toLowerCase().replace(" ", "_"); // "muy_inmaduro"
+            document.getElementById("editEstadoInicial").value = estado;
+            console.log(document.getElementById("editEstadoInicial").value)
+
+            // Renderizar campos extra según estado y valores actuales
+            actualizarCamposEdit(ovocito);
+
+            // Abrir modal
+            document.getElementById("modalEditOvocito").classList.remove("hidden");
+        })
+        .catch(err => {
+            console.error(err);
+            alert("No se pudo cargar la información del ovocito.");
+        });
+}
+
+
+
+function cerrarModalEdit() {
+    document.getElementById("modalEditOvocito").classList.add("hidden");
+}
+
+function actualizarCamposEdit(data = null) {
+
+    const estado = document.getElementById("editEstadoInicial").value;
+    const box = document.getElementById("editExtra");
+    console.log("EL ESTADO ES " + estado)
+
+    box.innerHTML = "";
+
+    if (!estado) return;
+
+    const tiempo = data?.estado_ovocito?.tiempo_maduracion || "";
+    const calidad = data?.calidad_morfologica || "";
+    const motivo = data?.estado_ovocito?.motivo_descarte || "";
+    const destino = data?.estado_ovocito?.TipoEstadoOvocito?.nombre?.toLowerCase() || "";
+    
+    if (estado === "muy_inmaduro") {
+        box.innerHTML = `
+            <label class="text-sm text-gray-700">Acción</label>
+            <select id="editAccion" class="input mt-1" onchange="actualizarSubCamposEdit()" required>
+                <option value="">Seleccione</option>
+                <option value="descartar" ${motivo ? "selected" : ""}>Descartar</option>
+                <option value="tratar_inmaduro" ${tiempo ? "selected" : ""}>Tratar como inmaduro</option>
+            </select>
+            <div id="editDesc" class="mt-2"></div>
+        `;
+    } else if (estado === "inmaduro") {
+        box.innerHTML = `
+            <label class="text-sm text-gray-700">Tiempo de maduración (hs)</label>
+            <input type="number" min="1" class="input mt-1 bg-gray-100" name="tiempo_maduracion" value="${tiempo}">
+            <div id="editDesc" class="mt-2"></div>
+        `;
+    } else if (estado === "maduro") {
+        box.innerHTML = `
+            <label class="text-sm text-gray-700">Destino</label>
+            <select id="editDestino" class="input mt-1" onchange="actualizarSubCamposEdit()" required>
+                <option value="">Seleccione</option>
+                <option value="fecundar" ${destino==="fecundar"?"selected":""}>Fecundación</option>
+                <option value="criopreservar" ${destino==="criopreservar"?"selected":""}>Criopreservación</option>
+                <option value="descartar" ${destino==="descartar"?"selected":""}>Descartar</option>
+            </select>
+            <div id="editDesc" class="mt-2"></div>
+        `;
+    }
+
+    actualizarSubCamposEdit(data);
+}
+
+function actualizarSubCamposEdit(data = null) {
+    const estado = document.getElementById("editEstadoInicial").value;
+    const accion = document.getElementById("editAccion")?.value;
+    const destino = document.getElementById("editDestino")?.value;
+    const box = document.getElementById("editDesc");
+
+    box.innerHTML = "";
+
+    const tiempo = data?.estado_ovocito?.tiempo_maduracion || "";
+    const calidad = data?.calidad_morfologica || "";
+    const motivo = data?.estado_ovocito?.motivo_descarte || "";
+    // Primero, obtenemos o creamos el input oculto
+    let inputCriopreservar = document.getElementById("is_criopreservar");
+    if (!inputCriopreservar) {
+        inputCriopreservar = document.createElement("input");
+        inputCriopreservar.type = "hidden";
+        inputCriopreservar.id = "is_criopreservar";
+        inputCriopreservar.name = "is_criopreservar";
+        document.querySelector("form").appendChild(inputCriopreservar); // o donde esté tu form
+    }
+    let inputAccion = document.getElementById("accion")
+    
+
+    // Determinar la acción según el select visible
+    let accionValue = "";
+    if (estado === "muy_inmaduro") {
+        accionValue = accion || ""; // "descartar" o "tratar_inmaduro"
+    } else if (estado === "maduro") {
+        accionValue = destino || ""; // "fecundar", "criopreservar", "descartar"
+    } else {
+        accionValue = ""; // inactivo para inmaduro
+    }
+
+    inputAccion.value = accionValue;
+    // Ahora seteamos el valor según el destino
+    inputCriopreservar.value = destino === "criopreservar" ? "true" : "false";
+
+
+    if (estado === "muy_inmaduro" && accion === "descartar") {
+        box.innerHTML = `<label class="text-sm text-gray-700">Motivo de descarte</label>
+                         <textarea class="input mt-1 bg-gray-100" name="motivo_descarte">${motivo}</textarea>`;
+    } else if (estado === "muy_inmaduro" && accion === "tratar_inmaduro") {
+        box.innerHTML = `<label class="text-sm text-gray-700">Tiempo de maduración (hs)</label>
+                         <input type="number" min="1" class="input mt-1 bg-gray-100" name="tiempo_maduracion" value="${tiempo}" required>`;
+    } else if (estado === "maduro" && ["fecundar","criopreservar"].includes(destino)) {
+        box.innerHTML = `<label class="text-sm text-gray-700">Calidad morfológica</label>
+                         <select class="input mt-1 bg-gray-100" name="calidad_morfologica" required>
+                            <option value="">Seleccione</option>
+                            <option value="1" ${calidad==1?"selected":""}>1 — Muy baja</option>
+                            <option value="2" ${calidad==2?"selected":""}>2 — Baja</option>
+                            <option value="3" ${calidad==3?"selected":""}>3 — Media</option>
+                            <option value="4" ${calidad==4?"selected":""}>4 — Buena</option>
+                            <option value="5" ${calidad==5?"selected":""}>5 — Excelente</option>
+                         </select>`;
+    } else if (estado === "maduro" && destino === "descartar") {
+        box.innerHTML = `<label class="text-sm text-gray-700">Motivo de descarte</label>
+                         <textarea class="input mt-1 bg-gray-100" name="motivo_descarte">${motivo}</textarea>`;
+    }
+}
 
 
 /* -------------------------

@@ -36,11 +36,11 @@ return new class extends Migration
           ->cascadeOnDelete();
 
     $table->foreign('estado_anterior_id')
-          ->references('id')->on('estados_ovocitos') // ← AJUSTAR NOMBRE REAL
+          ->references('id')->on('tipo_estado_ovocito') // ← AJUSTAR NOMBRE REAL
           ->nullOnDelete();
 
     $table->foreign('estado_nuevo_id')
-          ->references('id')->on('estados_ovocitos') // ← AJUSTAR NOMBRE REAL
+          ->references('id')->on('tipo_estado_ovocito') // ← AJUSTAR NOMBRE REAL
           ->cascadeOnDelete();
 });
 

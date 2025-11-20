@@ -55,7 +55,9 @@ Route::post('/tratamiento/{id}/agendar-consulta', [MedicoController::class, 'age
     ->name('tratamiento.agendar-consulta');
 
 Route::get('/ovocitos/{id}/editar', [OperadorController::class, 'editar'])->name('ovocito.editar');
-Route::put('/ovocitos/{id}', [OperadorController::class, 'actualizar'])->name('ovocito.actualizar');
+Route::post('ovocitos/actualizar', [OperadorController::class, 'updateOvocito'])->name('ovocito.actualizar');
+
+Route::get('/ovocito/{id}/json', [OperadorController::class, 'getJson'])->name('ovocito.json');
 
 
 ###########################################################
