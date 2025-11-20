@@ -9,7 +9,7 @@ use App\Models\Objetivo;
 use App\Models\EstadoTratamiento;
 use App\Models\Estudio;
 use App\Models\Monitoreo;
-use App\Models\AtecedenteFamiliar;
+use App\Models\AntecedenteFamiliar;
 use App\Models\AntecedentePersonal;
 use App\Models\AntecedenteGinecologico;
 use App\Models\AntecedenteGenital;
@@ -57,7 +57,7 @@ class Tratamiento extends Model
 
     public function antecedentesFamiliares()
     {
-        return $this->hasOne(AtecedenteFamiliar::class, 'tratamiento_id');
+        return $this->hasOne(AntecedenteFamiliar::class, 'tratamiento_id');
     }
 
     public function antecedentesPersonales()

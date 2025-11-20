@@ -10,6 +10,7 @@ class AntecedenteGinecologico extends Model
     protected $table =  'antecedentes_ginecologicos';
 
     protected $fillable = [
+        'tratamiento_id',
         'ciclo_regular',
         'duracion',
         'caracteristicas_sangrado',

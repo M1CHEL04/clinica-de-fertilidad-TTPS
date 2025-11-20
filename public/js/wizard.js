@@ -11,6 +11,7 @@ function showStep(step) {
     currentStep = step;
 }
 
+
 function nextStep() {
     if (currentStep < 4) showStep(currentStep + 1);
 }

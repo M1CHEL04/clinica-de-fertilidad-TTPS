@@ -9,7 +9,6 @@ class ConsultaController extends Controller
 {
     public function create()
     {
-        Log::info('ENTRE A CREATE');
 
         $objetivos = \App\Models\Objetivo::all();
         return view('medico.primerConsulta', compact('objetivos'));

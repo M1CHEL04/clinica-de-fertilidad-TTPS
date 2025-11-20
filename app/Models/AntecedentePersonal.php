@@ -18,6 +18,7 @@ class AntecedentePersonal extends Model
         'bebida_alcohol',
         'droga',
         'observaciones',
+        'antecedentes',
     ];
 
     public function tratamiento()

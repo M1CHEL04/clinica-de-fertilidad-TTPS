@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Tratamiento;
 
-class AtecedenteFamiliar extends Model
+class AntecedenteFamiliar extends Model
 {
     protected $table = 'antecedentes_familiares';
 

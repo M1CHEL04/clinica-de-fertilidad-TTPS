@@ -32,7 +32,6 @@
         <span class="nav-step" data-step="2">Antecedentes familiares</span>
         <span class="nav-step" data-step="3">Antecedentes ginecológicos</span>
         <span class="nav-step" data-step="4">Fenotipo</span>
-
     </div>
 
     <form action="{{ route('consulta.store') }}" method="POST">
@@ -40,6 +39,7 @@
 
         {{-- STEP 1 --}}
         <div class="step active" id="step-1">
+
 
            <h2>Objetivo de la consulta</h2>
 
@@ -57,14 +57,16 @@
 
             <h3>Datos personales</h3>
 
-            <h3>Antecedentes</h3>
+            
             <div class="mb-3">
-                <label for="antecedente" class="form-label">Antecedente</label>
+                <label for="antecedente-input" class="form-label">Antecedentes</label>
                 <div class="dropdown">
-                    <input type="text" id="antecedente-input" class="form-control dropdown-toggle" data-bs-toggle="dropdown" placeholder="Ingresar 3 letras...">
+                    <input type="text" id="antecedente-input" class="form-control" placeholder="Ingresar 3 letras...">
                     <div id="antecedente-dropdown" class="dropdown-menu p-2" style="max-height: 180px; overflow-y: auto;"></div>
                 </div>
+                <ul id="antecedente-list" class="list-group mt-2"></ul>
             </div>
+
 
             
 
@@ -264,8 +266,9 @@
 
             <br>
             <button type="button" onclick="prevStep()" class="btn btn-secondary">← Atrás</button>
-            
+            <button type="submit" class="btn btn-success float-end">Guardar consulta</button>
         </div>
+        
 
 
     </form>
@@ -278,81 +281,7 @@
 <script src="{{ asset('js/terminos.js') }}"></script>
 <script src="{{ asset('js/familiares.js') }}"></script>
 <script src="{{ asset('js/wizard.js')}}"></script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-
-    const fuma = document.getElementById("fuma");
-    const campoCantidad = document.getElementById("campo-cantidad");
-
-    const alcohol = document.getElementById("alcohol");
-    const alcoholExtra = document.getElementById("alcohol-extra");
-
-    // --- FUMA ---
-    fuma.addEventListener("change", () => {
-        if (fuma.value === "si") {
-            campoCantidad.style.display = "block";
-        } else {
-            campoCantidad.style.display = "none";
-            document.getElementById("cantidad").value = "";
-        }
-    });
-
-    // --- ALCOHOL ---
-    alcohol.addEventListener("change", () => {
-        if (alcohol.value === "si") {
-            alcoholExtra.style.display = "block";
-        } else {
-            alcoholExtra.style.display = "none";
-            document.getElementById("frecuencia").value = "";
-            document.getElementById("bebida-alcohol").value = "";
-        }
-    });
-
-});
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-
-    const fuma = document.getElementById("fuma");
-    const campoCantidad = document.getElementById("campo-cantidad");
-
-    const cant = document.getElementById("cant_cigarros");
-    const dias = document.getElementById("dias_fuma");
-    const anios = document.getElementById("anios_fuma");
-    const cantidadFinal = document.getElementById("cantidad");
-    const preview = document.getElementById("preview_cantidad");
-
-    // Mostrar/ocultar según Selección de Fuma
-    fuma.addEventListener("change", () => {
-        if (fuma.value === "si") {
-            campoCantidad.style.display = "block";
-        } else {
-            campoCantidad.style.display = "none";
-            cant.value = "";
-            dias.value = "";
-            anios.value = "";
-            cantidadFinal.value = "";
-            preview.textContent = "";
-        }
-    });
-
-    // Función que arma el texto final
-    function actualizarPackDias() {
-        if (cant.value && dias.value && anios.value) {
-            const texto = `${cant.value} cigarros x ${dias.value} días x ${anios.value} años / 20`;
-            cantidadFinal.value = texto;
-            preview.textContent = "->" + texto;
-        } else {
-            cantidadFinal.value = "";
-            preview.textContent = "";
-        }
-    }
-
-    // Actualizar cada vez que el usuario escribe
-    [cant, dias, anios].forEach(input => {
-        input.addEventListener("input", actualizarPackDias);
-    });
-
-});
-</script>
+<script src="{{ asset('js/formulario.js')}}"></script>
+<script src="{{ asset('js/estandarFumar.js')}}"></script>
+<script src="{{ asset('js/antecedentes.js')}}"></script>
 @endsection

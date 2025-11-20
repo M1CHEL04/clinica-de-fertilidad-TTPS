@@ -133,4 +133,16 @@ Route::post('/estudios', [EstudiosController::class, 'store'])->name('estudios.s
 Route::get('/estudios', [EstudiosController::class, 'estudios'])
     ->name('estudios.index');
 
+    Route::get('/consulta/pareja_mujer', function() {
+    return view('medico.pareja-mujer');
+});
+
+Route::get('/consulta/hombre_gametos', function() {
+    return view('medico.pareja-hombre');
+});
+
+Route::get('/consulta/hombre_donado', function() {
+    return view('medico.semen-donado');
+});
+
 
