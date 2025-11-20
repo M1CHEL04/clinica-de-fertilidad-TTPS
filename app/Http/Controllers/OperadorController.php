@@ -6,8 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Puncion;
 use App\Models\Ovocito;
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\EstadoOvocito;
+use App\Models\Guardado;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use App\Models\HistorialOvocito;
+use App\Models\TipoEstadoOvocito;
 
 class OperadorController extends Controller
 {
@@ -69,19 +74,49 @@ class OperadorController extends Controller
     public function formPuncion($paciente_id)
     {
         $paciente = User::findOrFail($paciente_id);
+        
 
+        // Traemos TODAS las punciones del paciente con toda la información necesaria
+        $punciones = Puncion::where('paciente_id', $paciente_id)
+            ->with([
+                'operador', // usuario que registró la punción
+
+                'ovocitos.estado_ovocito', // estado del ovocito
+                'ovocitos.estado_ovocito.TipoEstadoOvocito', // tipo de estado
+                'ovocitos.guardado', // si existe relación de guardado
+                'ovocitos.paciente', // paciente dueño del ovocito
+            ])
+            ->orderBy('fecha_hora', 'desc')
+            ->get();
+        $estados = TipoEstadoOvocito::all();
+        //dd( $punciones->toArray());
         return view('operador.puncion', [
-            'paciente' => $paciente,
-            'punciones' => collect(), // evita errores en la vista
+            'paciente'  => $paciente,
+            'punciones' => $punciones,
+            'estados'   => $estados,
         ]);
     }
 
-   public function guardarPuncion(Request $request)
+
+
+    private function mapTipoEstado($estado)
+{
+    return match ($estado) {
+        'muy_inmaduro' => 3,
+        'inmaduro'     => 2,
+        'maduro'       => 1,
+        default        => 1,
+    };
+}
+
+
+ public function guardarPuncion(Request $request)
 {
     $request->validate([
-        'paciente_id'     => 'required|exists:usuarios,id',
-        'fecha_hora'      => 'required|date',
-        'nro_quirofano'   => 'required|string|max:20',
+        'paciente_id'   => 'required|exists:usuarios,id',
+        'fecha'         => 'required|date',
+        'hora'          => 'required',
+        'numero_quirofano' => 'required|string|max:20',
 
         'ovocitos'                     => 'required|array',
         'ovocitos.*.id'                => 'required|string',
@@ -93,37 +128,154 @@ class OperadorController extends Controller
         'ovocitos.*.calidad_morfologica' => 'nullable|string',
         'ovocitos.*.motivo_descarte'     => 'nullable|string',
     ]);
+
+    // Unificación fecha + hora
     $fechaCompleta = $request->fecha . ' ' . $request->hora . ':00';
+
+    $rol = session('user_id');
 
     // Crear punción
     $puncion = Puncion::create([
         'fecha_hora'    => $fechaCompleta,
-        'nro_quirofano' => $request->nro_quirofano,
-        'operador_id'   => Auth::id(),
+        'nro_quirofano' => $request->numero_quirofano,
+        'operador_id'   => $rol,
         'paciente_id'   => $request->paciente_id,
     ]);
 
-    // Guardar ovocitos uno por uno
+    // Guardar ovocitos con su estado
     foreach ($request->ovocitos as $ovo) {
 
-        Ovocito::create([
-            'identificador'      => $ovo['id'],
-            'estado_inicial'     => $ovo['estado_inicial'] ?? null,
-            'accion_muy_inmaduro'=> $ovo['accion_muy_inmaduro'] ?? null,
-            'tiempo_maduracion'  => $ovo['tiempo_maduracion'] ?? null,
-            'destino_maduro'     => $ovo['destino_maduro'] ?? null,
-            'calidad_morfologica'=> $ovo['calidad_morfologica'] ?? null,
-            'motivo_descarte'    => $ovo['motivo_descarte'] ?? null,
+        // 1) Crear estado según el caso
+        $estado = new EstadoOvocito();
+        $estado->tipo_estado_ovocito_id = $this->mapTipoEstado($ovo['estado_inicial']);
+        $estado->motivo_descarte  = $ovo['motivo_descarte']     ?? null;
+        $estado->tiempo_maduracion = $ovo['tiempo_maduracion']  ?? null;
+        $estado->save();
 
-            'paciente_id'        => $request->paciente_id,
-            'puncion_id'         => $puncion->id,
+        // 2) Crear ovocito asociado
+        $ovocito = Ovocito::create([
+            'identificador'       => $ovo['id'],
+            'calidad_morfologica' => $ovo['calidad_morfologica'] ?? null,
+            'paciente_id'         => $request->paciente_id,
+            'puncion_id'          => $puncion->id,
+            'estado_ovocito_id'   => $estado->id,
         ]);
+
+        /*
+        ──────────────────────────────────────────
+        REGISTRO DE HISTORIAL
+        ──────────────────────────────────────────
+        */
+
+        // Estado inicial
+        HistorialOvocito::create([
+            'ovocito_id'        => $ovocito->id,
+            'estado_ovocito_id' => $estado->id,
+            'accion'            => 'Estado inicial',
+            'descripcion'       => 'Estado inicial: ' . $ovo['estado_inicial'],
+            'usuario_id'        => $rol,
+        ]);
+
+        // Maduración
+        if (!empty($ovo['tiempo_maduracion'])) {
+            HistorialOvocito::create([
+                'ovocito_id'        => $ovocito->id,
+                'estado_ovocito_id' => $estado->id,
+                'accion'            => 'Maduración',
+                'descripcion'       => 'Tiempo de maduración: ' . $ovo['tiempo_maduracion'] . ' horas.',
+                'usuario_id'        => $rol,
+            ]);
+        }
+
+        // Descarte
+        if (!empty($ovo['motivo_descarte'])) {
+            HistorialOvocito::create([
+                'ovocito_id'        => $ovocito->id,
+                'estado_ovocito_id' => $estado->id,
+                'accion'            => 'Descarte',
+                'descripcion'       => 'Motivo: ' . $ovo['motivo_descarte'],
+                'usuario_id'        => $rol,
+            ]);
+        }
+
+        // Criopreservación
+        if (!empty($ovo['destino_maduro']) && $ovo['destino_maduro'] === 'criopreservar') {
+
+            $guardadoId = $this->registrarCriopreservacion($ovocito->id);
+
+            if ($guardadoId) {
+
+                $ovocito->update([
+                    'guardado_id' => $guardadoId
+                ]);
+
+                HistorialOvocito::create([
+                    'ovocito_id'        => $ovocito->id,
+                    'estado_ovocito_id' => $estado->id,
+                    'accion'            => 'Criopreservación',
+                    'descripcion'       => 'El ovocito ha sido criopreservado.',
+                    'usuario_id'        => $rol,
+                ]);
+            }
+        }
     }
 
-    return redirect()
-        ->route('operador.puncion.form', $request->paciente_id)
-        ->with('success', 'Punción registrada correctamente.');
+    return redirect()->back()->with('success', 'Acción realizada correctamente.');
 }
+
+
+public function registrarCriopreservacion($ovocito_id)
+{
+    try {
+        Log::info("Iniciando registro de criopreservación para ovocito $ovocito_id");
+
+        // Llamada al endpoint
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post(
+            'https://ssewaxrnlmnyizqsbzxe.supabase.co/functions/v1/assign-ovocyte',
+            [
+                'nro_grupo' => 5,
+                'ovocito_id' => $ovocito_id,
+            ]
+        );
+
+        if (!$response->successful()) {
+            Log::error('Error al registrar criopreservación', [
+                'status' => $response->status(),
+                'body'   => $response->body()
+            ]);
+            return false;
+        }
+
+        // El endpoint devuelve un array → tomamos el primer elemento
+        $data = $response->json();
+        
+        if (!is_array($data) || empty($data)) {
+            Log::error("Respuesta inesperada del módulo", ['data' => $data]);
+            return false;
+        }
+
+        $registro = $data[0];
+
+        Log::info('Criopreservación asignada correctamente', $registro);
+        
+        // Guardar en la tabla guardados
+        $guardado = Guardado::create([
+            'id_tanque'   => $registro['tanque_id'],
+            'id_rack'     => $registro['rack_id'],
+        ]);
+        
+        return $guardado->id;
+
+    } catch (\Exception $e) {
+        Log::error('Excepción registrando criopreservación: ' . $e->getMessage());
+        return false;
+    }
+}
+
+
+
 
 }
 

@@ -19,6 +19,8 @@ class Ovocito extends Model
         'guardado_id',
         'paciente_id',
         'puncion_id',
+        'calidad_morfologica',
+        'estado_ovocito_id'
     ];
 
     public function guardado()
@@ -40,4 +42,10 @@ class Ovocito extends Model
     {
         return $this->belongsTo(EstadoOvocito::class, 'estado_ovocito_id');
     }
+
+    public function historial()
+{
+    return $this->hasMany(HistorialOvocito::class, 'ovocito_id');
+}
+
 }

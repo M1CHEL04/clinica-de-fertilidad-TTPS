@@ -51,8 +51,11 @@ Route::post('/tratamiento/{id}/avanzar', [MedicoController::class, 'avanzarEtapa
 Route::post('/tratamiento/{id}/retroceder', [MedicoController::class, 'retrocederEtapa'])
     ->name('tratamiento.retroceder-etapa');
 
-    Route::post('/tratamiento/{id}/agendar-consulta', [MedicoController::class, 'agendarConsulta'])
-     ->name('tratamiento.agendar-consulta');
+Route::post('/tratamiento/{id}/agendar-consulta', [MedicoController::class, 'agendarConsulta'])
+    ->name('tratamiento.agendar-consulta');
+
+Route::get('/ovocitos/{id}/editar', [OperadorController::class, 'editar'])->name('ovocito.editar');
+Route::put('/ovocitos/{id}', [OperadorController::class, 'actualizar'])->name('ovocito.actualizar');
 
 
 ###########################################################

@@ -8,6 +8,14 @@ use App\Models\Ovocito;
 
 class Guardado extends Model
 {
+
+    protected $table = 'guardados';
+
+    protected $fillable = [
+        'id_tanque',
+        'id_rack'
+    ];   
+
     public function embriones()
     {
         return $this->hasMany(Embrion::class, 'guardado_id');

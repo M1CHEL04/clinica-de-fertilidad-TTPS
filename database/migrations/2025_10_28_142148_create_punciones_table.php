@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('punciones', function (Blueprint $table) {
             $table->id();
-            $table->date('fecha_hora');
+            $table->dateTime('fecha_hora');
             $table->string('nro_quirofano');
             $table->foreignIdFor(User::class, 'operador_id');
             $table->foreignIdFor(User::class, 'paciente_id');

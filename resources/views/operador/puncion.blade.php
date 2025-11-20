@@ -38,9 +38,10 @@
                                 class="w-full flex justify-between items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg">
 
                             <span class="font-medium text-gray-800">
-                                {{ \Carbon\Carbon::parse($puncion->fecha)->format('d/m/Y') }} —
-                                {{ $puncion->hora }} — Qx: {{ $puncion->numero_quirofano }}
+                                Fecha: {{ ($puncion->fecha_hora)}} 
+                                
                             </span>
+                            <span class="font-medium text-gray-800">Quirofano: {{ $puncion->nro_quirofano }}</span>
 
                             <i :class="open ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
                                class="text-gray-600"></i>
@@ -57,42 +58,117 @@
                             <div class="space-y-3">
 
                                 @foreach ($puncion->ovocitos as $ovocito)
-                                    <div x-data="{ detail: false }" class="border rounded-md">
+    <div x-data="{ detail: false }" class="border rounded-md">
 
-                                        <button @click="detail = !detail"
-                                            class="w-full flex justify-between items-center px-3 py-2 bg-gray-50 hover:bg-gray-100">
-                                            <span class="font-medium">{{ $ovocito->id_ovocito }}</span>
-                                            <i :class="detail ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
-                                               class="text-gray-500"></i>
-                                        </button>
+        <!-- HEADER DEL OVOCITO -->
+        <div class="flex justify-between items-center bg-gray-50 px-3 py-2 hover:bg-gray-100 rounded-t-md">
+            <span class="font-medium">Identificador: {{ $ovocito->identificador }}</span>
 
-                                        <div x-show="detail" x-transition class="p-3 text-sm border-t">
-                                            <p><strong>Estado inicial:</strong> {{ $ovocito->estado_inicial }}</p>
-                                            <p><strong>Estado final:</strong> {{ $ovocito->estado_final ?? '-' }}</p>
-                                            @if($ovocito->tiempo_maduracion)
-                                                <p><strong>Tiempo maduración:</strong> {{ $ovocito->tiempo_maduracion }} hs</p>
-                                            @endif
-                                            @if($ovocito->calidad_morfologica)
-                                                <p><strong>Calidad morfológica:</strong> {{ $ovocito->calidad_morfologica }}</p>
-                                            @endif
-                                            @if($ovocito->motivo_descarte)
-                                                <p><strong>Motivo descarte:</strong> {{ $ovocito->motivo_descarte }}</p>
-                                            @endif
+            <div class="flex items-center gap-2">
+                <!-- Botón historial -->
+                <button onclick="document.getElementById('modal-{{ $ovocito->id }}').classList.remove('hidden')"
+                        class="text-blue-500 hover:text-blue-700">
+                    <i class="fas fa-history"></i>
+                </button>
+                <!-- Botón editar -->
+                <button type="button"
+                    onclick="abrirModalEdit({{ $ovocito->id }})"
+                    class="text-green-600 hover:text-green-800">
+                <i class="fas fa-edit"></i>
+            </button>
 
-                                            <div class="mt-2">
-                                                <strong>Tracking:</strong>
-                                                <ul class="list-disc list-inside text-gray-700 text-xs mt-1">
-                                                    @foreach($ovocito->historial as $log)
-                                                        <li>{{ $log }}</li>
-                                                    @endforeach
-                                                </ul>
-                                            </div>
+
+                <!-- Botón desplegar detalle -->
+                <button @click="detail = !detail">
+                    <i :class="detail ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                       class="text-gray-500"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- DETALLE DEL OVOCITO -->
+        <div x-show="detail" x-transition class="p-3 bg-gray-50 border-t text-gray-700">
+            @php
+                $estadoObj   = optional($ovocito->estado_ovocito);
+                $tipoEstado  = optional($estadoObj->TipoEstadoOvocito);
+                $motivoDescarte = $estadoObj->motivo_descarte;
+                $nombreEstado   = $tipoEstado->nombre ? strtolower($tipoEstado->nombre) : null;
+                $tiempoMaduracion = optional($ovocito->estado_ovocito)->tiempo_maduracion;
+                $guardado = $ovocito->guardado_id? strtolower($ovocito->guardado_id) : null;
+                $estadoFinal = '';
+
+                if ($motivoDescarte) $estadoFinal = 'Descartado';
+                elseif ($guardado != null) $estadoFinal = 'Criopreservado';
+                elseif ($nombreEstado === 'maduro' && !$guardado) $estadoFinal = 'Listo para fecundar';
+                elseif($tiempoMaduracion) $estadoFinal = 'Madurando';
+                else $estadoFinal = $tipoEstado->nombre ?? 'Sin estado';
+            @endphp
+
+           
+            <p><strong>Estado:</strong> {{ $tipoEstado->nombre ?? 'Sin estado' }}</p>
+            <p><strong>Condición:</strong> {{ $estadoFinal }}</p>
+
+            @if($tiempoMaduracion)
+                <p><strong>Tiempo maduración:</strong> {{ $tiempoMaduracion }} hs</p>
+            @endif
+            @if($ovocito->calidad_morfologica)
+                <p><strong>Calidad morfológica:</strong> {{ $ovocito->calidad_morfologica }}</p>
+            @endif
+            @if($motivoDescarte)
+                <p><strong>Motivo de descarte:</strong> {{ $motivoDescarte }}</p>
+            @endif
+            @if($ovocito->guardado_id)
+                <p><strong>Tanque:</strong> {{ $ovocito->guardado->id_tanque }}</p>
+                <p><strong>Rack:</strong> {{ $ovocito->guardado->id_rack }}</p>
+            @endif
+        </div>
+
+    </div>
+
+    <!-- MODAL HISTORIAL OVOCITO -->
+    <div id="modal-{{ $ovocito->id }}"
+         class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[80vh] p-6 flex flex-col">
+
+            <!-- HEADER -->
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Historial Ovocito {{ $ovocito->identificador }}</h3>
+                <button onclick="document.getElementById('modal-{{ $ovocito->id }}').classList.add('hidden')"
+                        class="text-gray-600 hover:text-gray-900 text-xl">&times;</button>
+            </div>
+
+            <!-- CONTENIDO SCROLLEABLE -->
+            <div class="overflow-y-auto flex-1 pr-2">
+                @forelse($ovocito->historial as $h)
+                    <div class="border-b py-2">
+                        <p><strong>Fecha:</strong> {{ $h->fecha_cambio }}</p>
+                        <p><strong>Acción:</strong> {{ $h->accion }}</p>
+                        <p><strong>Estado anterior:</strong> {{ optional($h->estadoAnterior)->TipoEstadoOvocito->nombre ?? 'N/A' }}</p>
+                        <p><strong>Estado nuevo:</strong> {{ optional($h->estadoNuevo)->TipoEstadoOvocito->nombre ?? 'N/A' }}</p>
+                        @if($h->motivo_descarte)
+                            <p><strong>Motivo de descarte:</strong> {{ $h->motivo_descarte }}</p>
+                        @endif
+                        @if($h->tiempo_maduracion)
+                            <p><strong>Tiempo maduración:</strong> {{ $h->tiempo_maduracion }} hs</p>
+                        @endif
+                    </div>
+                @empty
+                    <p class="text-gray-500">No hay historial registrado.</p>
+                @endforelse
+            </div>
+
+            <!-- FOOTER -->
+            <div class="flex justify-end mt-4">
+                <button onclick="document.getElementById('modal-{{ $ovocito->id }}').classList.add('hidden')"
+                        class="btn-secondary">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+@endforeach
+
+
                                         </div>
-
-                                    </div>
-                                @endforeach
-
-                            </div>
 
                         </div>
                     </div>
@@ -132,68 +208,74 @@
 
 
 <!-- MODAL PRINCIPAL -->
+
 <div id="modalPuncion"
      class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
 
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-3xl p-6">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-3xl p-6 
+                max-h-[90vh] flex flex-col">
 
+        <!-- HEADER (NO SCROLLEA) -->
         <h3 class="text-xl font-semibold mb-4 flex items-center text-gray-900">
             <i class="fas fa-syringe text-indigo-600 mr-2"></i> Registrar Nueva Punción
         </h3>
 
-        <form id="formPuncion" method="POST" action="{{ route('puncion.guardar') }}">
+        <form id="formPuncion" method="POST" action="{{ route('puncion.guardar') }}"
+              class="flex flex-col h-full">
             @csrf
 
-            <input type="hidden" name="paciente_id" value="{{ $paciente->id }}">
-            <input type="hidden" id="pacienteNombre" 
-                   value="{{ $paciente->nombre }} {{ $paciente->apellido }}">
+            <!-- CUERPO SCROLLEABLE REAL -->
+            <div class="flex-1 overflow-y-auto max-h-[65vh] pr-2">
 
-            <!-- DATOS PRINCIPALES -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                    <label class="font-medium text-gray-700">Fecha</label>
-                    <input type="date" name="fecha" id="fechaPuncion" class="input" required>
+                <input type="hidden" name="paciente_id" value="{{ $paciente->id }}">
+                <input type="hidden" id="pacienteNombre" 
+                       value="{{ $paciente->nombre }} {{ $paciente->apellido }}">
+
+                <!-- DATOS PRINCIPALES -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="font-medium text-gray-700">Fecha</label>
+                        <input type="date" name="fecha" id="fechaPuncion" class="input" required>
+                    </div>
+
+                    <div>
+                        <label class="font-medium text-gray-700">Hora</label>
+                        <input type="time" name="hora" id="horaPuncion" class="input" required>
+                    </div>
+
+                    <div>
+                        <label class="font-medium text-gray-700">Número de quirófano</label>
+                        <input type="text" name="numero_quirofano" id="quirofanoPuncion" class="input bg-gray-100" required>
+                    </div>
                 </div>
 
-                <div>
-                    <label class="font-medium text-gray-700">Hora</label>
-                    <input type="time" name="hora" class="input" required>
+                <!-- PACIENTE -->
+                <div class="mb-4">
+                    <label class="font-medium text-gray-700">Nombre y apellido del paciente</label>
+                    <input type="text"
+                           value="{{ $paciente->nombre }} {{ $paciente->apellido }}"
+                           class="input bg-gray-100 cursor-not-allowed"
+                           readonly>
                 </div>
 
-                <div>
-                    <label class="font-medium text-gray-700">Número de quirófano</label>
-                    <input type="text" name="numero_quirofano" class="input bg-gray-100" required>
+                <!-- OVOCITOS -->
+                <div class="border rounded-lg p-4 bg-gray-50 mb-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-semibold">Ovocitos</span>
+
+                        <button type="button"
+                                onclick="agregarOvocito()"
+                                class="px-3 py-1 bg-indigo-600 text-white rounded-md text-sm">
+                            + Agregar ovocito
+                        </button>
+                    </div>
+
+                    <div id="contenedorOvocitos"></div>
                 </div>
             </div>
 
-            <!-- PACIENTE -->
-            <div class="mb-4">
-                <label class="font-medium text-gray-700">Nombre y apellido del paciente</label>
-                <input type="text"
-                       value="{{ $paciente->nombre }} {{ $paciente->apellido }}"
-                       class="input bg-gray-100 cursor-not-allowed"
-                       readonly>
-            </div>
-
-            <!-- OVOCITOS -->
-            <div class="border rounded-lg p-4 bg-gray-50 mb-4">
-
-                <div class="flex justify-between items-center mb-3">
-                    <span class="font-semibold">Ovocitos</span>
-
-                    <button type="button"
-                            onclick="agregarOvocito()"
-                            class="px-3 py-1 bg-indigo-600 text-white rounded-md text-sm">
-                        + Agregar ovocito
-                    </button>
-                </div>
-
-                <div id="contenedorOvocitos"></div>
-
-            </div>
-
-            <!-- BOTONES -->
-            <div class="flex justify-end gap-3">
+            <!-- FOOTER (NO SCROLLEA) -->
+            <div class="flex justify-end gap-3 mt-4">
                 <button type="button"
                         onclick="cerrarModal()"
                         class="btn-secondary">
@@ -210,6 +292,8 @@
         </form>
     </div>
 </div>
+
+
 
 
 <!-- MODAL CONFIRMACIÓN -->
@@ -247,6 +331,9 @@
 @section('scripts')
 <script>
 
+
+
+
 let contador = 0;
 
 /* -------------------------
@@ -269,6 +356,8 @@ function cerrarConfirmacion() {
     document.getElementById('confirmModal').classList.add('hidden');
 }
 
+
+
 /* -------------------------
    GENERAR ID OVOCITO
 ------------------------- */
@@ -286,6 +375,17 @@ function generarIdOvocito() {
         alert("Debe seleccionar la fecha antes de agregar ovocitos.");
         return null;
     }
+    const hora = document.getElementById("horaPuncion").value;
+    if (!hora) {
+        alert("Debe seleccionar la hora antes de agregar ovocitos.");
+        return null;
+    }
+    const quirofano = document.getElementById("quirofanoPuncion").value;
+    if (!quirofano) {
+        alert("Debe seleccionar el numero de quirofano antes de agregar ovocitos.");
+        return null;
+    }
+
 
     const f = fecha.replaceAll("-", ""); // YYYYMMDD
     contador++;
@@ -418,36 +518,68 @@ function actualizarSubCampos(i) {
     const accion = document.querySelector(`select[name="ovocitos[${i}][accion_muy_inmaduro]"]`)?.value;
 
     const zone = document.getElementById(`desc_${i}`);
-
-    // limpiar primero
     zone.innerHTML = "";
 
-    // Muy inmaduro → descarte
+    /* -------------------------
+       MUY INMADURO → DESCARTAR
+    ------------------------- */
     if (estado === "muy_inmaduro" && accion === "descartar") {
         zone.innerHTML = `
             <label class="text-sm text-gray-700">Motivo de descarte</label>
-            <textarea class="input mt-1 bg-gray-100" name="ovocitos[${i}][motivo_descarte]"></textarea>
+            <textarea class="input mt-1 bg-gray-100" 
+                      name="ovocitos[${i}][motivo_descarte]"></textarea>
         `;
     }
 
-    // Maduro → calidad morfológica
-    else if (estado === "maduro" && ["fecundar", "criopreservar"].includes(destino)) {
+    /* -------------------------
+       MUY INMADURO → TRATAR COMO INMADURO
+       → debe pedir tiempo de maduración
+    ------------------------- */
+    else if (estado === "muy_inmaduro" && accion === "tratar_inmaduro") {
         zone.innerHTML = `
-            <label class="text-sm text-gray-700">Calidad morfológica</label>
-            <input type="text" class="input mt-1 bg-gray-100" name="ovocitos[${i}][calidad_morfologica]">
+            <label class="text-sm text-gray-700">Tiempo de maduración (hs)</label>
+            <input type="number" min="1" 
+                   class="input mt-1 bg-gray-100"
+                   name="ovocitos[${i}][tiempo_maduracion]" 
+                   required>
         `;
     }
 
-    // Maduro → descarte
+    /* -------------------------
+       MADURO → Fecundar / Criopreservar
+       → requiere calidad morfológica
+    ------------------------- */
+    else if (estado === "maduro" && ["fecundar", "criopreservar"].includes(destino)) {
+    zone.innerHTML = `
+        <label class="text-sm text-gray-700">Calidad morfológica</label>
+        <select class="input mt-1 bg-gray-100" 
+                name="ovocitos[${i}][calidad_morfologica]" required>
+            <option value="">Seleccione</option>
+            <option value="1">1 — Muy baja</option>
+            <option value="2">2 — Baja</option>
+            <option value="3">3 — Media</option>
+            <option value="4">4 — Buena</option>
+            <option value="5">5 — Excelente</option>
+        </select>
+    `;
+}
+
+
+    /* -------------------------
+       MADURO → Descarta
+    ------------------------- */
     else if (estado === "maduro" && destino === "descartar") {
         zone.innerHTML = `
             <label class="text-sm text-gray-700">Motivo de descarte</label>
-            <textarea class="input mt-1 bg-gray-100" name="ovocitos[${i}][motivo_descarte]"></textarea>
+            <textarea class="input mt-1 bg-gray-100" 
+                      name="ovocitos[${i}][motivo_descarte]"></textarea>
         `;
     }
 }
+
 
 </script>
 
 @endsection
 @endsection
+

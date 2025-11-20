@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('guardados', function (Blueprint $table) {
             $table->id();
-            $table->string('id_tanque')->unique();
-            $table->string('id_rack')->unique();
+            $table->string('id_tanque');
+            $table->string('id_rack');
             $table->timestamps();
         });
     }
