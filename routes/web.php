@@ -7,6 +7,7 @@ use App\Http\Middleware\AuthMiddleware;
 use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\TurnoController;
 use App\Http\Controllers\AvisosController;
+use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Http;
 ## Web Routes
 
@@ -41,6 +42,11 @@ Route::prefix('paciente')->middleware([AuthMiddleware::class . ':paciente'])->gr
     Route::get('/solicitar-turno', [TurnoController::class, 'showSolicitarTurnoForm'])->name('paciente.solicitar-turno');
     Route::post('/solicitar-turno-store', [TurnoController::class, 'storeTurno'])->name('paciente.store-turno');
     Route::get('/turnos-libres/{id_medico}', [TurnoController::class, 'listarTurnosLibres'])->name('paciente.turnos-libres');
+
+    //chatbot
+    Route::post('/chat/send-message', [ChatbotController::class, 'sendMessage'])
+    ->middleware('auth') // Asumo que solo usuarios logueados pueden usar el chat
+    ->name('chatbot.send');
 });
 
 ###########################################################
