@@ -6,6 +6,8 @@ use App\Http\Controllers\RegistroController;
 use App\Http\Middleware\AuthMiddleware;
 use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\TurnoController;
+use App\Http\Controllers\AvisosController;
+use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\OperadorController;
 
@@ -43,6 +45,11 @@ Route::prefix('paciente')->middleware([AuthMiddleware::class . ':paciente'])->gr
     Route::post('/solicitar-turno-store', [TurnoController::class, 'storeTurno'])->name('paciente.store-turno');
     Route::get('/turnos-libres/{id_medico}', [TurnoController::class, 'listarTurnosLibres'])->name('paciente.turnos-libres');
     Route::get('/turnos-sugeridos/{id_medico}/{id_paciente}', [TurnoController::class, 'listarTurnosSugeridos'])->name('paciente.turnos-sugeridos');
+
+    //chatbot
+    Route::post('/chat/send-message', [ChatbotController::class, 'sendMessage'])
+    ->middleware('auth') // Asumo que solo usuarios logueados pueden usar el chat
+    ->name('chatbot.send');
 });
 
 Route::post('/tratamiento/{id}/avanzar', [MedicoController::class, 'avanzarEtapa'])
@@ -68,6 +75,7 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
         
     Route::get('/home', [MedicoController::class, 'misPacientes'])->name('medico.home');
 
+    Route::get('/home', [MedicoController::class, 'misPacientes'])->name('medico.home');
 
     Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
         ->name('medico.tratamiento.detalle');
@@ -94,6 +102,15 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
         ->name('tratamiento.subir-consentimiento');
 
     Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\MedicoController::class, 'tratamientosDeUnPaciente']);
+
+    Route::get('/tratamiento/{id}/post-transferencia', [MedicoController::class, 'postTransferenciaForm']
+        )->name('tratamiento.post');
+
+    Route::post('/tratamiento/{id}/post-transferencia', [MedicoController::class, 'guardarPostTransferencia']
+        )->name('tratamiento.guardar-post');
+    
+    Route::post('/tratamiento/{id}/enviar-orden-medica', [AvisosController::class, 'enviarOrdenMedica'])
+    ->name('tratamiento.enviar-orden-medica');
 });
 ###########################################################
 # Rutas para el admin
@@ -132,6 +149,7 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
         [App\Http\Controllers\OperadorController::class, 'guardarPuncion'])
         ->name('puncion.guardar');
 });
+
 
 ###########################################################
 # Rutas para el jefe

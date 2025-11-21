@@ -16,6 +16,7 @@ use App\Models\AntecedenteGenital;
 use App\Models\AntecedenteFenotipo;
 use App\Models\ProtocoloEstimulacion;
 use App\Models\Embrion;
+use App\Models\PostTransferencia;
 
 class Tratamiento extends Model
 {
@@ -30,10 +31,6 @@ class Tratamiento extends Model
         'pago_id',
         'fecha_sugerida_inicio',
         'fecha_sugerida_fin',
-        'beta',
-        'saco',
-        'embrion',
-        'vivo',
         'consentimiento_pdf'
     ];
 
@@ -100,5 +97,10 @@ class Tratamiento extends Model
     public function embriones()
     {
         return $this->hasMany(Embrion::class, 'tratamiento_id');
+    }
+
+    public function postTransferencia()
+    {
+        return $this->hasOne(PostTransferencia::class);
     }
 }

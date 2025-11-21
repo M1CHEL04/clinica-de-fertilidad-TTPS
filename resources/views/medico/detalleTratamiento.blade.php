@@ -250,8 +250,8 @@
     {{--  Protocolo de Estimulación (desde etapa 2) --}}
     @if ($etapa2)
         <a href="{{ route('tratamiento.protocolo', $tratamiento->id) }}"
-           class="btn-primary w-full flex items-center justify-center gap-2">
-            <i class="fas fa-dna"></i> Protocolo de Estimulación
+        class="btn-primary w-full flex items-center justify-center gap-2">
+            <i class="fas fa-dna"></i> Protocolo De Estimulacion
         </a>
     @else
         <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
@@ -273,13 +273,14 @@
 
    
     @if ($etapa4)
-    <button class="btn-primary w-full flex items-center justify-center gap-2">
-        <i class="fas fa-seedling"></i> Cargar post-transferencia
-    </button>
+        <a href="{{ route('tratamiento.post', $tratamiento->id) }}"
+        class="btn-primary w-full flex items-center justify-center gap-2">
+            <i class="fas fa-leaf"></i> Post-transferencia
+        </a>
     @else
         <button class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
-        <i class="fas fa-seedling"></i> Cargar post-transferencia
-    </button>
+        <i class="fas fa-seedling"></i> Post-transferencia
+        </button>
     @endif
 
     
