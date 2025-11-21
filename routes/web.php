@@ -8,6 +8,7 @@ use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\TurnoController;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\OperadorController;
+use App\Http\Controllers\Auth\LoginController;
 
 ## Web Routes
 
@@ -59,7 +60,11 @@ Route::post('ovocitos/actualizar', [OperadorController::class, 'updateOvocito'])
 
 Route::get('/ovocito/{id}/json', [OperadorController::class, 'getJson'])->name('ovocito.json');
 
+// Ruta para mostrar el formulario de cambio de contraseña
+Route::get('/cambiar-contraseña{email}', [LoginController::class, 'showChangePasswordForm'])->name('change.password');
 
+// Ruta para actualizar la contraseña
+Route::post('/cambiar-contraseña', [LoginController::class, 'updatePassword'])->name('update.password');
 ###########################################################
 # Rutas para el medico
 ###########################################################

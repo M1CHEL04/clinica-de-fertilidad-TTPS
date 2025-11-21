@@ -23,6 +23,7 @@ class User extends Authenticatable
         'telefono',
         'password',
         'dni',
+        'cambio_password',
         'fecha_nacimiento',
         'ocupacion',
         'obra_social_id',

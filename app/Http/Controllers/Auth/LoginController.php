@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Http\Controllers\MailController;
+use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
@@ -23,11 +25,16 @@ class LoginController extends Controller
             'email'     => 'required|email',
             'password'  => 'required|string',
         ]);
+        
 
         $user = User::where('mail', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
+       
+        if (!$user || !Hash::check($request->password, $user->password)) {   
             return back()->with('error', 'Credenciales inválidas');
+        }
+
+        if ($user->cambio_password == false){
+            return redirect()->route('change.password', ['email' => $user->mail])->with('info', 'Debes cambiar tu contraseña. Te hemos enviado un correo con las instrucciones.');
         }
 
         // Loguear usuario
@@ -71,4 +78,44 @@ class LoginController extends Controller
 
         return redirect()->route('home')->with('success', 'Sesión cerrada correctamente');
     }
+
+    public function showChangePasswordForm($email)
+    {
+        // Vista para cambiar la contraseña
+        $user = User::where('mail', $email)->first();
+
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Usuario no encontrado.');
+        }
+
+        // Retornar la vista de cambio de contraseña, pasando el usuario
+        return view('auth.change-password', compact('user'));
+    }
+
+    public function updatePassword(Request $request)
+{
+    // Validar la nueva contraseña
+    $request->validate([
+        'new_password' => 'required|string|min:8',
+    ]);
+
+    // Encontrar al usuario por correo
+    $user = User::where('mail', $request->email)->first();
+
+    if (!$user) {
+        return redirect()->route('login')->with('error', 'Usuario no encontrado.');
+    }
+
+    if ($request->new_password != $request->new_password_confirmation){
+        return redirect()->back()->with('error', 'La Contraseñas ingresadas no coinciden');
+    }
+
+    // Actualizar la contraseña
+    $user->password = $request->new_password;
+    $user->cambio_password = true; // Marcar como que ya cambió la contraseña
+    $user->save();
+
+    return redirect()->route('login')->with('success', 'Contraseña cambiada con éxito. Puedes iniciar sesión ahora.');
+}
+
 }

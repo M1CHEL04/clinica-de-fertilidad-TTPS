@@ -7,6 +7,9 @@ use App\Models\RolTrabajador;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use App\Http\Controllers\MailController;
 
 class AdminController extends Controller
 {
@@ -72,16 +75,22 @@ class AdminController extends Controller
                 return redirect()->back()->withErrors(['email' => 'El correo electrónico ya está en uso.'])->withInput();
             }
 
+            $password = Str::random(8);
+
             $user = User::create([
                 'nombre' => $request->input('nombre'),
                 'apellido' => $request->input('apellido'),
                 'mail' => $request->input('email'),
-                'password' => 'contraseña',
+                'password' => $password,
                 'cambio_password' => false,
                 'rol_id' => $request->input('rol'),
             ]);
-
             // Enviar correo al usuario con su contraseña temporal
+            $mailController = new MailController();
+            $mailController->enviarMail([$user->mail], 'Password Temporal', 'mails.envioPassword', [
+            'nombre' => $user->nombre,
+            'password' => $password]);
+            
             return redirect()->route('admin.home')->with('success', 'Usuario creado exitosamente.');
         } catch (\Exception $e) {
             return redirect()->route('admin.home')->with('error', 'Ocurrió un error al crear el usuario.');
