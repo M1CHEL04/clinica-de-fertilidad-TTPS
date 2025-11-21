@@ -14,6 +14,7 @@ class Puncion extends Model
         'fecha_hora',
         'nro_quirofano',
         'operador_id',
+        'paciente_id',
     ];
 
     public function operador()
@@ -24,5 +25,10 @@ class Puncion extends Model
     public function ovocitos()
     {
         return $this->hasMany(Ovocito::class, 'puncion_id');
+    }
+
+     public function paciente()
+    {
+        return $this->belongsTo(User::class, 'paciente_id');
     }
 }

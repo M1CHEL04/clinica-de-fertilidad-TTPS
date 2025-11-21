@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('ovocitos', function (Blueprint $table) {
             $table->id();
             $table->string('identificador')->unique();
-            $table->enum('calidad_morfologica', [1, 2, 3, 4, 5]);
+            $table->enum('calidad_morfologica', [1, 2, 3, 4, 5])->nullable();
             $table->foreignIdFor(Guardado::class)->nullable();
             $table->foreignIdFor(User::class, 'paciente_id');
             $table->foreignIdFor(\App\Models\Puncion::class, 'puncion_id');

@@ -35,21 +35,34 @@
             <form action="{{ route('tratamiento.guardar-estudios', $tratamiento->id) }}" method="POST">
                 @csrf
 
-                <div class="space-y-6">
-                    @foreach ($estudiosPendientes as $estudio)
-                        <div class="border rounded-xl p-4 bg-gray-50">
-                            <p class="font-medium text-gray-700 mb-2">
-                                {{ $estudio->nombre }}
-                            </p>
+                <div class="space-y-8">
 
-                            <textarea
-                                name="resultados[{{ $estudio->id }}]"
-                                class="input w-full"
-                                rows="3"
-                                placeholder="Ingresá el resultado del estudio..."
-                            ></textarea>
+                    @foreach ($estudiosPendientes as $tipo => $grupo)
+
+                        {{-- CABECERA DEL TIPO --}}
+                        <h3 class="text-lg font-bold text-blue-700 border-b pb-1">
+                            {{ $tipo }}
+                        </h3>
+
+                        <div class="space-y-4">
+                            @foreach ($grupo as $estudio)
+                                <div class="border rounded-xl p-4 bg-gray-50">
+                                    <p class="font-medium text-gray-700 mb-2">
+                                        {{ $estudio->nombre }}
+                                    </p>
+
+                                    <textarea 
+                                        name="resultados[{{ $estudio->id }}]"
+                                        class="input w-full"
+                                        rows="3"
+                                        placeholder="Ingresá el resultado del estudio..."
+                                    ></textarea>
+                                </div>
+                            @endforeach
                         </div>
+
                     @endforeach
+
                 </div>
 
                 <div class="mt-6 flex justify-end">
@@ -75,18 +88,29 @@
                 No hay estudios cargados todavía.
             </p>
         @else
-            <div class="space-y-6">
-                @foreach ($estudiosCompletados as $estudio)
-                    <div class="border rounded-xl p-4 bg-white shadow-sm">
-                        <p class="font-medium text-gray-900">
-                            {{ $estudio->nombre }}
-                        </p>
 
-                        <p class="mt-2 text-gray-700 whitespace-pre-line">
-                            {{ $estudio->resultado }}
-                        </p>
-                    </div>
+            <div class="space-y-8">
+
+                @foreach ($estudiosCompletados as $tipo => $grupo)
+
+                    <h3 class="text-lg font-bold text-green-700 border-b pb-1">
+                        {{ $tipo }}
+                    </h3>
+
+                    @foreach ($grupo as $estudio)
+                        <div class="border rounded-xl p-4 bg-white shadow-sm">
+                            <p class="font-medium text-gray-900">
+                                {{ $estudio->nombre }}
+                            </p>
+
+                            <p class="mt-2 text-gray-700 whitespace-pre-line">
+                                {{ $estudio->resultado }}
+                            </p>
+                        </div>
+                    @endforeach
+
                 @endforeach
+
             </div>
 
         @endif

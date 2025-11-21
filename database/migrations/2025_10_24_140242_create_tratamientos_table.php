@@ -21,10 +21,6 @@ return new class extends Migration
             $table->unsignedBigInteger('pago_id');
             $table->date('fecha_sugerida_inicio')->nullable();
             $table->date('fecha_sugerida_fin')->nullable();
-            $table->boolean('beta')->nullable();
-            $table->boolean('saco')->nullable();
-            $table->boolean('embrion')->nullable();
-            $table->boolean('vivo')->nullable();
             $table->string('consentimiento_pdf')->nullable();
             $table->timestamps();
         });

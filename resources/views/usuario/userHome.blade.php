@@ -102,4 +102,142 @@
             </div>
         </div>
     </div>
+    @if (Auth::check())
+        <button id="openChatbotBtn" class="fixed bottom-6 right-6 z-50 p-4 bg-pink-500 rounded-full shadow-lg hover:bg-pink-600 transition-all focus:outline-none" title="Abrir Chatbot">
+        <i class="fas fa-robot text-white text-2xl"></i>
+        </button>
+
+        <div id="chatbotModal" class="hidden fixed bottom-[80px] right-6 w-full max-w-sm h-[80vh] max-h-[500px] bg-white rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden border border-gray-200">
+            
+            <div class="p-4 bg-pink-500 text-white flex justify-between items-center shadow-md">
+                <h5 class="text-lg font-semibold"><i class="fas fa-heartbeat mr-2"></i> Asistente de Fertilia</h5>
+                <button id="closeChatbotBtn" class="text-white hover:text-gray-200 focus:outline-none">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="chatHistory" class="flex-grow p-4 overflow-y-auto space-y-4">
+                <div class="flex justify-center mb-4">
+                    <div class="text-center text-sm text-gray-400 p-2 rounded-lg bg-gray-100">
+                        ¡Hola! Soy tu asistente de fertilia. ¿En qué puedo ayudarte hoy?
+                    </div>
+                </div>
+                </div>
+            
+            <form id="chatForm" class="p-4 border-t border-gray-200 bg-gray-50">
+                <div class="flex">
+                    <input type="text" id="userInput" placeholder="Escribe tu mensaje..." required 
+                        class="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    <button type="submit" id="sendBtn" 
+                            class="bg-pink-500 text-white p-2 rounded-r-lg hover:bg-pink-600 transition-colors">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    @endif
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const openBtn = document.getElementById('openChatbotBtn');
+    const closeBtn = document.getElementById('closeChatbotBtn');
+    const modal = document.getElementById('chatbotModal');
+    const chatForm = document.getElementById('chatForm');
+    const userInput = document.getElementById('userInput');
+    const chatHistory = document.getElementById('chatHistory');
+    const sendBtn = document.getElementById('sendBtn');
+
+    // --- Lógica de Apertura y Cierre del Modal ---
+
+    // Función para abrir el modal
+    openBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden'); // Muestra el modal
+        openBtn.classList.add('hidden');  // Oculta el botón flotante
+    });
+
+    // Función para cerrar el modal
+    closeBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');    // Oculta el modal
+        openBtn.classList.remove('hidden'); // Muestra el botón flotante
+    });
+    
+    // --- Lógica de la Conversación y Llamada a la API ---
+
+    // Función para añadir un mensaje al historial visual (UI)
+    function addMessageToChat(role, text) {
+        const messageContainer = document.createElement('div');
+        // Usamos clases de Tailwind para alinear y dar estilo de burbuja
+        messageContainer.className = role === 'user' 
+            ? 'flex justify-end' 
+            : 'flex justify-start';
+
+        const messageBubble = document.createElement('div');
+        messageBubble.className = role === 'user'
+            ? 'bg-pink-500 text-white p-3 rounded-t-xl rounded-bl-xl max-w-xs break-words'
+            : 'bg-gray-200 text-gray-800 p-3 rounded-t-xl rounded-br-xl max-w-xs break-words';
+        
+        messageBubble.innerText = text;
+        messageContainer.appendChild(messageBubble);
+        chatHistory.appendChild(messageContainer);
+        
+        // Desplazar automáticamente al último mensaje
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+
+    // Manejador del envío del formulario (la pregunta del usuario)
+    chatForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const userMessage = userInput.value.trim();
+        
+        if (userMessage.length === 0) return;
+
+        // 1. Mostrar el mensaje del usuario inmediatamente en la UI
+        addMessageToChat('user', userMessage);
+        
+        // Deshabilitar la entrada y el botón durante la carga
+        userInput.disabled = true;
+        sendBtn.disabled = true;
+        const originalIcon = sendBtn.innerHTML;
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; // Muestra un spinner
+
+        // Limpia el campo después de obtener el valor
+        userInput.value = ''; 
+
+        try {
+            // 2. Llamar a la ruta de Laravel para contactar al chatbot
+            const response = await fetch("{{ route('chatbot.send') }}", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Obtiene el token CSRF para seguridad
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                // Envía el mensaje del usuario al controlador
+                body: JSON.stringify({ message: userMessage })
+            });
+            
+            const data = await response.json();
+
+            if (response.ok) {
+                // 3. Mostrar la respuesta exitosa del bot
+                addMessageToChat('model', data.respuesta);
+            } else {
+                // Manejo de errores (ej: límite alcanzado o error interno del servidor)
+                const errorMessage = data.error || "Ocurrió un error al procesar tu solicitud. Por favor, revisa los límites de uso.";
+                addMessageToChat('model', `[Error]: ${errorMessage}`);
+            }
+
+        } catch (error) {
+            console.error('Fetch error:', error);
+            addMessageToChat('model', "[Error de conexión]: No se pudo conectar al servidor de Laravel o a la API externa.");
+        } finally {
+            // Restablecer la interfaz
+            userInput.disabled = false;
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = originalIcon; // Restaura el icono de enviar
+            userInput.focus(); // Vuelve a enfocar el campo para la siguiente pregunta
+        }
+    });
+});
+</script>
 @endsection

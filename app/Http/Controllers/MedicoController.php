@@ -8,6 +8,7 @@ use App\Models\Estudio;
 use App\Models\ProtocoloEstimulacion;
 use App\Models\TipoMedicacion;
 use App\Models\Monitoreo;
+use App\Models\PostTransferencia;
 use Illuminate\Http\Request;
 
 class MedicoController extends Controller
@@ -15,7 +16,8 @@ class MedicoController extends Controller
     public function misPacientes()
     {
         $medicoId = session('user_id');
-    
+        $rol_id = session('rol');
+        
 
         // Trae pacientes con tratamientos del médico logueado
         $pacientes = DB::table('tratamientos')
@@ -39,12 +41,14 @@ class MedicoController extends Controller
 
         
 
-        return view('medico.home', compact('pacientes'));
+        return view('medico.home', compact('pacientes', 'rol_id'));
     }
 
     public function detalleTratamiento($id)
-    {
+    {   
+        
         // ✅ Trae la info completa del tratamiento
+        $rol_id = session('rol');
         $tratamiento = DB::table('tratamientos')
             ->join('historias_clinica', 'tratamientos.historia_clinica_id', '=', 'historias_clinica.id')
             ->join('usuarios', 'historias_clinica.paciente_id', '=', 'usuarios.id')
@@ -66,7 +70,7 @@ class MedicoController extends Controller
             )
             ->where('tratamientos.id', $id)
             ->first();
-
+        
         // ✅ Intentamos traer consultas si existe la tabla (por si aún no la tenés creada)
         $consultas = [];
         if (DB::getSchemaBuilder()->hasTable('consultas')) {
@@ -75,9 +79,9 @@ class MedicoController extends Controller
                 ->orderBy('fecha', 'asc')
                 ->get();
         }
-
+        
         // ✅ Evita error si no hay consultas (pasa array vacío)
-        return view('medico.detalleTratamiento', compact('tratamiento', 'consultas'));
+        return view('medico.detalleTratamiento', compact('tratamiento', 'consultas', 'rol_id'));
     }
 
     public function tratamientosDeUnPaciente($pacienteId)
@@ -102,25 +106,30 @@ class MedicoController extends Controller
     return response()->json(['tratamientos' => $tratamientos]);
     }
 
-    public function cargarEstudios($id)
-    {
-        $tratamiento = Tratamiento::findOrFail($id);
+public function cargarEstudios($id)
+{
+    $tratamiento = Tratamiento::findOrFail($id);
 
-        // Estudios pendientes
-        $estudiosPendientes = Estudio::where('tratamiento_id', $id)
-            ->whereNull('resultado')
-            ->get();
+    // Estudios pendientes agrupados por tipo_estudio
+    $estudiosPendientes = Estudio::where('tratamiento_id', $id)
+        ->whereNull('resultado')
+        ->orderBy('tipo_estudio')
+        ->get()
+        ->groupBy('tipo_estudio');
 
-        // Estudios finalizados
-        $estudiosCompletados = Estudio::where('tratamiento_id', $id)
-            ->whereNotNull('resultado')
-            ->get();
+    // Estudios completados agrupados por tipo_estudio
+    $estudiosCompletados = Estudio::where('tratamiento_id', $id)
+        ->whereNotNull('resultado')
+        ->orderBy('tipo_estudio')
+        ->get()
+        ->groupBy('tipo_estudio');
 
-        return view(
-            'medico.cargarEstudios',
-            compact('tratamiento', 'estudiosPendientes', 'estudiosCompletados')
-        );
-    }
+    return view(
+        'medico.cargarEstudios',
+        compact('tratamiento', 'estudiosPendientes', 'estudiosCompletados')
+    );
+}
+
 
     public function guardarEstudios($id)
     {
@@ -135,14 +144,14 @@ class MedicoController extends Controller
         }
 
         return redirect()
-            ->route('medico.tratamiento.detalle', $id)
+            ->route('tratamiento.cargar-estudios', $id)
             ->with('success', 'Resultados cargados correctamente.');
     }
 
     public function protocolo($id)
     {
         $tratamiento = Tratamiento::findOrFail($id);
-        $protocolo = ProtocoloEstimulacion::where('tratamiento_id', $id)->first();
+        $protocolo = ProtocoloEstimulacion::where('tratamiento_id', $id)->get();
         $tiposMedicacion = TipoMedicacion::all();
 
         return view('medico.protocolo', compact('tratamiento', 'protocolo', 'tiposMedicacion'));
@@ -209,5 +218,138 @@ public function storeMonitoreo(Request $request)
     return back()->with('success', 'Monitoreo cargado correctamente');
 }
 
+private $etapas = [
+    1 => 'Primera Consulta',
+    2 => 'Segunda Consulta',
+    3 => 'Monitoreos',
+    4 => 'Punción',
+    5 => 'Transferencia',
+    6 => 'Control de embarazo',
+    7 => 'Finalizado',
+];
+
+
+public function avanzarEtapa($id)
+{
+    $tratamiento = DB::table('tratamientos')->where('id', $id)->first();
+
+    if (!$tratamiento) {
+        return back()->with('error', 'Tratamiento no encontrado.');
+    }
+
+    $actual = (int) $tratamiento->etapa_id;
+
+    if ($actual >= 7) {
+        return back()->with('error', 'No se puede avanzar más la etapa.');
+    }
+
+    $nuevoId = $actual + 1;
+
+    $updateData = [
+        'etapa_id' => $nuevoId,
+        'updated_at' => now(),
+    ];
+
+    // Si la etapa actual es "Monitoreos", limpiar fechas
+    if ($actual === 3) { // 3 = Monitoreos
+        $updateData['fecha_sugerida_inicio'] = null;
+        $updateData['fecha_sugerida_fin'] = null;
+    }
+
+    DB::table('tratamientos')->where('id', $id)->update($updateData);
+
+    return back()->with('success', 'Etapa actualizada a: ' . $this->etapas[$nuevoId]);
+}
+
+
+
+
+public function retrocederEtapa($id)
+{
+    $tratamiento = DB::table('tratamientos')->where('id', $id)->first();
+
+    if (!$tratamiento) {
+        return back()->with('error', 'Tratamiento no encontrado.');
+    }
+
+    $actual = (int) $tratamiento->etapa_id;
+
+    if ($actual <= 1) {
+        return back()->with('error', 'No se puede retroceder más la etapa.');
+    }
+
+    $nuevoId = $actual - 1;
+
+    DB::table('tratamientos')->where('id', $id)->update([
+        'etapa_id' => $nuevoId,
+        'updated_at' => now(),
+    ]);
+
+    return back()->with('success', 'Etapa actualizada a: ' . $this->etapas[$nuevoId]);
+}
+
+
+
+
+public function agendarConsulta(Request $request, $id)
+{
+    $fechaHoy = date('Y-m-d');
+    $fechaInicio = date('Y-m-d', strtotime($request->fecha_inicio));
+    $fechaFin = date('Y-m-d', strtotime($request->fecha_fin));
+
+    // Validaciones
+    if ($fechaInicio < $fechaHoy) {
+        return redirect()->back()->with('error', 'La fecha de inicio no puede ser anterior a hoy.');
+    }
+
+    if ($fechaInicio > $fechaFin) {
+        return redirect()->back()->with('error', 'La fecha de inicio no puede ser mayor que la fecha de fin.');
+    }
+
+    DB::table('tratamientos')->where('id', $id)->update([
+        'fecha_sugerida_inicio' => $fechaInicio,
+        'fecha_sugerida_fin' => $fechaFin,
+        'updated_at' => now(),
+    ]);
+
+    return redirect()->back()->with('success', 'Consulta agendada correctamente.');
+}
+
+
+
+//POST TRANSFERENCIA
+
+public function postTransferenciaForm($id)
+    {
+        $tratamiento = Tratamiento::findOrFail($id);
+
+        // Si ya existe, lo traemos. Si no, generamos uno vacío.
+        $post = PostTransferencia::where('tratamiento_id', $id)->first();
+
+        return view('medico.post-transferencia', compact('tratamiento', 'post'));
+    }
+
+public function guardarPostTransferencia(Request $request, $id)
+    {
+        $post = PostTransferencia::firstOrNew(['tratamiento_id' => $id]);
+
+        // Validaciones simples según etapa
+        $rules = [
+            'beta' => 'nullable|numeric',
+            'saco' => 'nullable|boolean',
+            'embarazo' => 'nullable|boolean',
+            'vivo' => 'nullable|boolean',
+            'fecha_nacimiento' => 'nullable|date',
+            'causa_no_nacido' => 'nullable|string|max:255',
+        ];
+
+        $validated = $request->validate($rules);
+
+        // Guardar
+        $post->fill($validated);
+        $post->save();
+
+        return redirect()->back()->with('success', 'Datos guardados correctamente');
+    }
 
 }

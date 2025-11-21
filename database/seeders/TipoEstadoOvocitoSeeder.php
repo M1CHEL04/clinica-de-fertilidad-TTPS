@@ -16,6 +16,7 @@ class TipoEstadoOvocitoSeeder extends Seeder
         TipoEstadoOvocito::insert([
             ['nombre' => 'Maduro'],
             ['nombre' => 'Inmaduro'],
+            ['nombre' => 'Muy inmaduro'],
             ['nombre' => 'Descartado'],
         ]);
     }

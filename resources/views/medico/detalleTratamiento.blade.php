@@ -82,26 +82,78 @@
 
         
 
+        <!-- ➡️ Avanzar etapa -->
+    
+
         <!-- 🔮 Próximas acciones -->
-        
+       
         <div class="card p-6">
+             
             <h3 class="text-lg font-semibold mb-4 text-gray-900 flex items-center">
                 <i class="fas fa-calendar-plus text-blue-600 mr-2"></i> Próximas Acciones
             </h3>
+ @if (session('rol') == 2)
+    <div class="flex space-x-2">
+    @if (strtolower($tratamiento->etapa) !== 'finalizado')
+        <form method="POST" action="{{ route('tratamiento.avanzar-etapa', $tratamiento->id) }}">
+            @csrf
+            <button class="btn-primary">
+                <i class="fas fa-arrow-right mr-1"></i> Avanzar etapa
+            </button>
+        </form>
+    @endif
 
-            <ul class="space-y-3 text-gray-800">
-                <li>📅 Próxima consulta: <strong>No programada</strong></li>
-                <li>💊 Revisar respuesta al tratamiento.</li>
-                <li>🧪 Control hormonal si aplica.</li>
-            </ul>
+    @if (strtolower($tratamiento->etapa) !== 'primera consulta')
+        <form method="POST" action="{{ route('tratamiento.retroceder-etapa', $tratamiento->id) }}">
+            @csrf
+            <button class="btn-secondary">
+                <i class="fas fa-arrow-left mr-1"></i> Retroceder etapa
+            </button>
+        </form>
+    @endif
+</div>
 
-            <div class="mt-6 flex justify-end">
-                <button class="btn-primary">
-                    <i class="fas fa-plus mr-2"></i> Agendar nueva consulta
-                </button>
+    
+    
+      @php
+    $deshabilitado = $tratamiento->etapa !== "Monitoreos";
+@endphp
+
+<button 
+    class="btn-primary {{ $deshabilitado ? 'btn-disabled' : '' }}"
+    @if($deshabilitado) disabled @else onclick="abrirModal()" @endif
+>
+    <i class="fas fa-plus mr-2"></i> Agendar nueva consulta
+</button>
+
+<div id="modal-agendar" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <h2 class="modal-title">Agendar consulta</h2>
+
+        <form method="POST" action="{{ route('tratamiento.agendar-consulta', $tratamiento->id) }}">
+            @csrf
+
+            <label>Fecha Inicio Tentativa</label>
+            <input type="date" name="fecha_inicio" required>
+
+            <label>Fecha Fin Tentativa</label>
+            <input type="date" name="fecha_fin" required>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                <button type="submit" class="btn-primary">Guardar</button>
             </div>
-        </div>
+        </form>
     </div>
+</div>
+
+
+
+        </div>
+        
+        @endif
+    </div>
+    
 
     <!-- 🧰 Panel lateral -->
     @if ($tratamiento->estado_tratamiento == 'Activo') 
@@ -110,40 +162,131 @@
             <h3 class="text-lg font-semibold mb-4 text-gray-900 flex items-center">
                 <i class="fas fa-tasks text-indigo-600 mr-2"></i> Acciones del Tratamiento
             </h3>
-
+            
             <div class="space-y-3">
-                <button class="btn-primary w-full flex items-center justify-center gap-2">
-                    <i class="fas fa-vials"></i> Recetar estudios
-                </button>
 
-                <a href="{{ route('tratamiento.cargar-estudios', $tratamiento->id) }}"
-                class="btn-primary w-full flex items-center justify-center gap-2">
-                    <i class="fas fa-file-upload"></i> Seccion Estudios
-                </a>
+    {{-- Normalizar el nombre de etapa para comparación --}}
+    @php
+        $etapa = trim(strtolower($tratamiento->etapa));
+    @endphp
 
-                <button class="btn-primary w-full flex items-center justify-center gap-2">
-                    <i class="fas fa-user-md"></i> Cargar antecedentes
-                </button>
+    {{-- PRIMERA CONSULTA --}}
+    @php
+        $etapa1 = in_array($etapa, [
+            'primera consulta',
+            'segunda consulta',
+            'monitoreos',
+            'control de embarazo',
+            'puncion',
+            'finalizado',
+            'transferencia'
+        ]);
+    @endphp
 
-                <a href="{{ route('monitoreos', $tratamiento->id) }}"
-                class="btn-primary w-full flex items-center justify-center gap-2">
-                    <i class="fas fa-heartbeat"></i> Seccion de monitoreos
-                </a>
+    {{-- SEGUNDA CONSULTA --}}
+    @php
+        $etapa2 = in_array($etapa, [
+            'segunda consulta',
+            'monitoreos',
+            'control de embarazo',
+            'puncion',
+            'finalizado',
+            'transferencia'
+        ]);
+    @endphp
+
+    @php
+        $etapa3 = in_array($etapa, [
+            'monitoreos',
+            'control de embarazo',
+            'puncion',
+            'finalizado',
+            'transferencia'
+        ]);
+    @endphp
+
+    {{-- CONTROL DE EMBARAZO --}}
+    @php
+        $etapa4 = in_array($etapa, [
+            'control de embarazo',
+            'finalizado'
+        ]);
+    @endphp
 
 
-                <button class="btn-primary w-full flex items-center justify-center gap-2" >
-                    <i class="fas fa-seedling"></i> Cargar post-transferencia
-                </button>
+    {{-- 6️⃣ Cargar objetivo (desde etapa 1) --}}
+    <button class="btn-primary w-full flex items-center justify-center gap-2 {{ !$etapa1 ? 'opacity-50 cursor-not-allowed' : '' }}"
+            {{ !$etapa1 ? 'disabled' : '' }}>
+        <i class="fas fa-bullseye"></i> Cargar objetivo
+    </button>
 
-                <button class="btn-primary w-full flex items-center justify-center gap-2">
-                    <i class="fas fa-bullseye"></i> Cargar objetivo
-                </button>
-                <a href="{{ route('tratamiento.protocolo', $tratamiento->id) }}"
-                class="btn-primary w-full flex items-center justify-center gap-2">
-                    <i class="fas fa-dna"></i> Protocolo De Estimulacion
-                </a>
-            </div>
-        </div>
+    {{-- 1️⃣ Recetar estudios (desde etapa 1) --}}
+    <button class="btn-primary w-full flex items-center justify-center gap-2 {{ !$etapa1 ? 'opacity-50 cursor-not-allowed' : '' }}"
+            {{ !$etapa1 ? 'disabled' : '' }}>
+        <i class="fas fa-vials"></i> Recetar estudios
+    </button>
+
+   
+
+    {{-- 3️⃣ Cargar antecedentes (desde etapa 1) --}}
+    <button class="btn-primary w-full flex items-center justify-center gap-2 {{ !$etapa1 ? 'opacity-50 cursor-not-allowed' : '' }}"
+            {{ !$etapa1 ? 'disabled' : '' }}>
+        <i class="fas fa-user-md"></i> Cargar antecedentes
+    </button>
+    
+     @if ($etapa2)
+        <a href="{{ route('tratamiento.cargar-estudios', $tratamiento->id) }}"
+           class="btn-primary w-full flex items-center justify-center gap-2">
+            <i class="fas fa-file-upload"></i> Sección Estudios
+        </a>
+    @else
+        <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+            <i class="fas fa-file-upload"></i> Sección Estudios
+        </a>
+    @endif
+    
+
+   
+    {{--  Protocolo de Estimulación (desde etapa 2) --}}
+    @if ($etapa2)
+        <a href="{{ route('tratamiento.protocolo', $tratamiento->id) }}"
+        class="btn-primary w-full flex items-center justify-center gap-2">
+            <i class="fas fa-dna"></i> Protocolo De Estimulacion
+        </a>
+    @else
+        <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+            <i class="fas fa-dna"></i> Protocolo de Estimulación
+        </a>
+    @endif
+
+     {{-- 4️⃣ Monitoreos (desde etapa 3) --}}
+    @if ($etapa3)
+        <a href="{{ route('monitoreos', $tratamiento->id) }}"
+           class="btn-primary w-full flex items-center justify-center gap-2">
+            <i class="fas fa-heartbeat"></i> Sección de Monitoreos
+        </a>
+    @else
+        <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+            <i class="fas fa-heartbeat"></i> Sección de Monitoreos
+        </a>
+    @endif
+
+   
+    @if ($etapa4)
+        <a href="{{ route('tratamiento.post', $tratamiento->id) }}"
+        class="btn-primary w-full flex items-center justify-center gap-2">
+            <i class="fas fa-leaf"></i> Post-transferencia
+        </a>
+    @else
+        <button class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+        <i class="fas fa-seedling"></i> Post-transferencia
+        </button>
+    @endif
+
+    
+
+</div>
+
 
         <div class="card p-4 bg-blue-50 border border-blue-200">
             <p class="text-sm text-gray-700">
@@ -155,3 +298,71 @@
 </div>
     
 @endsection
+
+<script>
+    function abrirModal() {
+        document.getElementById("modal-agendar").style.display = "flex";
+    }
+
+    function cerrarModal() {
+        document.getElementById("modal-agendar").style.display = "none";
+    }
+</script>
+
+
+<style>
+    .btn-disabled {
+    opacity: 0.5;           /* más transparente */
+    cursor: not-allowed;    /* cursor prohibido */
+    background-color: #999; /* color más apagado */
+    color: #fff;            /* asegura legibilidad */
+}
+
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    width: 400px;
+}
+
+.modal-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.modal-content label {
+    display: block;
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+.modal-content input[type="date"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+
+</style>

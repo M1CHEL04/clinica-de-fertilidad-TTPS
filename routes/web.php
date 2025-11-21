@@ -8,7 +8,11 @@ use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\TerminosController;
 use App\Http\Controllers\EstudiosController;
 use App\Http\Controllers\TurnoController;
+use App\Http\Controllers\AvisosController;
+use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\OperadorController;
+
 use App\Http\Controllers\ConsultaController;
 ## Web Routes
 
@@ -44,16 +48,37 @@ Route::prefix('paciente')->middleware([AuthMiddleware::class . ':paciente'])->gr
     Route::post('/solicitar-turno-store', [TurnoController::class, 'storeTurno'])->name('paciente.store-turno');
     Route::get('/turnos-libres/{id_medico}', [TurnoController::class, 'listarTurnosLibres'])->name('paciente.turnos-libres');
     Route::get('/turnos-sugeridos/{id_medico}/{id_paciente}', [TurnoController::class, 'listarTurnosSugeridos'])->name('paciente.turnos-sugeridos');
+
+    //chatbot
+    Route::post('/chat/send-message', [ChatbotController::class, 'sendMessage'])
+    ->middleware('auth') // Asumo que solo usuarios logueados pueden usar el chat
+    ->name('chatbot.send');
 });
+
+Route::post('/tratamiento/{id}/avanzar', [MedicoController::class, 'avanzarEtapa'])
+    ->name('tratamiento.avanzar-etapa');
+
+Route::post('/tratamiento/{id}/retroceder', [MedicoController::class, 'retrocederEtapa'])
+    ->name('tratamiento.retroceder-etapa');
+
+Route::post('/tratamiento/{id}/agendar-consulta', [MedicoController::class, 'agendarConsulta'])
+    ->name('tratamiento.agendar-consulta');
+
+Route::get('/ovocitos/{id}/editar', [OperadorController::class, 'editar'])->name('ovocito.editar');
+Route::post('ovocitos/actualizar', [OperadorController::class, 'updateOvocito'])->name('ovocito.actualizar');
+
+Route::get('/ovocito/{id}/json', [OperadorController::class, 'getJson'])->name('ovocito.json');
+
 
 ###########################################################
 # Rutas para el medico
 ###########################################################
 Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(function () {
-    Route::get('/home', function () {
-        return view('medico.home');
-    })->name('medico.home');
+    
+        
+    Route::get('/home', [MedicoController::class, 'misPacientes'])->name('medico.home');
 
+    Route::get('/home', [MedicoController::class, 'misPacientes'])->name('medico.home');
 
     Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
         ->name('medico.tratamiento.detalle');
@@ -80,6 +105,15 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
         ->name('tratamiento.subir-consentimiento');
 
     Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\MedicoController::class, 'tratamientosDeUnPaciente']);
+
+    Route::get('/tratamiento/{id}/post-transferencia', [MedicoController::class, 'postTransferenciaForm']
+        )->name('tratamiento.post');
+
+    Route::post('/tratamiento/{id}/post-transferencia', [MedicoController::class, 'guardarPostTransferencia']
+        )->name('tratamiento.guardar-post');
+    
+    Route::post('/tratamiento/{id}/enviar-orden-medica', [AvisosController::class, 'enviarOrdenMedica'])
+    ->name('tratamiento.enviar-orden-medica');
 });
 ###########################################################
 # Rutas para el admin
@@ -96,12 +130,28 @@ Route::prefix('admin')->middleware([AuthMiddleware::class . ':admin'])->group(fu
 ###########################################################
 # Rutas para el operador
 ###########################################################
+Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->group(function () {
+        Route::get('/home', [OperadorController::class, 'Pacientes'])->name('operador.home');
+        Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\OperadorController::class, 'tratamientosDeUnPaciente']);
+        Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
+        ->name('operador.tratamiento.detalle');
+        Route::get('paciente/{id}/puncion', [App\Http\Controllers\OperadorController::class, 'puncion'])
+        ->name('tratamiento.puncion');
+        // 1. Formulario general de punción
+    Route::get('/puncion/{paciente_id}', 
+        [App\Http\Controllers\OperadorController::class, 'formPuncion'])
+        ->name('puncion.form');
 
+    // 2. Buscar paciente por nombre+apellido o DNI
+    Route::post('/puncion/buscar-paciente',
+        [App\Http\Controllers\OperadorController::class, 'buscarPaciente'])
+        ->name('puncion.buscarPaciente');
 
-Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(function () {
-    Route::get('/home', [MedicoController::class, 'misPacientes'])->name('medico.home');
+    // 3. Guardar punción
+    Route::post('/puncion/guardar',
+        [App\Http\Controllers\OperadorController::class, 'guardarPuncion'])
+        ->name('puncion.guardar');
 });
-
 
 
 ###########################################################

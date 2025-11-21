@@ -10,6 +10,7 @@ class Estudio extends Model
 
     protected $fillable = [
         'tratamiento_id',
+        'tipo_estudio',
         'nombre',
         'resultado',
     ];
