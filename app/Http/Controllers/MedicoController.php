@@ -9,6 +9,8 @@ use App\Models\ProtocoloEstimulacion;
 use App\Models\TipoMedicacion;
 use App\Models\Monitoreo;
 use Illuminate\Http\Request;
+use App\Http\Controllers\MailController;
+use App\Models\User;
 
 class MedicoController extends Controller
 {
@@ -57,6 +59,7 @@ class MedicoController extends Controller
             ->select(
                 'tratamientos.id',
                 'objetivos.nombre as objetivo',
+                'usuarios.id as id_usuario',
                 'usuarios.nombre',
                 'usuarios.apellido',
                 'usuarios.mail',
@@ -300,11 +303,29 @@ public function agendarConsulta(Request $request, $id)
         return redirect()->back()->with('error', 'La fecha de inicio no puede ser mayor que la fecha de fin.');
     }
 
-    DB::table('tratamientos')->where('id', $id)->update([
+    $tratamiento = DB::table('tratamientos')->where('id', $id)->update([
         'fecha_sugerida_inicio' => $fechaInicio,
         'fecha_sugerida_fin' => $fechaFin,
         'updated_at' => now(),
     ]);
+    $trat = Tratamiento::findOrFail($id);
+    $user = $trat->historiaClinica->paciente;
+    $nombre = session('nombre');
+    $apellido = session('apellido');
+    $mailController = new MailController();
+    
+    $mailController->enviarMail(
+    [$user->mail],
+    'Dias sugeridos para tu consulta',
+    'mails.horariosSugeridos',
+    [
+        'fechaInicio' => $fechaInicio,
+        'fechaFin' => $fechaFin,
+        'nombre'=> $nombre,
+        'apellido'=>$apellido
+    ]
+);
+
 
     return redirect()->back()->with('success', 'Consulta agendada correctamente.');
 }

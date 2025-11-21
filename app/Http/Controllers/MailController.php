@@ -15,14 +15,14 @@ class MailController extends Controller
             Log::info('Iniciando Envio de mail');
             
             $htmlBody = view($bladeTemplate, $data)->render();
-
+            
             $response = Http::post('https://mvvuegssraetbyzeifov.supabase.co/functions/v1/send_email_v2', [
                 'group' => 5,
                 'toEmails' => $toEmail,
                 'subject' => $subject,
                 'htmlBody' => $htmlBody,
             ]);
-
+           
             if ($response->successful()) {
             $data = $response->json();
             Log::info('Respuesta exitosa del envío de email:', $data);

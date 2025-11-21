@@ -8,7 +8,7 @@
         <p class="page-subtitle">Información detallada del paciente y su tratamiento actual</p>
     </div>
     <div>
-        <a href="{{ route('medico.home') }}" class="btn-secondary">
+        <a href="{{ url()->previous() }}" class="btn-secondary">
             <i class="fas fa-arrow-left mr-2"></i> Volver a Pacientes
         </a>
     </div>
@@ -92,7 +92,7 @@
             <h3 class="text-lg font-semibold mb-4 text-gray-900 flex items-center">
                 <i class="fas fa-calendar-plus text-blue-600 mr-2"></i> Próximas Acciones
             </h3>
- @if (session('rol') == 2)
+ @if (session('rol') == 2 || session('rol') == 5)
     <div class="flex space-x-2">
     @if (strtolower($tratamiento->etapa) !== 'finalizado')
         <form method="POST" action="{{ route('tratamiento.avanzar-etapa', $tratamiento->id) }}">
@@ -115,7 +115,7 @@
 
     
     
-      @php
+@php
     $deshabilitado = $tratamiento->etapa !== "Monitoreos";
 @endphp
 
@@ -124,6 +124,70 @@
     @if($deshabilitado) disabled @else onclick="abrirModal()" @endif
 >
     <i class="fas fa-plus mr-2"></i> Agendar nueva consulta
+</button>
+
+<div id="modal-agendar" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <h2 class="modal-title">Agendar consulta</h2>
+
+        <form method="POST" action="{{ route('tratamiento.agendar-consulta', $tratamiento->id) }}">
+            @csrf
+
+            <label>Fecha Inicio Tentativa</label>
+            <input type="date" name="fecha_inicio" required>
+
+            <label>Fecha Fin Tentativa</label>
+            <input type="date" name="fecha_fin" required>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                <button type="submit" class="btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+        </div>
+        
+        @endif
+        @if (session('rol') == 3 )
+    <div class="flex space-x-2">
+    @if (strtolower($tratamiento->etapa) !== 'finalizado')
+        <form method="POST" action="{{ route('tratamiento.avanzar-etapa', $tratamiento->id) }}">
+            @csrf
+            <button
+                
+                class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled >
+                <i class="fas fa-arrow-right mr-1"></i> Avanzar etapa
+            </button>
+        </form>
+    @endif
+
+    @if (strtolower($tratamiento->etapa) !== 'primera consulta')
+        <form method="POST" action="{{ route('tratamiento.retroceder-etapa', $tratamiento->id) }}">
+            @csrf
+            <button class="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled>
+                <i class="fas fa-arrow-left mr-1"></i> Retroceder etapa
+            </button>
+        </form>
+    @endif
+</div>
+
+    
+    
+@php
+    $deshabilitado = $tratamiento->etapa !== "Monitoreos";
+@endphp
+
+<button 
+    class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+    disabled
+>
+    <i class="fas fa-plus mr-2" ></i> Agendar nueva consulta
 </button>
 
 <div id="modal-agendar" class="modal-overlay" style="display:none;">
