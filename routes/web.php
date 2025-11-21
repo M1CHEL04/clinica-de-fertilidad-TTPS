@@ -8,9 +8,19 @@ use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\TurnoController;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\OperadorController;
+use Illuminate\Support\Facades\Log;
 
 ## Web Routes
-
+Route::get('/borrar-turnos', function () {
+    try {
+        $response = Http::withToken(env('TOKEN_TURNERO'))->delete(' https://ahlnfxipnieoihruewaj.supabase.co/functions/v1/delete_turnos');
+        Log::info('Turnos borrados', ['deleted' => $response->json()['deleted']]);
+        return redirect()->back()->with('success', 'Se han borrado ' . $response->json()['deleted'] . ' turnos');
+    } catch (\Exception $e) {
+        Log::error('Error al conectar con el servicio de turnos', ['exception' => $e]);
+        return redirect()->back()->with('error', 'Error al conectar con el servicio de turnos');
+    }
+});
 ###########################################################
 # Rutas para login, registro y vistas sin session iniiada #
 ###########################################################
@@ -64,8 +74,8 @@ Route::get('/ovocito/{id}/json', [OperadorController::class, 'getJson'])->name('
 # Rutas para el medico
 ###########################################################
 Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(function () {
-    
-        
+
+
     Route::get('/home', [MedicoController::class, 'misPacientes'])->name('medico.home');
 
 
@@ -111,25 +121,31 @@ Route::prefix('admin')->middleware([AuthMiddleware::class . ':admin'])->group(fu
 # Rutas para el operador
 ###########################################################
 Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->group(function () {
-        Route::get('/home', [OperadorController::class, 'Pacientes'])->name('operador.home');
-        Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\OperadorController::class, 'tratamientosDeUnPaciente']);
-        Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
+    Route::get('/home', [OperadorController::class, 'Pacientes'])->name('operador.home');
+    Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\OperadorController::class, 'tratamientosDeUnPaciente']);
+    Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
         ->name('operador.tratamiento.detalle');
-        Route::get('paciente/{id}/puncion', [App\Http\Controllers\OperadorController::class, 'puncion'])
+    Route::get('paciente/{id}/puncion', [App\Http\Controllers\OperadorController::class, 'puncion'])
         ->name('tratamiento.puncion');
-        // 1. Formulario general de punción
-    Route::get('/puncion/{paciente_id}', 
-        [App\Http\Controllers\OperadorController::class, 'formPuncion'])
+    // 1. Formulario general de punción
+    Route::get(
+        '/puncion/{paciente_id}',
+        [App\Http\Controllers\OperadorController::class, 'formPuncion']
+    )
         ->name('puncion.form');
 
     // 2. Buscar paciente por nombre+apellido o DNI
-    Route::post('/puncion/buscar-paciente',
-        [App\Http\Controllers\OperadorController::class, 'buscarPaciente'])
+    Route::post(
+        '/puncion/buscar-paciente',
+        [App\Http\Controllers\OperadorController::class, 'buscarPaciente']
+    )
         ->name('puncion.buscarPaciente');
 
     // 3. Guardar punción
-    Route::post('/puncion/guardar',
-        [App\Http\Controllers\OperadorController::class, 'guardarPuncion'])
+    Route::post(
+        '/puncion/guardar',
+        [App\Http\Controllers\OperadorController::class, 'guardarPuncion']
+    )
         ->name('puncion.guardar');
 });
 

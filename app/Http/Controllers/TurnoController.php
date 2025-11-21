@@ -260,7 +260,7 @@ class TurnoController extends Controller
 
             if ($response->successful()) {
                 $data = $response->json();
-                Log::info('Respuesta exitosa de orden de pago: ', $data);
+                Log::info('Respuesta exitosa de orden de pago', ['data' => $data]);
 
                 // Retornar el ID del pago si está presente en la respuesta
                 if (isset($data['pago']['id'])) {
@@ -268,7 +268,7 @@ class TurnoController extends Controller
                     return $data['pago']['id'];
                 }
 
-                Log::error('No se encontró ID de pago en la respuesta exitosa', $data);
+                Log::error('No se encontró ID de pago en la respuesta exitosa', ['data' => $data]);
                 return false;
             } else {
                 Log::error('Error al registrar orden de pago - Status: ' . $response->status() . ' - Body: ' . $response->body());
