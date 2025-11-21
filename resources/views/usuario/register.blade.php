@@ -7,7 +7,7 @@
         <div class="max-w-4xl mx-auto">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-3">
                 <i class="fas fa-user-plus text-blue-600 mr-3"></i>
-                Registro de Usuario
+                Registro de usuario
             </h1>
             <p class="text-lg text-gray-600 mb-4">
                 Crea tu cuenta para acceder a nuestros servicios especializados en fertilidad
@@ -125,38 +125,13 @@
                         <i class="fas fa-hospital mr-2 text-blue-600"></i>Información de Obra Social
                     </h3>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            ¿Posee Obra Social?
-                        </label>
-                        <div class="flex gap-6">
-                            <label class="flex items-center cursor-pointer group">
-                                <input type="radio" name="posee_obra_social" value="si"
-                                    class="w-4 h-4 text-blue-600 focus:ring-1 focus:ring-blue-500 border-gray-300"
-                                    {{ old('posee_obra_social') == 'si' ? 'checked' : '' }}
-                                    onchange="toggleObraSocial(true)">
-                                <span class="ml-2 text-gray-700 group-hover:text-blue-600 transition-colors">Sí</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer group">
-                                <input type="radio" name="posee_obra_social" value="no"
-                                    class="w-4 h-4 text-blue-600 focus:ring-1 focus:ring-blue-500 border-gray-300"
-                                    {{ old('posee_obra_social') == 'no' ? 'checked' : '' }}
-                                    onchange="toggleObraSocial(false)">
-                                <span class="ml-2 text-gray-700 group-hover:text-blue-600 transition-colors">No</span>
-                            </label>
-                        </div>
-                        @error('posee_obra_social')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Detalles Obra Social (oculto por defecto) -->
-                    <div id="obra-social-details" class="grid md:grid-cols-2 gap-3" style="display: none;">
+                    <!-- Detalles Obra Social -->
+                    <div class="grid md:grid-cols-2 gap-3">
                         <div>
                             <label for="obra_social" class="block text-sm font-medium text-gray-700 mb-1">
-                                Obra Social
+                                Obra Social *
                             </label>
-                            <select id="obra_social" name="obra_social"
+                            <select id="obra_social" name="obra_social" required
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors @error('obra_social') border-red-500 @enderror">
                                 <option value="" disabled selected>Seleccionar obra social</option>
                                 @foreach ($obrasSociales as $obraSocial)
@@ -173,9 +148,9 @@
 
                         <div>
                             <label for="numero_afiliado" class="block text-sm font-medium text-gray-700 mb-1">
-                                Número de Afiliado
+                                Número de Afiliado *
                             </label>
-                            <input type="text" id="numero_afiliado" name="numero_afiliado"
+                            <input type="text" id="numero_afiliado" name="numero_afiliado" required
                                 value="{{ old('numero_afiliado') }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors @error('numero_afiliado') border-red-500 @enderror"
                                 placeholder="Número de afiliado">
@@ -227,7 +202,4 @@
             </form>
         </div>
     </div>
-@endsection
-@section('scripts')
-    <script src="{{ asset('js/showObrasSociales.js') }}"></script>
 @endsection
