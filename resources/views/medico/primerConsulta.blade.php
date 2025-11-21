@@ -22,6 +22,12 @@
         background: #007bff;
         color: white;
     }
+
+    label.required::after {
+        content: " *";
+        color: #e75353ff;
+        font-weight: bold;
+    }
 </style>
 
 <div class="container">
@@ -63,7 +69,7 @@
             <div class="mb-3">
                 <label for="antecedente-input" class="form-label">Antecedentes</label>
                 <div class="dropdown">
-                    <input type="text" id="antecedente-input" class="form-control" placeholder="Ingresar 3 letras...">
+                    <input type="text" id="antecedente-input" class="form-control" placeholder="Ingresar 3 letras..." >
                     <div id="antecedente-dropdown" class="dropdown-menu p-2" style="max-height: 180px; overflow-y: auto;"></div>
                 </div>
                 <ul id="antecedente-list" class="list-group mt-2"></ul>
@@ -74,8 +80,8 @@
 
             {{-- FUMA --}}
             <div class="mb-3">
-                <label for="fuma" class="form-label">¿Fuma?</label>
-                <select name="fuma" id="fuma" class="form-select">
+                <label for="fuma" class="form-label required">¿Fuma?</label>
+                <select name="fuma" id="fuma" class="form-select" required>
                     <option value="">Seleccione...</option>
                     <option value="si">Sí</option>
                     <option value="no">No</option>
@@ -83,7 +89,7 @@
             </div>
 
             <div class="mb-3" id="campo-cantidad" style="display:none;">
-                <label class="form-label">Pack/días</label>
+                <label class="form-label required">Pack/días</label>
 
                 <div class="row">
                     <div class="col-md-4">
@@ -107,8 +113,8 @@
 
             {{-- ALCOHOL --}}
             <div class="mb-3">
-                <label for="alcohol" class="form-label">¿Consume alcohol?</label>
-                <select name="alcohol" id="alcohol" class="form-select">
+                <label for="alcohol" class="form-label required">¿Consume alcohol?</label>
+                <select name="alcohol" id="alcohol" class="form-select" required>
                     <option value="">Seleccione...</option>
                     <option value="si">Sí</option>
                     <option value="no">No</option>
@@ -117,21 +123,21 @@
 
             <div id="alcohol-extra" style="display:none;">
                 <div class="mb-3">
-                    <label for="frecuencia" class="form-label">Frecuencia</label>
+                    <label for="frecuencia" class="form-label required">Frecuencia</label>
                     <input type="number" min="0" id="frecuencia" class="form-control" placeholder="dias a la semana">
                     
                 </div>
 
                 <div class="mb-3">
-                    <label for="bebida-alcohol" class="form-label">Qué bebida</label>
+                    <label for="bebida-alcohol" class="form-label required">Qué bebida</label>
                     <input type="text" name="bebida-alcohol" id="bebida-alcohol" class="form-control" placeholder="Ej: cerveza, vodka">
                 </div>
             </div>
 
             {{-- DROGAS --}}
             <div class="mb-3">
-                <label for="drogas" class="form-label">Drogas recreativas</label>
-                <select name="droga" id="droga" class="form-select">
+                <label for="drogas" class="form-label required">Drogas recreativas</label>
+                <select name="droga" id="droga" class="form-select" required>
                     <option value="">Seleccione...</option>
                     <option value="si">Sí</option>
                     <option value="no">No</option>
@@ -139,7 +145,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="observaciones" class="form-label">Observaciones</label>
+                <label for="observaciones" class="form-label required">Observaciones</label>
                 <textarea name="observaciones" id="observaciones" class="form-control"></textarea>
             </div>
 
@@ -167,49 +173,49 @@
             <h3>Antecedentes ginecológicos</h3>
             <div class="row">
                 <div class="col-md-4">
-                    <label for="ciclos" class="form-label">Ciclos menstruales</label>
-                    <select name="ciclos" id="ciclos" class="form-select">
+                    <label for="ciclos" class="form-label required">Ciclos menstruales</label>
+                    <select name="ciclos" id="ciclos" class="form-select" required>
                     <option value="">Seleccione...</option>
                     <option value="regular">Regular</option>
                     <option value="irregular">Irregular</option>
                 </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="duracion" class="form-label">Duracion del ciclo</label>
-                    <input type="number" name="duracion" id="duracion" class="form-control" placeholder="Ej: 21 dias">
+                    <label for="duracion" class="form-label required">Duracion del ciclo</label>
+                    <input type="number" name="duracion" id="duracion" class="form-control" placeholder="Ej: 21 dias" required>
                 </div>
                 <div class="col-md-4">
-                    <label for="caracteristica" class="form-label">Caracteristica del sangrado</label>
-                    <input type="text" name="caracteristica" id="caracteristica" class="form-control" placeholder="Ej: abundante, leve">
+                    <label for="caracteristica" class="form-label required">Caracteristica del sangrado</label>
+                    <input type="text" name="caracteristica" id="caracteristica" class="form-control" placeholder="Ej: abundante, leve" required>
                 </div>
                 <div class="col-md-4">
-                    <label for="menarca" class="form-label">Menarca (edad)</label>
-                    <input type="number" name="menarca" id="menarca" class="form-control" placeholder="Ej: 12 años">
+                    <label for="menarca" class="form-label required">Menarca (edad)</label>
+                    <input type="number" name="menarca" id="menarca" class="form-control" placeholder="Ej: 12 años" required>
                 </div>
             </div>
 
             <div class="row mt-3">
                 <div class="col-md-3">
-                    <label for="embarazos" class="form-label">G</label>
-                    <input type="number" name="embarazos" class="form-control" placeholder="Cantidad de embarazos">
+                    <label for="embarazos" class="form-label required">G</label>
+                    <input type="number" name="embarazos" id="embarazos" class="form-control" placeholder="Cantidad de embarazos" required>
                 </div>
                 <div class="col-md-3">
-                    <label for="partos" class="form-label">P</label>
-                    <input type="number" name="partos" class="form-control" placeholder="Cantidad de partos">
+                    <label for="partos" class="form-label required">P</label>
+                    <input type="number" name="partos" id="partos" class="form-control" placeholder="Cantidad de partos" required>
                 </div>
                 <div class="col-md-3">
-                    <label for="abortos" class="form-label">AB</label>
-                    <input type="number" name="abortos" class="form-control" placeholder="Cantidad de abortos">
+                    <label for="abortos" class="form-label required">AB</label>
+                    <input type="number" name="abortos" id="abortos" class="form-control" placeholder="Cantidad de abortos" required>
                 </div>
                 <div class="col-md-3">
-                    <label for="ectopicos" class="form-label">CT</label>
-                    <input type="number" name="ectopicos" class="form-control" placeholder="Cantidad de embarazos ectopicos">
+                    <label for="ectopicos" class="form-label required">CT</label>
+                    <input type="number" name="ectopicos" id="ectopicos" class="form-control" placeholder="Cantidad de embarazos ectopicos" required>
                 </div>
             </div>
 
             <div class="mt-3">
-                <label for="examen_fisico" class="form-label">Examen físico</label>
-                <textarea name="examen_fisico" class="form-control"></textarea>
+                <label for="examen_fisico" class="form-label required">Examen físico</label>
+                <textarea name="examen_fisico" id="examen_fisico" class="form-control" required></textarea>
             </div>
             <br>
                 <button type="button" onclick="prevStep()" class="btn btn-secondary">← Atrás</button>
@@ -222,8 +228,8 @@
             <h3 class="mt-4">Fenotipo</h3>
             <div class="row">
                 <div class="col-md-4">
-                    <label for="color-ojos" class="form-label">Color de ojos</label>
-                    <select name="color-ojos" id="color-ojos" class="form-select">
+                    <label for="color-ojos" class="form-label required">Color de ojos</label>
+                    <select name="color-ojos" id="color-ojos" class="form-select" required>
                         <option value="">Seleccione...</option>
                         <option value="ambar">Ambar</option>
                         <option value="castaño">Castaño</option>
@@ -234,8 +240,8 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="color-pelo" class="form-label">Color de pelo</label>
-                    <select name="color-pelo" id="color-pelo" class="form-select">
+                    <label for="color-pelo" class="form-label required">Color de pelo</label>
+                    <select name="color-pelo" id="color-pelo" class="form-select" required>
                         <option value="">Seleccione...</option>
                         <option value="negro">Negro</option>
                         <option value="castaño">Castaño</option>
@@ -244,8 +250,8 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="tipo-pelo" class="form-label">Tipo de pelo</label>
-                    <select name="tipo-pelo" id="tipo-pelo" class="form-select">
+                    <label for="tipo-pelo" class="form-label required">Tipo de pelo</label>
+                    <select name="tipo-pelo" id="tipo-pelo" class="form-select" required>
                         <option value="">Seleccione...</option>
                         <option value="rizado">Rizado</option>
                         <option value="liso">Liso</option>
@@ -253,16 +259,16 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="altura" class="form-label">Altura</label>
-                    <input type="number" name="altura" id="altura" class="form-control" placeholder="Ej: 1,72">
+                    <label for="altura" class="form-label required">Altura (en cm)</label>
+                    <input type="number" name="altura" id="altura" class="form-control" placeholder="Ej: 172" required>
                 </div>
                 <div class="col-md-4">
-                    <label for="complexion" class="form-label">Complexion</label>
-                    <input type="text" name="complexion" id="complexion" class="form-control" placeholder="Ej: delgada, robusta">
+                    <label for="complexion" class="form-label required">Complexion</label>
+                    <input type="text" name="complexion" id="complexion" class="form-control" placeholder="Ej: delgada, robusta" required>
                 </div>
                 <div class="col-md-4">
-                    <label for="rasgos-etnicos" class="form-label">Rasgos etnicos</label>
-                    <input type="text" name="rasgos-etnicos" id="rasgos-etnicos" class="form-control" placeholder="Ej: asiatico">
+                    <label for="rasgos-etnicos" class="form-label required">Rasgos etnicos</label>
+                    <input type="text" name="rasgos-etnicos" id="rasgos-etnicos" class="form-control" placeholder="Ej: asiatico" required>
                 </div>
             </div>
 

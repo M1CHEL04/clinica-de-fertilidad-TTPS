@@ -15,6 +15,7 @@ return new class extends Migration
         $table->id();
         $table->foreignId('tratamiento_id')->constrained()->onDelete('cascade');
 
+        $table->string('dni')->nullable();
         // Ginecológicos
         $table->string('ciclo_regular')->nullable();
         $table->string('duracion')->nullable();

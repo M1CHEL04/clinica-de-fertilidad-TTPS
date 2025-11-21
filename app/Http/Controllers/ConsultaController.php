@@ -44,15 +44,16 @@ class ConsultaController extends Controller
   
 
     $tratamiento->antecedentesPersonales()->create([
-        'fuma'             => $request->fuma,               
-        'cuanto_fuma'      => $request->cantidad,           
-        'alcohol'          => $request->alcohol,            
-        'frecuencia_alcohol' => $request->frecuencia,       
-        'bebida_alcohol'   => $request->input('bebida-alcohol'),
-        'droga'            => $request->droga,              
-        'observaciones'    => $request->observaciones,
-        'antecedentes'     => json_encode($request->antecedentes ?? []),
+    'fuma'               => $request->fuma === 'si' ? 1 : 0,
+    'cuanto_fuma'        => $request->cantidad,
+    'alcohol'            => $request->alcohol === 'si' ? 1 : 0,
+    'frecuencia_alcohol' => $request->frecuencia,
+    'bebida_alcohol'     => $request->input('bebida-alcohol'),
+    'droga'              => $request->droga === 'si' ? 1 : 0,
+    'observaciones'      => $request->observaciones,
+    'antecedentes'       => json_encode($request->antecedentes ?? []),
     ]);
+
 
 
 
@@ -78,7 +79,7 @@ class ConsultaController extends Controller
 
 
     $tratamiento->antecedentesGinecologicos()->create([
-        'ciclo_regular'          => $request->ciclos,              
+        'ciclo_regular' => $request->ciclos === 'regular' ? 1 : 0,              
         'duracion'               => $request->duracion,              
         'caracteristicas_sangrado' => $request->caracteristica,
         'edad_menarca'           => $request->menarca,
@@ -91,7 +92,7 @@ class ConsultaController extends Controller
 
 
 
-    $tratamiento->antecedentesFenotipo()->create([
+    $tratamiento->antecedentesFenotipos()->create([
         'color_ojos'        => $request->input('color-ojos'),
         'tipo_pelo'         => $request->input('tipo-pelo'),
         'altura'            => $request->altura,
