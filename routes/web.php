@@ -126,15 +126,13 @@ Route::get('/terminos/search', [TerminosController::class, 'search'])->name('ter
 
 
     // Primer consulta
-Route::get('/consulta', [ConsultaController::class, 'create'])->name('medico.primerConsulta.create');
+
 Route::post('/consulta', [ConsultaController::class, 'store'])->name('consulta.store');
 
-// Nueva página de estudios
-Route::post('/estudios', [EstudiosController::class, 'store'])->name('estudios.store');
-Route::get('/estudios', [EstudiosController::class, 'estudios'])
-    ->name('estudios.index');
+Route::get('/consulta/{paciente_id}', [ConsultaController::class, 'create'])
+    ->name('medico.primerConsulta.create');
 
-    Route::get('/consulta/pareja_mujer', function() {
+Route::get('/consulta/pareja_mujer', function() {
     return view('medico.pareja-mujer');
 });
 
@@ -145,5 +143,11 @@ Route::get('/consulta/hombre_gametos', function() {
 Route::get('/consulta/hombre_donado', function() {
     return view('medico.semen-donado');
 });
+
+// Nueva página de estudios
+Route::post('/estudios', [EstudiosController::class, 'store'])->name('estudios.store');
+Route::get('/estudios', [EstudiosController::class, 'estudios'])
+    ->name('estudios.index');
+
 
 

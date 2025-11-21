@@ -11,7 +11,12 @@ class AntecedenteFamiliar extends Model
 
     protected $fillable = [
         'tratamiento_id',
-        'descripcion',
+        'patologias_familiares', // usaremos para 'parentesco'
+        'patologias',            // guardaremos JSON de patologías
+    ];
+
+    protected $casts = [
+        'patologias' => 'array', // Laravel convertirá automáticamente JSON <-> array
     ];
 
     public function tratamiento()
@@ -19,3 +24,5 @@ class AntecedenteFamiliar extends Model
         return $this->belongsTo(Tratamiento::class);
     }
 }
+
+

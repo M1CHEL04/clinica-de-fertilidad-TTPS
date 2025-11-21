@@ -36,6 +36,8 @@
 
     <form action="{{ route('consulta.store') }}" method="POST">
         @csrf
+        <input type="hidden" name="paciente_id" value="{{ $paciente->id }}">
+
 
         {{-- STEP 1 --}}
         <div class="step active" id="step-1">
