@@ -38,6 +38,7 @@
         <span class="nav-step" data-step="2">Antecedentes familiares</span>
         <span class="nav-step" data-step="3">Antecedentes ginecológicos</span>
         <span class="nav-step" data-step="4">Fenotipo</span>
+        <span class="nav-step" data-step="5">Objetivo</span>
     </div>
 
     <form action="{{ route('consulta.store') }}" method="POST">
@@ -47,20 +48,6 @@
 
         {{-- STEP 1 --}}
         <div class="step active" id="step-1">
-
-
-           <h2>Objetivo de la consulta</h2>
-
-            <div class="mb-3">
-                <select name="objetivo" id="objetivo" class="form-select">
-                    <option value="">Seleccione...</option>
-
-                    @foreach ($objetivos as $obj)
-                        <option value="{{ $obj->id }}">{{ $obj->nombre }}</option>
-                    @endforeach
-                </select>
-            </div>
-
 
 
             <h3>Datos personales</h3>
@@ -75,8 +62,6 @@
                 <ul id="antecedente-list" class="list-group mt-2"></ul>
             </div>
 
-
-            
 
             {{-- FUMA --}}
             <div class="mb-3">
@@ -274,11 +259,27 @@
 
             <br>
             <button type="button" onclick="prevStep()" class="btn btn-secondary">← Atrás</button>
-            <button type="submit" class="btn btn-success float-end">Guardar consulta</button>
+            <button type="button" onclick="nextStep()" class="btn btn-primary float-end">Siguiente →</button>
         </div>
         
+        {{-- STEP 5 --}}
+        <div class="step" id="step-5">
+           <h2>Objetivo de la consulta</h2>
 
+            <div class="mb-3">
+                <select name="objetivo" id="objetivo" class="form-select">
+                    <option value="">Seleccione...</option>
 
+                    @foreach ($objetivos as $obj)
+                        <option value="{{ $obj->id }}">{{ $obj->nombre }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div id="formulario-dinamico"></div>
+
+            <button type="button" onclick="prevStep()" class="btn btn-secondary">← Atrás</button>
+            <button type="submit" class="btn btn-success float-end">Guardar consulta</button>
     </form>
 </div>
 

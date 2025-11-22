@@ -99,7 +99,11 @@ class ConsultaController extends Controller
         'complexion_corporal' => $request->complexion,
         'rasgos_etnicos'    => $request->input('rasgos-etnicos'),
     ]);
-
+    if ($request->filled('objetivo')) {
+            $tratamiento->update([
+                'objetivo_id' => $request->objetivo
+            ]);
+        }
 
 
     return back()->with('success', 'Antecedentes guardados correctamente.');

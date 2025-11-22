@@ -16,7 +16,6 @@ function nextStep() {
 
     // --- VALIDACIÓN DEL PASO 1 ---
     if (currentStep === 1) {
-        const objetivo = document.getElementById('objetivo');
         const fuma = document.getElementById('fuma');
         const alcohol = document.getElementById('alcohol');
         const droga = document.getElementById('droga');
@@ -26,10 +25,6 @@ function nextStep() {
         const frecuencia = document.getElementById('frecuencia');
         const bebida = document.getElementById('bebida-alcohol');
 
-        if (!objetivo.value) {
-            alert("Debe seleccionar un objetivo.");
-            return;
-        }
         if (!fuma.value) {
             alert("Debe indicar si fuma.");
             return;
@@ -113,12 +108,16 @@ function nextStep() {
             return;
         }
     }
+     if (currentStep === 5) {
+        const objetivo = document.getElementById('objetivo');
 
-    // --- VALIDACIÓN DEL PASO 4 (si hicieras una antes del submit) ---
-    // if (currentStep === 4) {}
-
-    // PASA AL SIGUIENTE PASO SI TODO ESTÁ BIEN
-    if (currentStep < 4) showStep(currentStep + 1);
+        
+        if (!objetivo.value) {
+            alert("Debe seleccionar un objetivo.");
+            return;
+        }
+     }
+    if (currentStep < 5) showStep(currentStep + 1);
 }
 
 function prevStep() {
