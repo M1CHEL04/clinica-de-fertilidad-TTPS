@@ -1,48 +1,36 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
+    const objetivo = document.getElementById("objetivo");
+    const contenedor = document.getElementById("antecedentePareja");
 
-    const selectObjetivo = document.getElementById("objetivo");
-    const contenido = document.getElementById("contenido-dinamico-pareja");
+    objetivo.addEventListener("change", function() {
+        const value = parseInt(this.value);
+        contenedor.innerHTML = ""; // limpiar
 
-    selectObjetivo.addEventListener("change", loadPartial);
-
-    function loadPartial() {
-        const sexoPaciente = document.getElementById("genero").value;
-        const sexoPareja   = document.getElementById("genero-pareja").value;
-
-        const objetivoTexto = selectObjetivo.options[selectObjetivo.selectedIndex].text.trim();
-
-        console.log("loadPartial() -> genero:", sexoPaciente,
-                    ", genero pareja:", sexoPareja,
-                    ", objetivo:", objetivoTexto);
-
-        contenido.innerHTML = ""; // limpiar
-
-        let url = null;
-
-        // ✔️ 1) Método ROPA → pareja mujer
-        if (objetivoTexto === "Método ROPA") {
-            url = "/consulta/pareja_mujer";
+        // NO cargar formulario
+        if (value === 4 || value === 5 || !value) {
+            return;
         }
 
-        // ✔️ 2) Embarazo con gametos propios → hombre aporta gametos
-        else if (objetivoTexto === "Embarazo con gametos propios") {
-            url = "/consulta/hombre_gametos";
+        let url = "";
+
+        // GAMETOS PROPIOS → datos del hombre
+        if (value === 1) {
+            url = "/medico/consulta/hombre_gametos";
         }
 
-        // ✔️ 3) Embarazo con esperma donado
-        else if (objetivoTexto === "Embarazo con esperma donado") {
-            url = "/consulta/hombre_donado";
+        // ESPERMA DONADO → solo fenotipo
+        if (value === 2) {
+            url = "/medico/consulta/hombre_donado";
         }
 
-        // Si hay una vista para cargar
-        if (url) {
-            console.log("Cargando vista:", url);
-            fetch(url)
-                .then(r => r.text())
-                .then(html => contenido.innerHTML = html)
-                .catch(err => console.error("Error cargando vista:", err));
-        } else {
-            console.log("Ninguna condición coincide. No se cargará parcial.");
+        // ROPA → datos mujer
+        if (value === 3) {
+            url = "/medico/consulta/pareja_mujer";
         }
-    }
+
+        // cargar HTML vía AJAX
+        fetch(url)
+            .then(res => res.text())
+            .then(html => contenedor.innerHTML = html);
+    });
 });

@@ -1,6 +1,11 @@
 {{-- PAREJA MUJER – ROPA --}}
 <h3>Datos de la pareja (mujer)</h3>
 
+<h4 class="mt-4">DNI</h4>
+<div class="mb-3">
+    <textarea name="dni" class="form-control" placeholder="12345678"></textarea>
+</div>
+
 {{-- Antecedentes personales --}}
 <h4 class="mt-3">Antecedentes personales</h4>
 <div class="mb-3">

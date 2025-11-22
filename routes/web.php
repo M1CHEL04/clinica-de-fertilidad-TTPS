@@ -115,10 +115,24 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
     Route::post('/tratamiento/{id}/enviar-orden-medica', [AvisosController::class, 'enviarOrdenMedica'])
     ->name('tratamiento.enviar-orden-medica');
 
+        Route::get('/consulta/pareja_mujer', function() {
+    return view('medico.pareja-mujer');
+});
+
+Route::get('/consulta/hombre_gametos', function() {
+    return view('medico.pareja-hombre');
+});
+
+Route::get('/consulta/hombre_donado', function() {
+    return view('medico.semen-donado');
+});
+
     Route::post('/consulta', [ConsultaController::class, 'store'])->name('consulta.store');
 
 Route::get('/consulta/{paciente_id}', [ConsultaController::class, 'create'])
     ->name('medico.primerConsulta.create');
+
+
 });
 ###########################################################
 # Rutas para el admin
@@ -184,17 +198,7 @@ Route::get('/terminos/search', [TerminosController::class, 'search'])->name('ter
 
 
 
-Route::get('/consulta/pareja_mujer', function() {
-    return view('medico.pareja-mujer');
-});
 
-Route::get('/consulta/hombre_gametos', function() {
-    return view('medico.pareja-hombre');
-});
-
-Route::get('/consulta/hombre_donado', function() {
-    return view('medico.semen-donado');
-});
 
 // Nueva página de estudios
 Route::post('/estudios', [EstudiosController::class, 'store'])->name('estudios.store');

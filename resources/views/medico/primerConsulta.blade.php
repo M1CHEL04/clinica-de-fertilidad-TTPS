@@ -276,7 +276,7 @@
                 </select>
             </div>
 
-            <div id="formulario-dinamico"></div>
+            <div id="antecedentePareja"></div>
 
             <button type="button" onclick="prevStep()" class="btn btn-secondary">← Atrás</button>
             <button type="submit" class="btn btn-success float-end">Guardar consulta</button>
@@ -293,4 +293,5 @@
 <script src="{{ asset('js/formulario.js')}}"></script>
 <script src="{{ asset('js/estandarFumar.js')}}"></script>
 <script src="{{ asset('js/antecedentes.js')}}"></script>
+<script src="{{ asset('js/parejas.js')}}"></script>
 @endsection

@@ -2,10 +2,17 @@
 <h3>Antecedentes del paciente</h3>
 
 {{-- Antecedentes personales --}}
+<h4 class="mt-4">DNI</h4>
+<div class="mb-3">
+    <textarea name="dni" class="form-control" placeholder="12345678"></textarea>
+</div>
+
 <h4 class="mt-3">Antecedentes personales</h4>
 <div class="mb-3">
     <textarea name="hombre_antecedentes_personales" class="form-control"></textarea>
 </div>
+
+
 
 {{-- Antecedentes familiares --}}
 <h4 class="mt-3">Antecedentes familiares</h4>
