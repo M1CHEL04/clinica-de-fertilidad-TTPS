@@ -89,6 +89,11 @@ class Tratamiento extends Model
         return $this->hasOne(AntecedenteFenotipo::class, 'tratamiento_id');
     }
 
+    public function antecedentesPareja()
+    {
+        return $this->hasOne(AntecedentePareja::class, 'tratamiento_id');
+    }
+
     public function protocolosEstimulacion()
     {
         return $this->hasMany(ProtocoloEstimulacion::class, 'tratamiento_id');

@@ -11,6 +11,7 @@ class AntecedentePareja extends Model
 
     protected $fillable = [
         'tratamiento_id',
+        'dni',
         // Ginecológicos
         'ciclo_regular',
         'duracion',

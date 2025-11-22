@@ -115,24 +115,27 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
     Route::post('/tratamiento/{id}/enviar-orden-medica', [AvisosController::class, 'enviarOrdenMedica'])
     ->name('tratamiento.enviar-orden-medica');
 
-        Route::get('/consulta/pareja_mujer', function() {
-    return view('medico.pareja-mujer');
-});
+    Route::get('/consulta/partials/hombre-gametos', function () {
+        return view('medico.partials.pareja-hombre');
+    });
 
-Route::get('/consulta/hombre_gametos', function() {
-    return view('medico.pareja-hombre');
-});
+    Route::get('/consulta/partials/hombre-donado', function () {
+        return view('medico.partials.semen-donado');
+    });
 
-Route::get('/consulta/hombre_donado', function() {
-    return view('medico.semen-donado');
-});
+    Route::get('/consulta/partials/pareja-mujer', function () {
+        return view('medico.partials.pareja-mujer');
+    });
+
 
     Route::post('/consulta', [ConsultaController::class, 'store'])->name('consulta.store');
 
-Route::get('/consulta/{paciente_id}', [ConsultaController::class, 'create'])
-    ->name('medico.primerConsulta.create');
+    Route::get('/consulta/{paciente_id}', [ConsultaController::class, 'create'])
+        ->name('medico.primerConsulta.create');
 
-
+    Route::post('/estudios', [EstudiosController::class, 'store'])->name('estudios.store');
+    Route::get('/estudios/{paciente_id}', [EstudiosController::class, 'estudios'])
+        ->name('estudios.index');
 });
 ###########################################################
 # Rutas para el admin
@@ -201,9 +204,7 @@ Route::get('/terminos/search', [TerminosController::class, 'search'])->name('ter
 
 
 // Nueva página de estudios
-Route::post('/estudios', [EstudiosController::class, 'store'])->name('estudios.store');
-Route::get('/estudios', [EstudiosController::class, 'estudios'])
-    ->name('estudios.index');
+
 
 
 

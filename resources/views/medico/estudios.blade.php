@@ -5,8 +5,9 @@
     <h1>Estudios Médicos</h1>
 
     <form action="{{ route('estudios.store') }}" method="POST">
-    @csrf
-
+        @csrf
+        <!-- Input hidden con el ID del paciente -->
+        <input type="hidden" name="paciente_id" value="{{ $paciente->id }}">
 
         <div class="mb-4">
             <label class="form-label">Estudios Ginecológicos</label>

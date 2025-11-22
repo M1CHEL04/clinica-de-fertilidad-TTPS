@@ -294,4 +294,5 @@
 <script src="{{ asset('js/estandarFumar.js')}}"></script>
 <script src="{{ asset('js/antecedentes.js')}}"></script>
 <script src="{{ asset('js/parejas.js')}}"></script>
+<script src="{{ asset('js/antecedentes-pareja.js')}}"></script>
 @endsection

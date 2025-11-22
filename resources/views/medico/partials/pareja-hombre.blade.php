@@ -2,15 +2,30 @@
 <h3>Antecedentes del paciente</h3>
 
 {{-- Antecedentes personales --}}
-<h4 class="mt-4">DNI</h4>
-<div class="mb-3">
-    <textarea name="dni" class="form-control" placeholder="12345678"></textarea>
+
+<div class="col-md-4">
+        <label class="form-label">DNI</label>
+        <input type="number" name="dni" class="form-control">
 </div>
 
 <h4 class="mt-3">Antecedentes personales</h4>
-<div class="mb-3">
-    <textarea name="hombre_antecedentes_personales" class="form-control"></textarea>
+<div class="mb-3 position-relative">
+
+    <div class="dropdown w-100">
+        <input id="hombre-antecedente-input"
+               type="text"
+               class="form-control"
+               placeholder="Buscar término médico..."
+               autocomplete="off">
+
+        <div id="hombre-antecedente-dropdown"
+             class="dropdown-menu w-100 p-2"
+             style="max-height:200px; overflow-y:auto;"></div>
+    </div>
+
+    <ul id="hombre-antecedente-list" class="list-group mt-2"></ul>
 </div>
+
 
 
 
@@ -78,6 +93,3 @@
     </div>
 </div>
 
-@section('scripts')
-<script src="{{ asset('js/familiares.js') }}"></script>
-@endsection
