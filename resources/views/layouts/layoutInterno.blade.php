@@ -48,7 +48,7 @@
                         <!-- Dropdown Menu -->
                         <div class="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                             <div class="py-2">
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                <a href="{{route ('verPerfilNoUsuario')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                     <i class="fas fa-user mr-2 text-gray-400"></i>Mi Perfil
                                 </a>
                                <form method="POST" action="{{ route('logout') }}" class="w-full">

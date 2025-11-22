@@ -47,6 +47,12 @@ class Tratamiento extends Model
         return $this->belongsTo(User::class, 'medico_id');
     }
 
+    public function etapa()
+    {
+        return $this->belongsTo(Etapa::class, 'etapa_id');
+    }
+
+
     public function objetivo()
     {
         return $this->belongsTo(Objetivo::class, 'objetivo_id');

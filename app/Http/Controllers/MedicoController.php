@@ -22,26 +22,35 @@ class MedicoController extends Controller
 
         // Trae pacientes con tratamientos del médico logueado
         $pacientes = DB::table('tratamientos')
-            ->join('historias_clinica', 'tratamientos.historia_clinica_id', '=', 'historias_clinica.id')
-            ->join('usuarios', 'historias_clinica.paciente_id', '=', 'usuarios.id')
-            ->join('estados_tratamiento', 'tratamientos.estado_tratamiento_id', '=', 'estados_tratamiento.id')
-            ->select(
-                'usuarios.id as paciente_id',
-                'usuarios.nombre',
-                'usuarios.apellido',
-                'usuarios.mail',
-                'usuarios.dni',
-                'usuarios.fecha_nacimiento',
-                'usuarios.telefono',
-                'estados_tratamiento.nombre as estado_tratamiento',
-                'tratamientos.created_at as fecha_inicio'
-            )
-            ->where('tratamientos.medico_id', $medicoId)
-            ->distinct()
-            ->get();
+    ->join('historias_clinica', 'tratamientos.historia_clinica_id', '=', 'historias_clinica.id')
+    ->join('usuarios', 'historias_clinica.paciente_id', '=', 'usuarios.id')
+    ->join('estados_tratamiento', 'tratamientos.estado_tratamiento_id', '=', 'estados_tratamiento.id')
+    ->where('tratamientos.medico_id', $medicoId)
+    ->select(
+        'usuarios.id as paciente_id',
+        'usuarios.nombre',
+        'usuarios.apellido',
+        'usuarios.mail',
+        'usuarios.dni',
+        'usuarios.fecha_nacimiento',
+        'usuarios.telefono',
+        DB::raw('MAX(estados_tratamiento.nombre) as estado_tratamiento'),
+        DB::raw('MIN(tratamientos.created_at) as fecha_inicio')
+    )
+    ->groupBy(
+        'usuarios.id',
+        'usuarios.nombre',
+        'usuarios.apellido',
+        'usuarios.mail',
+        'usuarios.dni',
+        'usuarios.fecha_nacimiento',
+        'usuarios.telefono'
+    )
+    ->get();
+
 
         
-
+       
         return view('medico.home', compact('pacientes', 'rol_id'));
     }
 

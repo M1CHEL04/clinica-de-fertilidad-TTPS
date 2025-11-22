@@ -66,7 +66,7 @@
                             <!-- Dropdown Menu -->
                             <div class="absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                                 <div class="py-2">
-                                    <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 text-sm">
+                                    <a href="{{route ('verPerfil')}}" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 text-sm">
                                         <i class="fas fa-user mr-2"></i>Mi Perfil
                                     </a>
                                     <div class="border-t border-gray-100"></div>

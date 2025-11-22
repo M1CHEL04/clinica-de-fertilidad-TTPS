@@ -29,6 +29,11 @@ Route::get('/registro', function () {
     $obrasSociales = $response->json()['data'];
     return view('usuario.register', compact('obrasSociales'));
 })->name('registro');
+Route::get('/perfil', [App\Http\Controllers\Auth\LoginController::class, 'perfil'])->name('verPerfil');
+Route::get('/ver-perfil', [App\Http\Controllers\Auth\LoginController::class, 'verPerfilNoUsuario'])->name('verPerfilNoUsuario');
+Route::put('/usuario/perfil', [LoginController::class, 'updatePerfil'])
+    ->name('usuario.updatePerfil');
+
 Route::get('/login', function () {
     return view('usuario.login');
 })->name('login');
@@ -61,10 +66,13 @@ Route::post('ovocitos/actualizar', [OperadorController::class, 'updateOvocito'])
 Route::get('/ovocito/{id}/json', [OperadorController::class, 'getJson'])->name('ovocito.json');
 
 // Ruta para mostrar el formulario de cambio de contraseña
-Route::get('/cambiar-contraseña{email}', [LoginController::class, 'showChangePasswordForm'])->name('change.password');
+Route::get('/cambiar-contraseña/{email}', [LoginController::class, 'showChangePasswordForm'])->name('change.password');
+Route::get('/cambiar-contraseña-private/{email}', [LoginController::class, 'showChangePasswordFormPrivate'])->name('change.password.private');
 
 // Ruta para actualizar la contraseña
 Route::post('/cambiar-contraseña', [LoginController::class, 'updatePassword'])->name('update.password');
+Route::post('/cambiar-contraseña-usuario', [LoginController::class, 'updatePasswordUser'])->name('update.password.user');
+
 ###########################################################
 # Rutas para el medico
 ###########################################################
