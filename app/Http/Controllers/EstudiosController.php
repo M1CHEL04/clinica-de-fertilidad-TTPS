@@ -117,8 +117,8 @@ class EstudiosController extends Controller
     $html .= "<p>Se han registrado los siguientes estudios:</p><ul>";
 
     foreach ($estudios_guardados as $est) {
-        $resultado = $est->resultado ?: 'Pendiente';
-        $html .= "<li>{$est->tipo_estudio} - {$est->nombre} - Resultado: {$resultado}</li>";
+        
+        $html .= "<li>{$est->tipo_estudio} - {$est->nombre} </li>";
     }
 
     $html .= "</ul><p>Saludos cordiales,<br>Fertilia</p>";
