@@ -221,10 +221,18 @@
     </button>
 
     {{-- 1️⃣ Recetar estudios (desde etapa 1) --}}
-    <button class="btn-primary w-full flex items-center justify-center gap-2 {{ !$etapa1 ? 'opacity-50 cursor-not-allowed' : '' }}"
-            {{ !$etapa1 ? 'disabled' : '' }}>
+    @if ($etapa1)
+    <a href="{{ route('estudios.index', $tratamiento->paciente_id) }}"
+   class="btn-primary w-full flex items-center justify-center gap-2">
+    <i class="fas fa-vials"></i> Recetar estudios
+</a>
+
+@else
+    <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
         <i class="fas fa-vials"></i> Recetar estudios
-    </button>
+    </a>
+@endif
+
 
    
 

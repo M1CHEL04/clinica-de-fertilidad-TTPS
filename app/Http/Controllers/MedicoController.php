@@ -57,6 +57,7 @@ class MedicoController extends Controller
             ->join('etapa', 'etapa.id', '=', 'tratamientos.etapa_id')
             ->select(
                 'tratamientos.id',
+                'usuarios.id as paciente_id', 
                 'objetivos.nombre as objetivo',
                 'usuarios.nombre',
                 'usuarios.apellido',

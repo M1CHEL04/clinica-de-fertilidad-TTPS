@@ -181,8 +181,12 @@ switch ($request->objetivo) {
 }
 
 
+    $tratamiento->update(['etapa_id' => 1]);
 
-    return back()->with('success', 'Antecedentes guardados correctamente.');
+    return redirect()
+    ->route('medico.tratamiento.detalle', $tratamiento->id)
+    ->with('success', 'Antecedentes guardados correctamente.');
+
 }
 
 
