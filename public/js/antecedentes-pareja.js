@@ -1,10 +1,17 @@
 function inicializarFormParejas() {
 
     /* ======================================================
-       UTILIDAD: buscador reutilizable
+       BUSCADOR REUTILIZABLE (estética unificada)
     ====================================================== */
     function attachTermSearch(input, dropdown, list, hiddenNamePrefix) {
         if (!input || !dropdown || !list) return;
+
+        // Cerrar al click afuera
+        document.addEventListener("click", e => {
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.remove("show");
+            }
+        });
 
         input.addEventListener("input", function () {
             const q = input.value.trim();
@@ -19,21 +26,30 @@ function inicializarFormParejas() {
                 .then(res => res.json())
                 .then(data => {
                     dropdown.innerHTML = "";
+                    dropdown.style.maxHeight = "180px";
+                    dropdown.style.overflowY = "auto";
 
                     if (data.rows?.length) {
                         data.rows.forEach(item => {
                             const card = document.createElement("div");
-                            card.classList.add("border", "rounded", "p-2", "mb-2", "bg-light", "text-dark");
+                            card.classList.add(
+                                "border", "rounded", "p-2", "mb-2",
+                                "bg-light", "text-dark"
+                            );
                             card.style.cursor = "pointer";
                             card.textContent = item;
 
                             card.addEventListener("click", () => {
 
+                                // Evitar duplicados
                                 if ([...list.children].some(li => li.textContent.includes(item)))
                                     return;
 
                                 const li = document.createElement("li");
-                                li.classList.add("list-group-item","d-flex","justify-content-between","align-items-center");
+                                li.classList.add(
+                                    "list-group-item", "d-flex",
+                                    "justify-content-between", "align-items-center"
+                                );
                                 li.textContent = item;
 
                                 const hidden = document.createElement("input");
@@ -46,7 +62,7 @@ function inicializarFormParejas() {
                                 removeBtn.type = "button";
                                 removeBtn.classList.add("btn","btn-sm","btn-outline-danger");
                                 removeBtn.textContent = "✕";
-                                removeBtn.onclick = () => li.remove();
+                                removeBtn.addEventListener("click", () => li.remove());
                                 li.appendChild(removeBtn);
 
                                 list.appendChild(li);
@@ -60,7 +76,6 @@ function inicializarFormParejas() {
                         });
 
                         dropdown.classList.add("show");
-
                     } else {
                         dropdown.classList.remove("show");
                     }
@@ -80,36 +95,40 @@ function inicializarFormParejas() {
     );
 
     /* ======================================================
-       MUJER – antecedentes familiares
+       MUJER – antecedentes familiares (bloques dinámicos)
     ====================================================== */
     const famContainer = document.getElementById("pareja-familiares-container");
     const famBtn = document.getElementById("add-pareja-familiar");
     let famIndex = 0;
 
-    function newFamBlock(index) {
-        if (!famContainer) return;
+    function newFamBlock(i) {
+        const wrap = document.createElement("div");
+        wrap.classList.add("border", "rounded", "p-3", "mb-3", "bg-light");
 
-        const box = document.createElement("div");
-        box.classList.add("border","rounded","p-3","mb-3","bg-light");
+        wrap.innerHTML = `
+            <div class="mb-2">
+                <label class="form-label">Parentesco</label>
+                <input type="text" class="form-control" name="pareja_familiares[${i}][parentesco]">
+            </div>
 
-        box.innerHTML = `
-            <label>Parentesco</label>
-            <input type="text" class="form-control mb-2" name="pareja_familiares[${index}][parentesco]">
-
-            <label>Antecedentes médicos</label>
-            <input type="text" class="form-control familiar-antecedente-input" placeholder="buscar...">
-
-            <div class="dropdown-menu familiar-antecedentes-dropdown w-100 p-2"></div>
-            <ul class="list-group familiar-antecedentes-list mt-2"></ul>
+            <div class="mb-2 position-relative">
+                <label class="form-label">Antecedentes médicos</label>
+                <div class="dropdown w-100">
+                    <input type="text" class="form-control familiar-antecedente-input" 
+                           placeholder="Buscar término médico..." autocomplete="off">
+                    <div class="dropdown-menu familiar-antecedentes-dropdown w-100 p-2"></div>
+                </div>
+                <ul class="list-group mt-2 familiar-antecedentes-list"></ul>
+            </div>
         `;
 
-        famContainer.appendChild(box);
+        famContainer.appendChild(wrap);
 
         attachTermSearch(
-            box.querySelector(".familiar-antecedente-input"),
-            box.querySelector(".familiar-antecedentes-dropdown"),
-            box.querySelector(".familiar-antecedentes-list"),
-            `pareja_familiares[${index}][antecedentes][]`
+            wrap.querySelector(".familiar-antecedente-input"),
+            wrap.querySelector(".familiar-antecedentes-dropdown"),
+            wrap.querySelector(".familiar-antecedentes-list"),
+            `pareja_familiares[${i}][antecedentes][]`
         );
     }
 
@@ -132,38 +151,42 @@ function inicializarFormParejas() {
        HOMBRE – antecedentes familiares
     ====================================================== */
     const hFamContainer = document.getElementById("hombre-familiares-container");
-    const hFamBtn = document.getElementById("add-hombre-familiar");
-    let hIndex = 0;
+    const hBtn = document.getElementById("add-hombre-familiar");
+    let hIdx = 0;
 
-    function newHFamBlock(index) {
-        if (!hFamContainer) return;
+    function newHFamBlock(i) {
+        const wrap = document.createElement("div");
+        wrap.classList.add("border", "rounded", "p-3", "mb-3", "bg-light");
 
-        const box = document.createElement("div");
-        box.classList.add("border","rounded","p-3","mb-3","bg-light");
+        wrap.innerHTML = `
+            <div class="mb-2">
+                <label class="form-label">Parentesco</label>
+                <input type="text" class="form-control" name="hombre_familiares[${i}][parentesco]">
+            </div>
 
-        box.innerHTML = `
-            <label>Parentesco</label>
-            <input type="text" class="form-control mb-2" name="hombre_familiares[${index}][parentesco]">
-
-            <label>Antecedentes médicos</label>
-            <input type="text" class="form-control hombre-fam-input" placeholder="buscar...">
-
-            <div class="dropdown-menu hombre-fam-dropdown w-100 p-2"></div>
-            <ul class="list-group hombre-fam-list mt-2"></ul>
+            <div class="mb-2 position-relative">
+                <label class="form-label">Antecedentes médicos</label>
+                <div class="dropdown w-100">
+                    <input type="text" class="form-control hombre-fam-input"
+                           placeholder="Buscar término médico..." autocomplete="off">
+                    <div class="dropdown-menu hombre-fam-dropdown w-100 p-2"></div>
+                </div>
+                <ul class="list-group hombre-fam-list mt-2"></ul>
+            </div>
         `;
 
-        hFamContainer.appendChild(box);
+        hFamContainer.appendChild(wrap);
 
         attachTermSearch(
-            box.querySelector(".hombre-fam-input"),
-            box.querySelector(".hombre-fam-dropdown"),
-            box.querySelector(".hombre-fam-list"),
-            `hombre_familiares[${index}][antecedentes][]`
+            wrap.querySelector(".hombre-fam-input"),
+            wrap.querySelector(".hombre-fam-dropdown"),
+            wrap.querySelector(".hombre-fam-list"),
+            `hombre_familiares[${i}][antecedentes][]`
         );
     }
 
-    if (hFamBtn) {
-        hFamBtn.onclick = () => newHFamBlock(hIndex++);
-        newHFamBlock(hIndex++);
+    if (hBtn) {
+        hBtn.onclick = () => newHFamBlock(hIdx++);
+        newHFamBlock(hIdx++);
     }
 }

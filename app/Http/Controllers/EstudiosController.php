@@ -110,18 +110,38 @@ class EstudiosController extends Controller
             }
         }
     }
+// Construir HTML del mail en formato CARD
+$html = "
+<div style='
+    max-width:600px;
+    margin:20px auto;
+    padding:20px;
+    border-radius:10px;
+    background:#f8f9fa;
+    border:1px solid #ddd;
+    font-family:Arial, sans-serif;
+    color:#333;
+'>
+    <h2 style='color:#2563eb; text-align:center; margin-top:0;'>Estudios Médicos</h2>
 
-    // Construir HTML del mail
-    $html = "<h2 style='color:#2563eb'>Estudios Médicos</h2>";
-    $html .= "<p>Estimado/a {$tratamiento->nombre} {$tratamiento->apellido},</p>";
-    $html .= "<p>Se han registrado los siguientes estudios:</p><ul>";
+    <p>Estimado/a {$paciente->nombre} {$paciente->apellido},</p>
 
-    foreach ($estudios_guardados as $est) {
-        
-        $html .= "<li>{$est->tipo_estudio} - {$est->nombre} </li>";
-    }
+    <p>Se han registrado los siguientes estudios:</p>
 
-    $html .= "</ul><p>Saludos cordiales,<br>Fertilia</p>";
+    <ul style='padding-left:18px;'>
+";
+
+foreach ($estudios_guardados as $est) {
+    $html .= "<li>{$est->tipo_estudio} - {$est->nombre}</li>";
+}
+
+$html .= "
+    </ul>
+
+    <p style='margin-top:20px;'>Saludos cordiales,<br><strong>Fertilia</strong></p>
+</div>
+";
+
 
     // Enviar por la API
     $payload = [

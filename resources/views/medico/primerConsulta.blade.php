@@ -30,7 +30,18 @@
     }
 </style>
 
-<div class="container">
+{{-- CONTENEDOR CENTRADO CORRECTAMENTE --}}
+<div style="
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+">
+
+    <div class="card shadow p-4" style="max-width: 900px; width: 100%;">
+
+
     <h1>Primera Consulta</h1>
 
     <div class="wizard-nav">
@@ -90,9 +101,7 @@
                     </div>
                 </div>
 
-                <!-- Campo final que se enviará al backend -->
                 <input type="hidden" name="cantidad" id="cantidad">
-                
                 <small class="text-muted" id="preview_cantidad" style="display:block; margin-top: 5px;"></small>
             </div>
 
@@ -110,7 +119,6 @@
                 <div class="mb-3">
                     <label for="frecuencia" class="form-label required">Frecuencia</label>
                     <input type="number" min="0" id="frecuencia" class="form-control" placeholder="dias a la semana">
-                    
                 </div>
 
                 <div class="mb-3">
@@ -134,7 +142,7 @@
                 <textarea name="observaciones" id="observaciones" class="form-control"></textarea>
             </div>
 
-            <br><br>
+            <br>
             <button type="button" onclick="nextStep()" class="btn btn-primary float-end">Siguiente →</button>
         </div>
 
@@ -148,123 +156,123 @@
             <br>
             <button type="button" onclick="prevStep()" class="btn btn-secondary">← Atrás</button>
             <button type="button" onclick="nextStep()" class="btn btn-primary float-end">Siguiente →</button>
-        
         </div>
-
 
         {{-- STEP 3 --}}
         <div class="step" id="step-3">
 
             <h3>Antecedentes ginecológicos</h3>
-            <div class="row">
-                <div class="col-md-4">
-                    <label for="ciclos" class="form-label required">Ciclos menstruales</label>
-                    <select name="ciclos" id="ciclos" class="form-select" required>
-                    <option value="">Seleccione...</option>
-                    <option value="regular">Regular</option>
-                    <option value="irregular">Irregular</option>
-                </select>
-                </div>
-                <div class="col-md-4">
-                    <label for="duracion" class="form-label required">Duracion del ciclo</label>
-                    <input type="number" name="duracion" id="duracion" class="form-control" placeholder="Ej: 21 dias" required>
-                </div>
-                <div class="col-md-4">
-                    <label for="caracteristica" class="form-label required">Caracteristica del sangrado</label>
-                    <input type="text" name="caracteristica" id="caracteristica" class="form-control" placeholder="Ej: abundante, leve" required>
-                </div>
-                <div class="col-md-4">
-                    <label for="menarca" class="form-label required">Menarca (edad)</label>
-                    <input type="number" name="menarca" id="menarca" class="form-control" placeholder="Ej: 12 años" required>
-                </div>
-            </div>
 
-            <div class="row mt-3">
-                <div class="col-md-3">
-                    <label for="embarazos" class="form-label required">G</label>
-                    <input type="number" name="embarazos" id="embarazos" class="form-control" placeholder="Cantidad de embarazos" required>
-                </div>
-                <div class="col-md-3">
-                    <label for="partos" class="form-label required">P</label>
-                    <input type="number" name="partos" id="partos" class="form-control" placeholder="Cantidad de partos" required>
-                </div>
-                <div class="col-md-3">
-                    <label for="abortos" class="form-label required">AB</label>
-                    <input type="number" name="abortos" id="abortos" class="form-control" placeholder="Cantidad de abortos" required>
-                </div>
-                <div class="col-md-3">
-                    <label for="ectopicos" class="form-label required">CT</label>
-                    <input type="number" name="ectopicos" id="ectopicos" class="form-control" placeholder="Cantidad de embarazos ectopicos" required>
-                </div>
-            </div>
+            <div class="row"> 
+                <div class="col-md-4"> 
+                    <label for="ciclos" class="form-label required">Ciclos menstruales</label> 
+                    <select name="ciclos" id="ciclos" class="form-select" required> 
+                        <option value="">Seleccione...</option> 
+                        <option value="regular">Regular</option> 
+                        <option value="irregular">Irregular</option> 
+                    </select> </div> <div class="col-md-4"> 
+                        <label for="duracion" class="form-label required">Duracion del ciclo</label> 
+                        <input type="number" name="duracion" id="duracion" class="form-control" placeholder="Ej: 21 dias" required> 
+                    </div> 
+                    <div class="col-md-4"> 
+                        <label for="caracteristica" class="form-label required">Caracteristica del sangrado</label> 
+                        <input type="text" name="caracteristica" id="caracteristica" class="form-control" placeholder="Ej: abundante, leve" required> 
+                    </div> 
+                    <div class="col-md-4"> 
+                        <label for="menarca" class="form-label required">Menarca (edad)</label> 
+                        <input type="number" name="menarca" id="menarca" class="form-control" placeholder="Ej: 12 años" required> 
+                    </div> 
+                </div> 
+                <div class="row mt-3"> 
+                    <div class="col-md-3"> 
+                        <label for="embarazos" class="form-label required">G</label> 
+                        <input type="number" name="embarazos" id="embarazos" class="form-control" placeholder="Cantidad de embarazos" required> 
+                    </div> 
+                    <div class="col-md-3"> 
+                        <label for="partos" class="form-label required">P</label> 
+                        <input type="number" name="partos" id="partos" class="form-control" placeholder="Cantidad de partos" required> 
+                    </div> 
+                    <div class="col-md-3"> 
+                        <label for="abortos" class="form-label required">AB</label> 
+                        <input type="number" name="abortos" id="abortos" class="form-control" placeholder="Cantidad de abortos" required> 
+                    </div> 
+                    <div class="col-md-3"> 
+                        <label for="ectopicos" class="form-label required">CT</label> 
+                        <input type="number" name="ectopicos" id="ectopicos" class="form-control" placeholder="Cantidad de embarazos ectopicos" required> 
+                    </div> 
+                </div> 
+                <div class="mt-3"> 
+                    <label for="examen_fisico" class="form-label required">Examen físico</label> 
+                    <textarea name="examen_fisico" id="examen_fisico" class="form-control" required>
 
-            <div class="mt-3">
-                <label for="examen_fisico" class="form-label required">Examen físico</label>
-                <textarea name="examen_fisico" id="examen_fisico" class="form-control" required></textarea>
-            </div>
+                    </textarea> 
+                </div>
+
             <br>
-                <button type="button" onclick="prevStep()" class="btn btn-secondary">← Atrás</button>
-                <button type="button" onclick="nextStep()" class="btn btn-primary float-end">Siguiente →</button>
+            <button type="button" onclick="prevStep()" class="btn btn-secondary">← Atrás</button>
+            <button type="button" onclick="nextStep()" class="btn btn-primary float-end">Siguiente →</button>
         </div>
 
         {{-- STEP 4 --}}
         <div class="step" id="step-4">
 
             <h3 class="mt-4">Fenotipo</h3>
+
             <div class="row">
-                <div class="col-md-4">
-                    <label for="color-ojos" class="form-label required">Color de ojos</label>
-                    <select name="color-ojos" id="color-ojos" class="form-select" required>
-                        <option value="">Seleccione...</option>
-                        <option value="ambar">Ambar</option>
-                        <option value="castaño">Castaño</option>
-                        <option value="avellana">Avellana</option>
-                        <option value="azul">Azul</option>
-                        <option value="verde">Verde</option>
-                        <option value="gris">Gris</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label for="color-pelo" class="form-label required">Color de pelo</label>
-                    <select name="color-pelo" id="color-pelo" class="form-select" required>
-                        <option value="">Seleccione...</option>
-                        <option value="negro">Negro</option>
-                        <option value="castaño">Castaño</option>
-                        <option value="rubio">Rubio</option>
-                        <option value="pelirrojo">Pelirrojo</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label for="tipo-pelo" class="form-label required">Tipo de pelo</label>
-                    <select name="tipo-pelo" id="tipo-pelo" class="form-select" required>
-                        <option value="">Seleccione...</option>
-                        <option value="rizado">Rizado</option>
-                        <option value="liso">Liso</option>
-                        <option value="ondulado">Ondulado</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label for="altura" class="form-label required">Altura (en cm)</label>
-                    <input type="number" name="altura" id="altura" class="form-control" placeholder="Ej: 172" required>
-                </div>
-                <div class="col-md-4">
-                    <label for="complexion" class="form-label required">Complexion</label>
-                    <input type="text" name="complexion" id="complexion" class="form-control" placeholder="Ej: delgada, robusta" required>
-                </div>
-                <div class="col-md-4">
-                    <label for="rasgos-etnicos" class="form-label required">Rasgos etnicos</label>
-                    <input type="text" name="rasgos-etnicos" id="rasgos-etnicos" class="form-control" placeholder="Ej: asiatico" required>
-                </div>
+                <div class="col-md-4"> 
+                    <label for="color-ojos" class="form-label required">Color de ojos</label> 
+                    <select name="color-ojos" id="color-ojos" class="form-select" required> 
+                        <option value="">Seleccione...</option> 
+                        <option value="ambar">Ambar</option> 
+                        <option value="castaño">Castaño</option> 
+                        <option value="avellana">Avellana</option> 
+                        <option value="azul">Azul</option> 
+                        <option value="verde">Verde</option> 
+                        <option value="gris">Gris</option> 
+                    </select> 
+                </div> 
+                <div class="col-md-4"> 
+                    <label for="color-pelo" class="form-label required">Color de pelo</label> 
+                    <select name="color-pelo" id="color-pelo" class="form-select" required> 
+                        <option value="">Seleccione...</option> 
+                        <option value="negro">Negro</option> 
+                        <option value="castaño">Castaño</option> 
+                        <option value="rubio">Rubio</option> 
+                        <option value="pelirrojo">Pelirrojo</option> 
+                    </select> 
+                </div> 
+                <div class="col-md-4"> 
+                    <label for="tipo-pelo" class="form-label required">Tipo de pelo</label> 
+                    <select name="tipo-pelo" id="tipo-pelo" class="form-select" required> 
+                        <option value="">Seleccione...</option> 
+                        <option value="rizado">Rizado</option> 
+                        <option value="liso">Liso</option> 
+                        <option value="ondulado">Ondulado</option> 
+                    </select> 
+                </div> 
+                <div class="col-md-4"> 
+                    <label for="altura" class="form-label required">Altura (en cm)</label> 
+                    <input type="number" name="altura" id="altura" class="form-control" placeholder="Ej: 172" required> 
+                </div> 
+                <div class="col-md-4"> 
+                    <label for="complexion" class="form-label required">Complexion</label> 
+                    <input type="text" name="complexion" id="complexion" class="form-control" placeholder="Ej: delgada, robusta" required> 
+                </div> 
+                <div class="col-md-4"> 
+                    <label for="rasgos-etnicos" class="form-label required">Rasgos etnicos</label> 
+                    <input type="text" name="rasgos-etnicos" id="rasgos-etnicos" class="form-control" placeholder="Ej: asiatico" required> 
+                </div> 
             </div>
 
             <br>
             <button type="button" onclick="prevStep()" class="btn btn-secondary">← Atrás</button>
             <button type="button" onclick="nextStep()" class="btn btn-primary float-end">Siguiente →</button>
         </div>
-        
+
         {{-- STEP 5 --}}
         <div class="step" id="step-5">
-           <h2>Objetivo de la consulta</h2>
+
+            <h2>Objetivo de la consulta</h2>
 
             <div class="mb-3">
                 <select name="objetivo" id="objetivo" class="form-select">
@@ -280,8 +288,12 @@
 
             <button type="button" onclick="prevStep()" class="btn btn-secondary">← Atrás</button>
             <button type="submit" class="btn btn-success float-end">Guardar consulta</button>
+        </div>
+
     </form>
-</div>
+
+    </div> {{-- card --}}
+</div> {{-- centering container --}}
 
 @endsection
 

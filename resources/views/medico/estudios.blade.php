@@ -1,7 +1,17 @@
 @extends('layouts.layoutInterno')
-
+<style>
+    .card-centered-wrapper {
+        min-height: 80vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+    }
+</style>
 @section('content')
-<div class="container">
+<div class="card-centered-wrapper">
+    <div class="card shadow p-4" style="max-width: 900px; width: 100%;">
+
     <h1>Estudios Médicos</h1>
 
     <form action="{{ route('estudios.store') }}" method="POST">
@@ -63,7 +73,8 @@
 
         <button type="submit" class="btn btn-success float-end">Guardar estudios</button>
     </form>
-</div>
+    </div> {{-- card --}}
+</div> {{-- wrapper --}}
 @endsection
 
 @section('scripts')
