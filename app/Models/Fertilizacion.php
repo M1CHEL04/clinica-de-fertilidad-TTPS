@@ -23,16 +23,21 @@ class Fertilizacion extends Model
 
     public function embrion()
     {
-        return $this->belongsTo(Embrion::class, 'embrion_id');
+        return $this->hasMany(Embrion::class, 'embrion_id');
     }
 
-    public function medico()
+    public function operador()
     {
-        return $this->belongsTo(User::class, 'medico_id');
+        return $this->belongsTo(User::class, 'operador_id');
     }
 
     public function paciente()
     {
         return $this->belongsTo(User::class, 'paciente_id');
+    }
+
+    public function tratamiento()
+    {
+        return $this->belongsTo(Tratamiento::class, 'tratamiento_id');
     }
 }

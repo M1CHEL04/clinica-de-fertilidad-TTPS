@@ -25,4 +25,14 @@ class Embrion extends Model
     {
         return $this->belongsTo(EstadoEmbrion::class, 'estado_embrion_id');
     }
+
+    public function fertilizacion()
+    {
+        return $this->belongsTo(Fertilizacion::class, 'fertilizacion_id');
+    }
+
+    public function ovocito()
+    {
+        return $this->belongsTo(Ovocito::class, 'ovocito_id');
+    }
 }

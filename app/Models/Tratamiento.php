@@ -108,4 +108,9 @@ class Tratamiento extends Model
     {
         return $this->hasOne(PostTransferencia::class);
     }
+
+    public function fertilizaciones()
+    {
+        return $this->hasMany(Fertilizacion::class, 'tratamiento_id');
+    }
 }

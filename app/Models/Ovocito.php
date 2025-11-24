@@ -44,8 +44,12 @@ class Ovocito extends Model
     }
 
     public function historial()
-{
-    return $this->hasMany(HistorialOvocito::class, 'ovocito_id');
-}
+    {
+        return $this->hasMany(HistorialOvocito::class, 'ovocito_id');
+    }
 
+    public function embriones()
+    {
+        return $this->hasOne(Embrion::class, 'ovocito_id');
+    }
 }

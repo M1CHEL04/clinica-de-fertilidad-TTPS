@@ -83,8 +83,8 @@ class User extends Authenticatable
         return $this->hasMany(Fertilizacion::class, 'paciente_id');
     }
 
-    public function fertilizacionesMedico()
+    public function fertilizacionesOperador()
     {
-        return $this->hasMany(Fertilizacion::class, 'medico_id');
+        return $this->hasMany(Fertilizacion::class, 'operador_id');
     }
 };

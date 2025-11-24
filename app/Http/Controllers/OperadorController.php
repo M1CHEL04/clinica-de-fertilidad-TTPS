@@ -417,6 +417,8 @@ class OperadorController extends Controller
 
     public function fertilizacion()
     {
+
+
         return view('operador.fertilizacion');
     }
 }
