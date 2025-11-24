@@ -159,9 +159,12 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
 
-                                <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Nueva Consulta">
+                                <a href="{{ route('medico.primerConsulta.create', $paciente->paciente_id) }}"
+                                class="p-2 text-green-600 hover:bg-green-50 rounded-lg" 
+                                title="Nueva Consulta">
                                     <i class="fas fa-plus"></i>
-                                </button>
+                                </a>
+
                                 <button class="p-2 text-gray-600 hover:bg-gray-50 rounded-lg" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </button>

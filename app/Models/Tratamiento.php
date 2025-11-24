@@ -9,13 +9,14 @@ use App\Models\Objetivo;
 use App\Models\EstadoTratamiento;
 use App\Models\Estudio;
 use App\Models\Monitoreo;
-use App\Models\AtecedenteFamiliar;
+use App\Models\AntecedenteFamiliar;
 use App\Models\AntecedentePersonal;
 use App\Models\AntecedenteGinecologico;
 use App\Models\AntecedenteGenital;
 use App\Models\AntecedenteFenotipo;
 use App\Models\ProtocoloEstimulacion;
 use App\Models\Embrion;
+use App\Models\PostTransferencia;
 
 class Tratamiento extends Model
 {
@@ -30,10 +31,6 @@ class Tratamiento extends Model
         'pago_id',
         'fecha_sugerida_inicio',
         'fecha_sugerida_fin',
-        'beta',
-        'saco',
-        'embrion',
-        'vivo',
         'consentimiento_pdf'
     ];
 
@@ -69,7 +66,7 @@ class Tratamiento extends Model
 
     public function antecedentesFamiliares()
     {
-        return $this->hasOne(AtecedenteFamiliar::class, 'tratamiento_id');
+        return $this->hasOne(AntecedenteFamiliar::class, 'tratamiento_id');
     }
 
     public function antecedentesPersonales()
@@ -92,6 +89,11 @@ class Tratamiento extends Model
         return $this->hasOne(AntecedenteFenotipo::class, 'tratamiento_id');
     }
 
+    public function antecedentesPareja()
+    {
+        return $this->hasOne(AntecedentePareja::class, 'tratamiento_id');
+    }
+
     public function protocolosEstimulacion()
     {
         return $this->hasMany(ProtocoloEstimulacion::class, 'tratamiento_id');
@@ -100,5 +102,10 @@ class Tratamiento extends Model
     public function embriones()
     {
         return $this->hasMany(Embrion::class, 'tratamiento_id');
+    }
+
+    public function postTransferencia()
+    {
+        return $this->hasOne(PostTransferencia::class);
     }
 }

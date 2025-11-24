@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('estudios', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(\App\Models\Tratamiento::class, 'tratamiento_id');
+            $table->string('tipo_estudio');
             $table->string('nombre');
             $table->string('resultado')->nullable();
             $table->timestamps();

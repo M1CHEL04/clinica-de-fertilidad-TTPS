@@ -8,6 +8,7 @@ use App\Models\Estudio;
 use App\Models\ProtocoloEstimulacion;
 use App\Models\TipoMedicacion;
 use App\Models\Monitoreo;
+use App\Models\PostTransferencia;
 use Illuminate\Http\Request;
 
 class MedicoController extends Controller
@@ -56,6 +57,7 @@ class MedicoController extends Controller
             ->join('etapa', 'etapa.id', '=', 'tratamientos.etapa_id')
             ->select(
                 'tratamientos.id',
+                'usuarios.id as paciente_id', 
                 'objetivos.nombre as objetivo',
                 'usuarios.nombre',
                 'usuarios.apellido',
@@ -105,25 +107,30 @@ class MedicoController extends Controller
     return response()->json(['tratamientos' => $tratamientos]);
     }
 
-    public function cargarEstudios($id)
-    {
-        $tratamiento = Tratamiento::findOrFail($id);
+public function cargarEstudios($id)
+{
+    $tratamiento = Tratamiento::findOrFail($id);
 
-        // Estudios pendientes
-        $estudiosPendientes = Estudio::where('tratamiento_id', $id)
-            ->whereNull('resultado')
-            ->get();
+    // Estudios pendientes agrupados por tipo_estudio
+    $estudiosPendientes = Estudio::where('tratamiento_id', $id)
+        ->whereNull('resultado')
+        ->orderBy('tipo_estudio')
+        ->get()
+        ->groupBy('tipo_estudio');
 
-        // Estudios finalizados
-        $estudiosCompletados = Estudio::where('tratamiento_id', $id)
-            ->whereNotNull('resultado')
-            ->get();
+    // Estudios completados agrupados por tipo_estudio
+    $estudiosCompletados = Estudio::where('tratamiento_id', $id)
+        ->whereNotNull('resultado')
+        ->orderBy('tipo_estudio')
+        ->get()
+        ->groupBy('tipo_estudio');
 
-        return view(
-            'medico.cargarEstudios',
-            compact('tratamiento', 'estudiosPendientes', 'estudiosCompletados')
-        );
-    }
+    return view(
+        'medico.cargarEstudios',
+        compact('tratamiento', 'estudiosPendientes', 'estudiosCompletados')
+    );
+}
+
 
     public function guardarEstudios($id)
     {
@@ -138,14 +145,14 @@ class MedicoController extends Controller
         }
 
         return redirect()
-            ->route('medico.tratamiento.detalle', $id)
+            ->route('tratamiento.cargar-estudios', $id)
             ->with('success', 'Resultados cargados correctamente.');
     }
 
     public function protocolo($id)
     {
         $tratamiento = Tratamiento::findOrFail($id);
-        $protocolo = ProtocoloEstimulacion::where('tratamiento_id', $id)->first();
+        $protocolo = ProtocoloEstimulacion::where('tratamiento_id', $id)->get();
         $tiposMedicacion = TipoMedicacion::all();
 
         return view('medico.protocolo', compact('tratamiento', 'protocolo', 'tiposMedicacion'));
@@ -310,5 +317,40 @@ public function agendarConsulta(Request $request, $id)
 }
 
 
+
+//POST TRANSFERENCIA
+
+public function postTransferenciaForm($id)
+    {
+        $tratamiento = Tratamiento::findOrFail($id);
+
+        // Si ya existe, lo traemos. Si no, generamos uno vacío.
+        $post = PostTransferencia::where('tratamiento_id', $id)->first();
+
+        return view('medico.post-transferencia', compact('tratamiento', 'post'));
+    }
+
+public function guardarPostTransferencia(Request $request, $id)
+    {
+        $post = PostTransferencia::firstOrNew(['tratamiento_id' => $id]);
+
+        // Validaciones simples según etapa
+        $rules = [
+            'beta' => 'nullable|numeric',
+            'saco' => 'nullable|boolean',
+            'embarazo' => 'nullable|boolean',
+            'vivo' => 'nullable|boolean',
+            'fecha_nacimiento' => 'nullable|date',
+            'causa_no_nacido' => 'nullable|string|max:255',
+        ];
+
+        $validated = $request->validate($rules);
+
+        // Guardar
+        $post->fill($validated);
+        $post->save();
+
+        return redirect()->back()->with('success', 'Datos guardados correctamente');
+    }
 
 }

@@ -1,17 +1,20 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Tratamiento;
 
-class AtecedenteFamiliar extends Model
+class PostTransferencia extends Model
 {
-    protected $table = 'antecedentes_familiares';
+    protected $table = 'post_transferencias';
 
     protected $fillable = [
         'tratamiento_id',
-        'descripcion',
+        'beta',
+        'saco',
+        'embarazo',
+        'vivo',
+        'fecha_nacimiento',
+        'causa_no_nacido',
     ];
 
     public function tratamiento()

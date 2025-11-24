@@ -5,11 +5,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegistroController;
 use App\Http\Middleware\AuthMiddleware;
 use App\Http\Controllers\MedicoController;
+use App\Http\Controllers\TerminosController;
+use App\Http\Controllers\EstudiosController;
 use App\Http\Controllers\TurnoController;
+use App\Http\Controllers\AvisosController;
+use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\OperadorController;
 use Illuminate\Support\Facades\Log;
 
+use App\Http\Controllers\ConsultaController;
 ## Web Routes
 Route::get('/borrar-turnos', function () {
     try {
@@ -53,6 +58,11 @@ Route::prefix('paciente')->middleware([AuthMiddleware::class . ':paciente'])->gr
     Route::post('/solicitar-turno-store', [TurnoController::class, 'storeTurno'])->name('paciente.store-turno');
     Route::get('/turnos-libres/{id_medico}', [TurnoController::class, 'listarTurnosLibres'])->name('paciente.turnos-libres');
     Route::get('/turnos-sugeridos/{id_medico}/{id_paciente}', [TurnoController::class, 'listarTurnosSugeridos'])->name('paciente.turnos-sugeridos');
+
+    //chatbot
+    Route::post('/chat/send-message', [ChatbotController::class, 'sendMessage'])
+    ->middleware('auth') // Asumo que solo usuarios logueados pueden usar el chat
+    ->name('chatbot.send');
 });
 
 Route::post('/tratamiento/{id}/avanzar', [MedicoController::class, 'avanzarEtapa'])
@@ -78,6 +88,7 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
 
     Route::get('/home', [MedicoController::class, 'misPacientes'])->name('medico.home');
 
+    Route::get('/home', [MedicoController::class, 'misPacientes'])->name('medico.home');
 
     Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
         ->name('medico.tratamiento.detalle');
@@ -104,6 +115,37 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
         ->name('tratamiento.subir-consentimiento');
 
     Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\MedicoController::class, 'tratamientosDeUnPaciente']);
+
+    Route::get('/tratamiento/{id}/post-transferencia', [MedicoController::class, 'postTransferenciaForm']
+        )->name('tratamiento.post');
+
+    Route::post('/tratamiento/{id}/post-transferencia', [MedicoController::class, 'guardarPostTransferencia']
+        )->name('tratamiento.guardar-post');
+    
+    Route::post('/tratamiento/{id}/enviar-orden-medica', [AvisosController::class, 'enviarOrdenMedica'])
+    ->name('tratamiento.enviar-orden-medica');
+
+    Route::get('/consulta/partials/hombre-gametos', function () {
+        return view('medico.partials.pareja-hombre');
+    });
+
+    Route::get('/consulta/partials/hombre-donado', function () {
+        return view('medico.partials.semen-donado');
+    });
+
+    Route::get('/consulta/partials/pareja-mujer', function () {
+        return view('medico.partials.pareja-mujer');
+    });
+
+
+    Route::post('/consulta', [ConsultaController::class, 'store'])->name('consulta.store');
+
+    Route::get('/consulta/{paciente_id}', [ConsultaController::class, 'create'])
+        ->name('medico.primerConsulta.create');
+
+    Route::post('/estudios', [EstudiosController::class, 'store'])->name('estudios.store');
+    Route::get('/estudios/{paciente_id}', [EstudiosController::class, 'estudios'])
+        ->name('estudios.index');
 });
 ###########################################################
 # Rutas para el admin
@@ -148,6 +190,7 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
     Route::get('/fertilizacion/{paciente_id}', [OperadorController::class, 'fertilizacion'])->name('operador.fertilizacion');
 });
 
+
 ###########################################################
 # Rutas para el jefe
 ###########################################################
@@ -159,3 +202,24 @@ Route::prefix('jefe')->middleware([AuthMiddleware::class . ':jefe'])->group(func
 
 
 Route::get('/register', [RegistroController::class, 'show'])->name('register');
+
+
+############################################################
+# Rutas de prueba primer consulta
+############################################################
+
+
+Route::get('/terminos/search', [TerminosController::class, 'search'])->name('terminos.search');
+
+
+    // Primer consulta
+
+
+
+
+
+// Nueva página de estudios
+
+
+
+
