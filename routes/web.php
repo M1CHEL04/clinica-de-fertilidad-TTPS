@@ -118,6 +118,8 @@ Route::prefix('admin')->middleware([AuthMiddleware::class . ':admin'])->group(fu
     Route::post('/baja_user', [App\Http\Controllers\AdminController::class, 'baja_user'])->name('admin.baja_user');
     Route::post('/alta_user', [App\Http\Controllers\AdminController::class, 'alta_user'])->name('admin.alta_user');
     Route::post('/set_horarios', [AdminController::class, 'set_horarios'])->name('admin.set_horarios');
+    Route::get('/usuarios', [AdminController::class, 'index'])->name('admin.usuarios.index');
+    Route::get('/pago/{id}/marcar-pagado', [AdminController::class, 'marcarPagado'])->name('admin.pago.marcar-pagado');
 });
 
 ###########################################################

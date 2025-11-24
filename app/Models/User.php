@@ -69,6 +69,8 @@ class User extends Authenticatable
         return $this->hasOne(HistoriaClinica::class, 'paciente_id');
     }
 
+    
+
     public function ovocitos()
     {
         return $this->hasMany(Ovocito::class, 'paciente_id');

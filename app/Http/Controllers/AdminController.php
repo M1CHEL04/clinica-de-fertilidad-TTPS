@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Http\Controllers\MailController;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class AdminController extends Controller
 {
@@ -156,4 +157,135 @@ class AdminController extends Controller
             return redirect()->route('admin.home')->with('error', 'Ocurrió un error al actualizar los horarios.');
         }
     }
+
+ public function index()
+{
+    // 1) Traer pagos de Supabase
+    $url = "https://ueozxvwsckonkqypfasa.supabase.co/functions/v1/get-pagos-grupo";
+
+    $response = Http::withHeaders([
+        "Content-Type" => "application/json",
+        "Authorization" => "Bearer " . env('SUPABASE_SERVICE_ROLE')
+    ])->post($url, ["group" => 5]);
+
+    if (!$response->ok()) {
+        return abort(500, "Error obteniendo pagos del servidor");
+    }
+
+    $pagosArray = $response->json("pagos") ?? [];
+    $pagosCollection = collect($pagosArray);
+
+    // 2) Usuarios de la DB
+    $usuarios = \App\Models\User::where('rol_id', 1)
+        ->orderBy('apellido')
+        ->get();
+
+    // 3) Relacionar pagos con usuario
+    $usuariosById = $usuarios->keyBy(fn($u) => (int)$u->id);
+
+    $pagosConUsuario = $pagosCollection->filter(function ($p) use ($usuariosById) {
+        $pid = $p['id_paciente'] ?? $p['paciente_id'] ?? $p['idPaciente'] ?? null;
+        return $pid && $usuariosById->has((int)$pid);
+    })->map(function ($p) use ($usuariosById) {
+        $pid = (int)($p['id_paciente'] ?? $p['paciente_id'] ?? $p['idPaciente']);
+        $p['usuario'] = $usuariosById[$pid];
+        return $p;
+    });
+
+    // 4) Agrupar pagos por paciente
+    $pagosPorPaciente = $pagosConUsuario->groupBy(fn($p) =>
+        (int)($p['id_paciente'] ?? $p['paciente_id'] ?? $p['idPaciente'])
+    );
+
+    // 5) Usuarios con pagos
+    $usuariosConPagos = $usuarios->filter(fn($u) =>
+        $pagosPorPaciente->has((int)$u->id)
+    );
+
+    // -----------------------
+    // 6) Aplicar FILTROS
+    // -----------------------
+    $search = request('search');
+    $rol = request('rol');
+    $estado = request('estado');
+
+    $usuariosConPagos = $usuariosConPagos->filter(function ($u) use ($search, $rol, $estado) {
+
+        // FILTRO POR TEXTO
+        if ($search) {
+            $texto = strtolower($search);
+            if (
+                !str_contains(strtolower($u->nombre), $texto) &&
+                !str_contains(strtolower($u->apellido), $texto) &&
+                !str_contains(strtolower($u->mail), $texto)
+            ) {
+                return false;
+            }
+        }
+
+        // FILTRO POR ROL
+        if ($rol) {
+            if (!$u->rol || strtolower($u->rol->nombre) !== strtolower($rol)) {
+                return false;
+            }
+        }
+
+        // FILTRO POR ESTADO
+        if ($estado) {
+            $esActivo = $u->activo ? "activo" : "inactivo";
+            if ($estado !== $esActivo) {
+                return false;
+            }
+        }
+
+        return true;
+    })->values();
+
+    // -----------------------
+    // 7) Paginación
+    // -----------------------
+    $perPage = 10;
+    $currentPage = (int) request()->get('page', 1);
+    $total = $usuariosConPagos->count();
+
+    $items = $usuariosConPagos->forPage($currentPage, $perPage);
+
+    $usuariosPaginados = new LengthAwarePaginator(
+        $items,
+        $total,
+        $perPage,
+        $currentPage,
+        [
+            'path' => request()->url(),
+            'query' => request()->query()
+        ]
+    );
+
+    return view("admin.usuariosIndex", [
+        'usuarios' => $usuariosPaginados,
+        'pagosPorPaciente' => $pagosPorPaciente
+    ]);
+}
+
+
+public function marcarPagado($id)
+{
+    $url = "https://ueozxvwsckonkqypfasa.supabase.co/functions/v1/registrar-pago-obra-social";
+
+    $response = Http::withHeaders([
+        "Content-Type" => "application/json",
+        "Authorization" => "Bearer " . env("SUPABASE_SERVICE_ROLE"),
+    ])->post($url, [
+        "id_grupo" => 5,
+        "id_pago" => (int) $id,
+        "paciente_pagado" => true
+    ]);
+
+    if (!$response->ok()) {
+        return redirect()->back()->with('error', 'Error registrando pago.');
+    }
+
+    return redirect()->back()->with('success', 'Pago marcado como completado.');
+}
+
 }
