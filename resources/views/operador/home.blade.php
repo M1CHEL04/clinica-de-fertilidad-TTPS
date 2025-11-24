@@ -50,6 +50,23 @@
             </div>
         </div>
     </div>
+    <!-- Sección Donaciones -->
+    <div class="card p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <i class="fas fa-vial text-indigo-600"></i>
+            Donaciones
+        </h2>
+
+        <div class="flex flex-col sm:flex-row gap-4">
+            
+            <!-- Botón Registrar Donante -->
+            <a href="{{ route('donantes.semen.form') }}"
+            class="btn-primary flex items-center gap-2">
+                <i class="fas fa-user-plus"></i>
+                Registrar Donante de Semen
+            </a>
+        </div>
+    </div>
 
     <!-- Filtros y Búsqueda -->
     <div class="card p-6 mb-6">
