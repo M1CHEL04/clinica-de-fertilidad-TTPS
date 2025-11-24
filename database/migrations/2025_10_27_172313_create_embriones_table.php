@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\EstadoEmbrion;
+use App\Models\Fertilizacion;
 use App\Models\Guardado;
+use App\Models\Ovocito;
 use App\Models\Semen;
 use App\Models\Tratamiento;
 use Illuminate\Database\Migrations\Migration;
@@ -19,11 +21,13 @@ return new class extends Migration
             $table->id();
             $table->string('identificador')->unique();
             $table->foreignIdFor(Guardado::class);
-            $table->foreignIdFor(Tratamiento::class);
             $table->foreignIdFor(EstadoEmbrion::class);
+            $table->foreignIdFor(Fertilizacion::class);
+            $table->foreignIdFor(Ovocito::class);
             $table->enum('calidad_morfologica', [1, 2, 3, 4, 5]);
 
-            $table->string('dni_donante')->nullable();
+            $table->string('semen_dni')->nullable();
+            $table->unsignedBigInteger('gameto_id')->nullable();
 
             //hay que ver como se guarda el PGT
             $table->string('urlPGT')->nullable();

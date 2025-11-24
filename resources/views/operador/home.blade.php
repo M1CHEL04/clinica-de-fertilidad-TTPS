@@ -1,5 +1,5 @@
 @extends('layouts.layoutInterno')
-@section('title', 'Inicio Médico - Fertilia')
+@section('title', 'Inicio Operador - Fertilia')
 
 @section('page-header')
 <div class="page-header">
@@ -67,18 +67,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Filtro por Estado -->
-            <!-- <div class="w-full md:w-48">
-                <label class="form-label">Estado</label>
-                <select class="form-input">
-                    <option value="">Todos</option>
-                    <option value="activo">Activo</option>
-                    <option value="tratamiento">En Tratamiento</option>
-                    <option value="seguimiento">Seguimiento</option>
-                    <option value="completado">Completado</option>
-                </select>
-            </div> -->
             
             <!-- Botón Limpiar -->
             <div class="flex items-end">
@@ -159,22 +147,21 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
 
-                                <!-- Nueva Consulta -->
-                                <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Nueva Consulta">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-
-                                <!-- Editar -->
-                                <button class="p-2 text-gray-600 hover:bg-gray-50 rounded-lg" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-
                                 <!-- AGREGAR PUNCIÓN (SOLO ROL 3) -->
                                 @if(auth()->user()->rol_id == 3)
                                 <a href="{{ route('puncion.form', ['paciente_id' => $paciente->paciente_id]) }}"
                                 class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg"
                                 title="Registrar Punción">
                                     <i class="fas fa-syringe"></i>
+                                </a>
+                                @endif
+
+                                @if(auth()->user()->rol_id == 3)
+                                <!-- FERTILIZACIÓN -->
+                                <a href="{{ route('operador.fertilizacion', ['paciente_id' => $paciente->paciente_id]) }}"
+                                   class="p-2 text-green-600 hover:bg-green-50 rounded-lg"
+                                   title="Fertilización">
+                                    <i class="fas fa-seedling"></i>
                                 </a>
                                 @endif
                             </div>

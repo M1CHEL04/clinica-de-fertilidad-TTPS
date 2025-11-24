@@ -142,11 +142,10 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
         ->name('puncion.buscarPaciente');
 
     // 3. Guardar punción
-    Route::post(
-        '/puncion/guardar',
-        [App\Http\Controllers\OperadorController::class, 'guardarPuncion']
-    )
-        ->name('puncion.guardar');
+    Route::post('/puncion/guardar', [App\Http\Controllers\OperadorController::class, 'guardarPuncion'])->name('puncion.guardar');
+
+    // 4. Fertilización
+    Route::get('/fertilizacion/{paciente_id}', [OperadorController::class, 'fertilizacion'])->name('operador.fertilizacion');
 });
 
 ###########################################################

@@ -2,6 +2,7 @@
 
 use App\Models\Embrion;
 use App\Models\TipoFertilizacion;
+use App\Models\Tratamiento;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -17,10 +18,10 @@ return new class extends Migration
         Schema::create('fertilizaciones', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(TipoFertilizacion::class, 'tipo_fertilizacion_id');
-            $table->enum('calidad', ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']);
-            $table->foreignIdFor(Embrion::class, 'embrion_id');
-            $table->foreignIdFor(User::class, 'medico_id');
+            $table->foreignIdFor(User::class, 'operador_id');
             $table->foreignIdFor(User::class, 'paciente_id');
+            $table->foreignIdFor(Tratamiento::class, 'tratamiento_id');
+            $table->date('fecha_fertilizacion');
             $table->timestamps();
         });
     }
