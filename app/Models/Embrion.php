@@ -11,6 +11,18 @@ class Embrion extends Model
 {
     protected $table = 'embriones';
 
+    protected $fillable = [
+        'identificador',
+        'guardado_id',
+        'estado_embrion_id',
+        'fertilizacion_id',
+        'ovocito_id',
+        'calidad_morfologica',
+        'semen_dni',
+        'gameto_id',
+        'urlPGT'
+    ];
+
     public function guardado()
     {
         return $this->belongsTo(Guardado::class, 'guardado_id');

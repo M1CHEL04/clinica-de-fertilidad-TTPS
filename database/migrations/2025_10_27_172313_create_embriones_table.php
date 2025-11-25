@@ -21,10 +21,11 @@ return new class extends Migration
             $table->id();
             $table->string('identificador')->unique();
             $table->foreignIdFor(Guardado::class);
-            $table->foreignIdFor(EstadoEmbrion::class);
             $table->foreignIdFor(Fertilizacion::class);
             $table->foreignIdFor(Ovocito::class);
             $table->enum('calidad_morfologica', [1, 2, 3, 4, 5]);
+            $table->string('motivo_descarte')->nullable();
+            $table->boolean('transferir')->nullable();
 
             $table->string('semen_dni')->nullable();
             $table->unsignedBigInteger('gameto_id')->nullable();

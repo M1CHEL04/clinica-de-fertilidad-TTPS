@@ -61,8 +61,8 @@ Route::prefix('paciente')->middleware([AuthMiddleware::class . ':paciente'])->gr
 
     //chatbot
     Route::post('/chat/send-message', [ChatbotController::class, 'sendMessage'])
-    ->middleware('auth') // Asumo que solo usuarios logueados pueden usar el chat
-    ->name('chatbot.send');
+        ->middleware('auth') // Asumo que solo usuarios logueados pueden usar el chat
+        ->name('chatbot.send');
 });
 
 Route::post('/tratamiento/{id}/avanzar', [MedicoController::class, 'avanzarEtapa'])
@@ -116,14 +116,18 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
 
     Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\MedicoController::class, 'tratamientosDeUnPaciente']);
 
-    Route::get('/tratamiento/{id}/post-transferencia', [MedicoController::class, 'postTransferenciaForm']
-        )->name('tratamiento.post');
+    Route::get(
+        '/tratamiento/{id}/post-transferencia',
+        [MedicoController::class, 'postTransferenciaForm']
+    )->name('tratamiento.post');
 
-    Route::post('/tratamiento/{id}/post-transferencia', [MedicoController::class, 'guardarPostTransferencia']
-        )->name('tratamiento.guardar-post');
-    
+    Route::post(
+        '/tratamiento/{id}/post-transferencia',
+        [MedicoController::class, 'guardarPostTransferencia']
+    )->name('tratamiento.guardar-post');
+
     Route::post('/tratamiento/{id}/enviar-orden-medica', [AvisosController::class, 'enviarOrdenMedica'])
-    ->name('tratamiento.enviar-orden-medica');
+        ->name('tratamiento.enviar-orden-medica');
 
     Route::get('/consulta/partials/hombre-gametos', function () {
         return view('medico.partials.pareja-hombre');
@@ -188,6 +192,36 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
 
     // 4. Fertilización
     Route::get('/fertilizacion/{paciente_id}', [OperadorController::class, 'fertilizacion'])->name('operador.fertilizacion');
+
+    // 4.1. Nueva fertilización
+    Route::get('/fertilizacion/{paciente_id}/nueva', [OperadorController::class, 'nuevaFertilizacion'])->name('fertilizacion.nueva');
+
+    // 4.2. Guardar fertilización
+    Route::post('/fertilizacion/guardar', [OperadorController::class, 'guardarFertilizacion'])->name('fertilizacion.guardar');
+
+    // 5. API para ovocitos maduros
+    Route::get('/api/ovocitos-maduros/{paciente_id}', [OperadorController::class, 'getOvocitosMaduros']);
+
+    // 6. Ruta de prueba para debug (temporal)
+    Route::get('/test-ovocitos/{paciente_id}', function ($paciente_id) {
+        $ovocitos = \App\Models\Ovocito::where('paciente_id', $paciente_id)
+            ->with(['estado_ovocito.TipoEstadoOvocito', 'embriones'])
+            ->get();
+
+        return response()->json([
+            'paciente_id' => $paciente_id,
+            'total_ovocitos' => $ovocitos->count(),
+            'ovocitos' => $ovocitos->map(function ($ovo) {
+                return [
+                    'id' => $ovo->id,
+                    'identificador' => $ovo->identificador,
+                    'estado' => $ovo->estado_ovocito?->TipoEstadoOvocito?->nombre,
+                    'tiene_embrion' => $ovo->embriones ? 'Sí' : 'No',
+                    'calidad' => $ovo->calidad_morfologica
+                ];
+            })
+        ]);
+    });
 });
 
 
@@ -219,7 +253,3 @@ Route::get('/terminos/search', [TerminosController::class, 'search'])->name('ter
 
 
 // Nueva página de estudios
-
-
-
-

@@ -20,7 +20,8 @@ class Ovocito extends Model
         'paciente_id',
         'puncion_id',
         'calidad_morfologica',
-        'estado_ovocito_id'
+        'estado_ovocito_id',
+        'utilizado'
     ];
 
     public function guardado()

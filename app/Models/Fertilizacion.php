@@ -13,7 +13,10 @@ class Fertilizacion extends Model
 
     protected $fillable = [
         'tipo_fertilizacion_id',
-        'calidad',
+        'operador_id',
+        'paciente_id',
+        'tratamiento_id',
+        'fecha_fertilizacion',
     ];
 
     public function tipo_fertilizacion()
@@ -23,7 +26,7 @@ class Fertilizacion extends Model
 
     public function embrion()
     {
-        return $this->hasMany(Embrion::class, 'embrion_id');
+        return $this->hasMany(Embrion::class, 'fertilizacion_id');
     }
 
     public function operador()
