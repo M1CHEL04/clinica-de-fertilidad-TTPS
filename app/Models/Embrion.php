@@ -47,4 +47,9 @@ class Embrion extends Model
     {
         return $this->belongsTo(Ovocito::class, 'ovocito_id');
     }
+
+    public function historial()
+    {
+        return $this->hasMany(HistorialEmbrion::class, 'embrion_id');
+    }
 }

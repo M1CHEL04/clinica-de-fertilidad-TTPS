@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\EstadoOvocito;
 use App\Models\Fertilizacion;
 use App\Models\Guardado;
+use App\Models\HistorialEmbrion;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use App\Models\HistorialOvocito;
@@ -663,6 +664,38 @@ class OperadorController extends Controller
                         ]);
                         break;
                 }
+
+                // Crear registro inicial en el historial del embrión
+                $descripcion_inicial = "Embrión creado a partir del ovocito {$ovocito->identificador}";
+
+                // Determinar estado inicial según la acción
+                switch ($embrionData['accion']) {
+                    case 'descartar':
+                        $accion_inicial = 'Descartar';
+                        $descripcion_inicial .= " - Marcado para descarte";
+                        break;
+                    case 'criopreservar':
+                        $accion_inicial = 'Criopreservar';
+                        $descripcion_inicial .= " - Enviado a criopreservación";
+                        break;
+                    case 'transferir':
+                        $accion_inicial = 'Transferir';
+                        $descripcion_inicial .= " - Marcado para transferencia";
+                        break;
+                }
+
+                HistorialEmbrion::create([
+                    'embrion_id' => $embrion->id,
+                    'operador_id' => session('user_id'),
+                    'accion' => $accion_inicial,
+                    'descripcion' => $descripcion_inicial,
+                    'motivo_descarte_anterior' => null,
+                    'motivo_descarte_nuevo' => $embrionData['accion'] === 'descartar' ? $embrionData['motivo_descarte'] : null,
+                    'transferir_anterior' => null,
+                    'transferir_nuevo' => $embrionData['accion'] === 'transferir' ? true : null,
+                    'guardado_id_anterior' => null,
+                    'guardado_id_nuevo' => $embrionData['accion'] === 'criopreservar' ? ($guardado->id ?? null) : null,
+                ]);
 
                 // Registrar en historial que el ovocito fue usado para fertilización
                 $ovocito = \App\Models\Ovocito::find($embrionData['ovocito_id']);
