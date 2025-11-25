@@ -215,10 +215,11 @@
 
 
     {{-- 6️⃣ Cargar objetivo (desde etapa 1) --}}
-    <button class="btn-primary w-full flex items-center justify-center gap-2 {{ !$etapa1 ? 'opacity-50 cursor-not-allowed' : '' }}"
+    
+     <a href="{{ route('medico.verConsulta', $tratamiento->paciente_id) }}" class="btn-primary w-full flex items-center justify-center gap-2"
             {{ !$etapa1 ? 'disabled' : '' }}>
-        <i class="fas fa-bullseye"></i> Cargar objetivo
-    </button>
+        <i class="fas fa-bullseye"></i> Seccion de primera consulta
+    </a>
 
     {{-- 1️⃣ Recetar estudios (desde etapa 1) --}}
     @if ($etapa1)
@@ -236,12 +237,12 @@
 
    
 
-    {{-- 3️⃣ Cargar antecedentes (desde etapa 1) --}}
+    <!-- {{-- 3️⃣ Cargar antecedentes (desde etapa 1) --}}
     <button class="btn-primary w-full flex items-center justify-center gap-2 {{ !$etapa1 ? 'opacity-50 cursor-not-allowed' : '' }}"
             {{ !$etapa1 ? 'disabled' : '' }}>
         <i class="fas fa-user-md"></i> Cargar antecedentes
     </button>
-    
+     -->
      @if ($etapa2)
         <a href="{{ route('tratamiento.cargar-estudios', $tratamiento->id) }}"
            class="btn-primary w-full flex items-center justify-center gap-2">

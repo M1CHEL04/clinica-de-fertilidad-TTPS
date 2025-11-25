@@ -11,7 +11,7 @@ class AntecedenteGenital extends Model
 
     protected $fillable = [
         'tratamiento_id',
-        'descripcion',
+        'observacion',
     ];
 
     public function tratamiento()

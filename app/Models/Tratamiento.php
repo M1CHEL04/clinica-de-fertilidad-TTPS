@@ -66,7 +66,7 @@ class Tratamiento extends Model
 
     public function antecedentesFamiliares()
     {
-        return $this->hasOne(AntecedenteFamiliar::class, 'tratamiento_id');
+        return $this->hasMany(AntecedenteFamiliar::class, 'tratamiento_id');
     }
 
     public function antecedentesPersonales()

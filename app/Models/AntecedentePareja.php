@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Tratamiento;
 
+use App\Models\AntecedenteFamiliar;
+
 class AntecedentePareja extends Model
 {
     protected $table = 'antecedentes_pareja';
@@ -12,7 +14,6 @@ class AntecedentePareja extends Model
     protected $fillable = [
         'tratamiento_id',
         'dni',
-        // Ginecológicos
         'ciclo_regular',
         'duracion',
         'caracteristicas_sangrado',
@@ -22,9 +23,7 @@ class AntecedentePareja extends Model
         'AB',
         'CT',
         'examen_fisico',
-        // Genitales
         'descripcion_genital',
-        // Personales
         'fuma',
         'cuanto_fuma',
         'alcohol',
@@ -33,9 +32,7 @@ class AntecedentePareja extends Model
         'droga',
         'observaciones_personales',
         'antecedentes_personales',
-        // Familiares
         'descripcion_familiar',
-        // Fenotipo
         'color_ojos',
         'tipo_pelo',
         'altura',
@@ -47,4 +44,6 @@ class AntecedentePareja extends Model
     {
         return $this->belongsTo(Tratamiento::class);
     }
+
+  
 }
