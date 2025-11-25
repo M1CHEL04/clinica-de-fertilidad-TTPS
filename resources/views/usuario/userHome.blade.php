@@ -102,14 +102,15 @@
             </div>
         </div>
     </div>
-    @if (Auth::check())
-        <button id="openChatbotBtn" class="fixed bottom-6 right-6 z-50 p-4 bg-pink-500 rounded-full shadow-lg hover:bg-pink-600 transition-all focus:outline-none" title="Abrir Chatbot">
+
+    @if(auth()->check())
+        <button id="openChatbotBtn" class="fixed bottom-6 right-6 z-50 p-4 bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 transition-all focus:outline-none" title="Abrir Chatbot">
         <i class="fas fa-robot text-white text-2xl"></i>
         </button>
 
         <div id="chatbotModal" class="hidden fixed bottom-[80px] right-6 w-full max-w-sm h-[80vh] max-h-[500px] bg-white rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden border border-gray-200">
             
-            <div class="p-4 bg-pink-500 text-white flex justify-between items-center shadow-md">
+            <div class="p-4 bg-blue-600 text-white flex justify-between items-center shadow-md">
                 <h5 class="text-lg font-semibold"><i class="fas fa-heartbeat mr-2"></i> Asistente de Fertilia</h5>
                 <button id="closeChatbotBtn" class="text-white hover:text-gray-200 focus:outline-none">
                     <i class="fas fa-times text-xl"></i>
@@ -122,15 +123,15 @@
                         ¡Hola! Soy tu asistente de fertilia. ¿En qué puedo ayudarte hoy?
                     </div>
                 </div>
-                </div>
+            </div>
             
             <form id="chatForm" class="p-4 border-t border-gray-200 bg-gray-50">
                 <div class="flex">
                     <input type="text" id="userInput" placeholder="Escribe tu mensaje..." required 
-                        class="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                        class="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <button type="submit" id="sendBtn" 
-                            class="bg-pink-500 text-white p-2 rounded-r-lg hover:bg-pink-600 transition-colors">
-                        <i class="fas fa-paper-plane"></i>
+                            class="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-paper-plane" style="font-size: 15px;"></i>
                     </button>
                 </div>
             </form>
@@ -173,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const messageBubble = document.createElement('div');
         messageBubble.className = role === 'user'
-            ? 'bg-pink-500 text-white p-3 rounded-t-xl rounded-bl-xl max-w-xs break-words'
+            ? 'bg-blue-600 text-white p-3 rounded-t-xl rounded-bl-xl max-w-xs break-words'
             : 'bg-gray-200 text-gray-800 p-3 rounded-t-xl rounded-br-xl max-w-xs break-words';
         
         messageBubble.innerText = text;

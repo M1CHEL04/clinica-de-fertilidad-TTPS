@@ -198,30 +198,6 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
 
     // 4.2. Guardar fertilización
     Route::post('/fertilizacion/guardar', [OperadorController::class, 'guardarFertilizacion'])->name('fertilizacion.guardar');
-
-    // 5. API para ovocitos maduros
-    Route::get('/api/ovocitos-maduros/{paciente_id}', [OperadorController::class, 'getOvocitosMaduros']);
-
-    // 6. Ruta de prueba para debug (temporal)
-    Route::get('/test-ovocitos/{paciente_id}', function ($paciente_id) {
-        $ovocitos = \App\Models\Ovocito::where('paciente_id', $paciente_id)
-            ->with(['estado_ovocito.TipoEstadoOvocito', 'embriones'])
-            ->get();
-
-        return response()->json([
-            'paciente_id' => $paciente_id,
-            'total_ovocitos' => $ovocitos->count(),
-            'ovocitos' => $ovocitos->map(function ($ovo) {
-                return [
-                    'id' => $ovo->id,
-                    'identificador' => $ovo->identificador,
-                    'estado' => $ovo->estado_ovocito?->TipoEstadoOvocito?->nombre,
-                    'tiene_embrion' => $ovo->embriones ? 'Sí' : 'No',
-                    'calidad' => $ovo->calidad_morfologica
-                ];
-            })
-        ]);
-    });
 });
 
 
