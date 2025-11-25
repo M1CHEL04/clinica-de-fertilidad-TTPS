@@ -116,6 +116,9 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
 
     Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\MedicoController::class, 'tratamientosDeUnPaciente']);
 
+    Route::post('paciente/{id}/tratamiento/dar-de-baja', [MedicoController::class, 'darDeBajaTratamiento'])
+        ->name('medico.tratamiento.dar-baja');
+
     Route::get(
         '/tratamiento/{id}/post-transferencia',
         [MedicoController::class, 'postTransferenciaForm']

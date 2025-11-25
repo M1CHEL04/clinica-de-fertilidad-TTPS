@@ -500,6 +500,7 @@ class OperadorController extends Controller
 
         return view('operador.fertilizacionCarga', compact('paciente', 'tiposFertilizacion', 'estadosEmbrion', 'ovocitosDisponibles', 'tratamiento_id'));
     }
+
     public function guardarFertilizacion(Request $request)
     {
         $request->validate([

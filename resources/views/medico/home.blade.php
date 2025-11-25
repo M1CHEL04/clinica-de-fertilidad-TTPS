@@ -11,7 +11,13 @@
 @endsection
 
 @section('content')
-<div x-data="{ open: false, tratamientos: [], pacienteNombre: '' }" x-cloak>
+<div x-data="{ 
+    open: false, 
+    tratamientos: [], 
+    pacienteNombre: '',
+    confirmModal: false,
+    tratamientoParaCancelar: null
+}" x-cloak>
     <!-- Estadísticas Rápidas -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div class="stat-card">
@@ -220,6 +226,13 @@
                                     >
                                         Ver detalle
                                     </a>
+                                    <template x-if="tratamiento.estado_tratamiento === 'Activo'">
+                                        <button type="button" 
+                                                @click="tratamientoParaCancelar = tratamiento; confirmModal = true"
+                                                class="px-3 py-1 rounded-lg bg-red-600 hover:bg-red-500 transition-colors text-white text-sm font-medium ml-2">
+                                            Cancelar tratamiento
+                                        </button>
+                                    </template>
                                 </td>
                             </tr>
                         </template>
@@ -239,6 +252,9 @@
         </div>
     </div>
 </div>
+
+    <!-- Modal de confirmación -->
+    @include('medico.modals.modalConfirmarCancelacion')
 
 </div>
 @endsection

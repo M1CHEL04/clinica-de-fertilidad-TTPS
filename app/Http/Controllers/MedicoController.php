@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\Tratamiento;
 use App\Models\Estudio;
 use App\Models\ProtocoloEstimulacion;
@@ -17,7 +18,7 @@ class MedicoController extends Controller
     {
         $medicoId = session('user_id');
         $rol_id = session('rol');
-        
+
 
         // Trae pacientes con tratamientos del médico logueado
         $pacientes = DB::table('tratamientos')
@@ -39,14 +40,14 @@ class MedicoController extends Controller
             ->distinct()
             ->get();
 
-        
+
 
         return view('medico.home', compact('pacientes', 'rol_id'));
     }
 
     public function detalleTratamiento($id)
-    {   
-        
+    {
+
         // ✅ Trae la info completa del tratamiento
         $rol_id = session('rol');
         $tratamiento = DB::table('tratamientos')
@@ -57,7 +58,7 @@ class MedicoController extends Controller
             ->join('etapa', 'etapa.id', '=', 'tratamientos.etapa_id')
             ->select(
                 'tratamientos.id',
-                'usuarios.id as paciente_id', 
+                'usuarios.id as paciente_id',
                 'objetivos.nombre as objetivo',
                 'usuarios.nombre',
                 'usuarios.apellido',
@@ -71,7 +72,7 @@ class MedicoController extends Controller
             )
             ->where('tratamientos.id', $id)
             ->first();
-        
+
         // ✅ Intentamos traer consultas si existe la tabla (por si aún no la tenés creada)
         $consultas = [];
         if (DB::getSchemaBuilder()->hasTable('consultas')) {
@@ -80,56 +81,56 @@ class MedicoController extends Controller
                 ->orderBy('fecha', 'asc')
                 ->get();
         }
-        
+
         // ✅ Evita error si no hay consultas (pasa array vacío)
         return view('medico.detalleTratamiento', compact('tratamiento', 'consultas', 'rol_id'));
     }
 
     public function tratamientosDeUnPaciente($pacienteId)
     {
-         $medicoId = session('user_id');
+        $medicoId = session('user_id');
         $tratamientos = DB::table('tratamientos')
-        ->join('historias_clinica', 'tratamientos.historia_clinica_id', '=', 'historias_clinica.id')
-        ->join('usuarios', 'historias_clinica.paciente_id', '=', 'usuarios.id')
-        ->join('estados_tratamiento', 'tratamientos.estado_tratamiento_id', '=', 'estados_tratamiento.id')
-        ->join('objetivos', 'objetivos.id', '=', 'tratamientos.objetivo_id')
-        ->select(
-            'tratamientos.id',
-            'objetivos.nombre as objetivo',
-            'estados_tratamiento.nombre as estado_tratamiento',
-            'tratamientos.created_at as fecha_inicio',
-            'tratamientos.updated_at as ultima_actualizacion'
-        )
-        ->where('usuarios.id', $pacienteId)
-        ->where('tratamientos.medico_id', $medicoId)
-        ->get();
+            ->join('historias_clinica', 'tratamientos.historia_clinica_id', '=', 'historias_clinica.id')
+            ->join('usuarios', 'historias_clinica.paciente_id', '=', 'usuarios.id')
+            ->join('estados_tratamiento', 'tratamientos.estado_tratamiento_id', '=', 'estados_tratamiento.id')
+            ->join('objetivos', 'objetivos.id', '=', 'tratamientos.objetivo_id')
+            ->select(
+                'tratamientos.id',
+                'objetivos.nombre as objetivo',
+                'estados_tratamiento.nombre as estado_tratamiento',
+                'tratamientos.created_at as fecha_inicio',
+                'tratamientos.updated_at as ultima_actualizacion'
+            )
+            ->where('usuarios.id', $pacienteId)
+            ->where('tratamientos.medico_id', $medicoId)
+            ->get();
 
-    return response()->json(['tratamientos' => $tratamientos]);
+        return response()->json(['tratamientos' => $tratamientos]);
     }
 
-public function cargarEstudios($id)
-{
-    $tratamiento = Tratamiento::findOrFail($id);
+    public function cargarEstudios($id)
+    {
+        $tratamiento = Tratamiento::findOrFail($id);
 
-    // Estudios pendientes agrupados por tipo_estudio
-    $estudiosPendientes = Estudio::where('tratamiento_id', $id)
-        ->whereNull('resultado')
-        ->orderBy('tipo_estudio')
-        ->get()
-        ->groupBy('tipo_estudio');
+        // Estudios pendientes agrupados por tipo_estudio
+        $estudiosPendientes = Estudio::where('tratamiento_id', $id)
+            ->whereNull('resultado')
+            ->orderBy('tipo_estudio')
+            ->get()
+            ->groupBy('tipo_estudio');
 
-    // Estudios completados agrupados por tipo_estudio
-    $estudiosCompletados = Estudio::where('tratamiento_id', $id)
-        ->whereNotNull('resultado')
-        ->orderBy('tipo_estudio')
-        ->get()
-        ->groupBy('tipo_estudio');
+        // Estudios completados agrupados por tipo_estudio
+        $estudiosCompletados = Estudio::where('tratamiento_id', $id)
+            ->whereNotNull('resultado')
+            ->orderBy('tipo_estudio')
+            ->get()
+            ->groupBy('tipo_estudio');
 
-    return view(
-        'medico.cargarEstudios',
-        compact('tratamiento', 'estudiosPendientes', 'estudiosCompletados')
-    );
-}
+        return view(
+            'medico.cargarEstudios',
+            compact('tratamiento', 'estudiosPendientes', 'estudiosCompletados')
+        );
+    }
 
 
     public function guardarEstudios($id)
@@ -195,132 +196,132 @@ public function cargarEstudios($id)
     }
 
     public function monitoreos($id)
-{
-    $tratamiento = Tratamiento::findOrFail($id);
+    {
+        $tratamiento = Tratamiento::findOrFail($id);
 
-    // ejemplo: traer monitoreos asociados
-    $monitoreos = Monitoreo::where('tratamiento_id', $id)->orderBy('created_at', 'desc')->get();
+        // ejemplo: traer monitoreos asociados
+        $monitoreos = Monitoreo::where('tratamiento_id', $id)->orderBy('created_at', 'desc')->get();
 
-    return view('medico.monitoreos', compact('tratamiento', 'monitoreos'));
-}
-
-public function storeMonitoreo(Request $request)
-{
-    $validated = $request->validate([
-        'tratamiento_id' => 'required|exists:tratamientos,id',
-        'observacion'    => 'required|string',
-    ]);
-
-    Monitoreo::create([
-        'tratamiento_id' => $validated['tratamiento_id'],
-        'observacion'    => $validated['observacion'],
-    ]);
-
-    return back()->with('success', 'Monitoreo cargado correctamente');
-}
-
-private $etapas = [
-    1 => 'Primera Consulta',
-    2 => 'Segunda Consulta',
-    3 => 'Monitoreos',
-    4 => 'Punción',
-    5 => 'Transferencia',
-    6 => 'Control de embarazo',
-    7 => 'Finalizado',
-];
-
-
-public function avanzarEtapa($id)
-{
-    $tratamiento = DB::table('tratamientos')->where('id', $id)->first();
-
-    if (!$tratamiento) {
-        return back()->with('error', 'Tratamiento no encontrado.');
+        return view('medico.monitoreos', compact('tratamiento', 'monitoreos'));
     }
 
-    $actual = (int) $tratamiento->etapa_id;
+    public function storeMonitoreo(Request $request)
+    {
+        $validated = $request->validate([
+            'tratamiento_id' => 'required|exists:tratamientos,id',
+            'observacion'    => 'required|string',
+        ]);
 
-    if ($actual >= 7) {
-        return back()->with('error', 'No se puede avanzar más la etapa.');
+        Monitoreo::create([
+            'tratamiento_id' => $validated['tratamiento_id'],
+            'observacion'    => $validated['observacion'],
+        ]);
+
+        return back()->with('success', 'Monitoreo cargado correctamente');
     }
 
-    $nuevoId = $actual + 1;
-
-    $updateData = [
-        'etapa_id' => $nuevoId,
-        'updated_at' => now(),
+    private $etapas = [
+        1 => 'Primera Consulta',
+        2 => 'Segunda Consulta',
+        3 => 'Monitoreos',
+        4 => 'Punción',
+        5 => 'Transferencia',
+        6 => 'Control de embarazo',
+        7 => 'Finalizado',
     ];
 
-    // Si la etapa actual es "Monitoreos", limpiar fechas
-    if ($actual === 3) { // 3 = Monitoreos
-        $updateData['fecha_sugerida_inicio'] = null;
-        $updateData['fecha_sugerida_fin'] = null;
+
+    public function avanzarEtapa($id)
+    {
+        $tratamiento = DB::table('tratamientos')->where('id', $id)->first();
+
+        if (!$tratamiento) {
+            return back()->with('error', 'Tratamiento no encontrado.');
+        }
+
+        $actual = (int) $tratamiento->etapa_id;
+
+        if ($actual >= 7) {
+            return back()->with('error', 'No se puede avanzar más la etapa.');
+        }
+
+        $nuevoId = $actual + 1;
+
+        $updateData = [
+            'etapa_id' => $nuevoId,
+            'updated_at' => now(),
+        ];
+
+        // Si la etapa actual es "Monitoreos", limpiar fechas
+        if ($actual === 3) { // 3 = Monitoreos
+            $updateData['fecha_sugerida_inicio'] = null;
+            $updateData['fecha_sugerida_fin'] = null;
+        }
+
+        DB::table('tratamientos')->where('id', $id)->update($updateData);
+
+        return back()->with('success', 'Etapa actualizada a: ' . $this->etapas[$nuevoId]);
     }
 
-    DB::table('tratamientos')->where('id', $id)->update($updateData);
-
-    return back()->with('success', 'Etapa actualizada a: ' . $this->etapas[$nuevoId]);
-}
 
 
 
+    public function retrocederEtapa($id)
+    {
+        $tratamiento = DB::table('tratamientos')->where('id', $id)->first();
 
-public function retrocederEtapa($id)
-{
-    $tratamiento = DB::table('tratamientos')->where('id', $id)->first();
+        if (!$tratamiento) {
+            return back()->with('error', 'Tratamiento no encontrado.');
+        }
 
-    if (!$tratamiento) {
-        return back()->with('error', 'Tratamiento no encontrado.');
+        $actual = (int) $tratamiento->etapa_id;
+
+        if ($actual <= 1) {
+            return back()->with('error', 'No se puede retroceder más la etapa.');
+        }
+
+        $nuevoId = $actual - 1;
+
+        DB::table('tratamientos')->where('id', $id)->update([
+            'etapa_id' => $nuevoId,
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', 'Etapa actualizada a: ' . $this->etapas[$nuevoId]);
     }
 
-    $actual = (int) $tratamiento->etapa_id;
 
-    if ($actual <= 1) {
-        return back()->with('error', 'No se puede retroceder más la etapa.');
+
+
+    public function agendarConsulta(Request $request, $id)
+    {
+        $fechaHoy = date('Y-m-d');
+        $fechaInicio = date('Y-m-d', strtotime($request->fecha_inicio));
+        $fechaFin = date('Y-m-d', strtotime($request->fecha_fin));
+
+        // Validaciones
+        if ($fechaInicio < $fechaHoy) {
+            return redirect()->back()->with('error', 'La fecha de inicio no puede ser anterior a hoy.');
+        }
+
+        if ($fechaInicio > $fechaFin) {
+            return redirect()->back()->with('error', 'La fecha de inicio no puede ser mayor que la fecha de fin.');
+        }
+
+        DB::table('tratamientos')->where('id', $id)->update([
+            'fecha_sugerida_inicio' => $fechaInicio,
+            'fecha_sugerida_fin' => $fechaFin,
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Consulta agendada correctamente.');
     }
 
-    $nuevoId = $actual - 1;
-
-    DB::table('tratamientos')->where('id', $id)->update([
-        'etapa_id' => $nuevoId,
-        'updated_at' => now(),
-    ]);
-
-    return back()->with('success', 'Etapa actualizada a: ' . $this->etapas[$nuevoId]);
-}
 
 
+    //POST TRANSFERENCIA
 
-
-public function agendarConsulta(Request $request, $id)
-{
-    $fechaHoy = date('Y-m-d');
-    $fechaInicio = date('Y-m-d', strtotime($request->fecha_inicio));
-    $fechaFin = date('Y-m-d', strtotime($request->fecha_fin));
-
-    // Validaciones
-    if ($fechaInicio < $fechaHoy) {
-        return redirect()->back()->with('error', 'La fecha de inicio no puede ser anterior a hoy.');
-    }
-
-    if ($fechaInicio > $fechaFin) {
-        return redirect()->back()->with('error', 'La fecha de inicio no puede ser mayor que la fecha de fin.');
-    }
-
-    DB::table('tratamientos')->where('id', $id)->update([
-        'fecha_sugerida_inicio' => $fechaInicio,
-        'fecha_sugerida_fin' => $fechaFin,
-        'updated_at' => now(),
-    ]);
-
-    return redirect()->back()->with('success', 'Consulta agendada correctamente.');
-}
-
-
-
-//POST TRANSFERENCIA
-
-public function postTransferenciaForm($id)
+    public function postTransferenciaForm($id)
     {
         $tratamiento = Tratamiento::findOrFail($id);
 
@@ -330,7 +331,7 @@ public function postTransferenciaForm($id)
         return view('medico.post-transferencia', compact('tratamiento', 'post'));
     }
 
-public function guardarPostTransferencia(Request $request, $id)
+    public function guardarPostTransferencia(Request $request, $id)
     {
         $post = PostTransferencia::firstOrNew(['tratamiento_id' => $id]);
 
@@ -353,4 +354,42 @@ public function guardarPostTransferencia(Request $request, $id)
         return redirect()->back()->with('success', 'Datos guardados correctamente');
     }
 
+    public function darDeBajaTratamiento(Request $request, $id)
+    {
+        try {
+            // Obtener el ID del tratamiento desde el request (input hidden)
+            $tratamientoId = $request->input('tratamiento_id', $id);
+
+            // Verificar que el tratamiento existe y pertenece al médico logueado
+            $medicoId = session('user_id');
+
+            $tratamiento = DB::table('tratamientos')
+                ->where('id', $tratamientoId)
+                ->where('medico_id', $medicoId)
+                ->first();
+
+            if (!$tratamiento) {
+                Log::error('Tratamiento no encontrado. ID Tratamiento: ' . $tratamientoId . ', ID Médico: ' . $medicoId);
+                return redirect()->back()->with('error', 'Tratamiento no encontrado o no autorizado.');
+            }
+
+            // Verificar que el tratamiento esté activo (estado_tratamiento_id = 1)
+            if ($tratamiento->estado_tratamiento_id != 1) {
+                return redirect()->back()->with('error', 'Solo se pueden cancelar tratamientos activos.');
+            }
+
+            // Cambiar estado a "Cancelado" (ID = 3)
+            DB::table('tratamientos')
+                ->where('id', $tratamientoId)
+                ->update([
+                    'estado_tratamiento_id' => 3, // Cancelado
+                    'updated_at' => now(),
+                ]);
+
+            return redirect()->back()->with('success', 'Tratamiento cancelado correctamente.');
+        } catch (\Exception $e) {
+            Log::error('Error al cancelar tratamiento: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error interno al cancelar el tratamiento.');
+        }
+    }
 }
