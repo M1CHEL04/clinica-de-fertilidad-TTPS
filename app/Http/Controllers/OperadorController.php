@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use App\Models\HistorialOvocito;
 use App\Models\TipoEstadoOvocito;
+use App\Models\Tratamiento;
 
 class OperadorController extends Controller
 {
@@ -415,5 +416,423 @@ class OperadorController extends Controller
             return redirect()->back()->with('error', "Este ovocito ya se encuentra criopreservado");
         }
         return redirect()->back()->with('success', "Ovocito {$ovocito->identificador} actualizado correctamente.");
+    }
+
+    public function fertilizacion($paciente_id)
+    {
+        $paciente = User::findOrFail($paciente_id);
+
+        // Obtener todas las fertilizaciones del paciente con las relaciones necesarias
+        $fertilizaciones = \App\Models\Fertilizacion::where('paciente_id', $paciente_id)
+            ->with([
+                'operador',
+                'tipo_fertilizacion',
+                'embrion.ovocito',
+                'embrion.estado',
+                'embrion.guardado',
+                'tratamiento'
+            ])
+            ->orderBy('fecha_fertilizacion', 'desc')
+            ->get();
+
+        // Obtener todos los embriones del paciente
+        $embriones = \App\Models\Embrion::whereHas('fertilizacion', function ($query) use ($paciente_id) {
+            $query->where('paciente_id', $paciente_id);
+        })
+            ->with([
+                'fertilizacion.tipo_fertilizacion',
+                'estado',
+                'guardado',
+                'ovocito'
+            ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Obtener tipos de fertilización para el formulario
+        $tiposFertilizacion = \App\Models\TipoFertilizacion::all();
+
+
+        return view('operador.fertilizacion', compact('paciente', 'fertilizaciones', 'embriones', 'tiposFertilizacion'));
+    }
+
+
+    public function nuevaFertilizacion($paciente_id)
+    {
+        $paciente = User::findOrFail($paciente_id);
+
+        $tratamiento_id = Tratamiento::whereHas('historiaClinica', function ($query) use ($paciente_id) {
+            $query->where('paciente_id', $paciente_id);
+        })
+            ->where('estado_tratamiento_id', 2)
+            ->first()?->id;
+
+        // Obtener tipos de fertilización para el formulario
+        $tiposFertilizacion = \App\Models\TipoFertilizacion::all();
+
+        // Obtener estados de embrión para el formulario
+        $estadosEmbrion = \App\Models\EstadoEmbrion::all();
+
+        // Debug: Primero ver todos los ovocitos del paciente
+        $todosOvocitos = \App\Models\Ovocito::where('paciente_id', $paciente_id)
+            ->with(['estado_ovocito.TipoEstadoOvocito'])
+            ->get();
+
+        Log::info("Debug - Total ovocitos del paciente $paciente_id: " . $todosOvocitos->count());
+
+        foreach ($todosOvocitos as $ovocito) {
+            $tipoEstado = $ovocito->estado_ovocito?->TipoEstadoOvocito?->nombre ?? 'Sin estado';
+            $utilizado = $ovocito->utilizado ? 'Sí' : 'No';
+            Log::info("Ovocito {$ovocito->identificador} - Estado: {$tipoEstado} - Utilizado: {$utilizado}");
+        }
+
+        // Obtener ovocitos maduros disponibles directamente
+        $ovocitosDisponibles = \App\Models\Ovocito::where('paciente_id', $paciente_id)
+            ->where('utilizado', false) // Filtrar por no utilizados
+            ->whereHas('estado_ovocito.TipoEstadoOvocito', function ($query) {
+                $query->where('nombre', 'Maduro');
+            })
+            ->whereDoesntHave('embriones') // No han sido utilizados para crear embriones
+            ->with(['estado_ovocito.TipoEstadoOvocito'])
+            ->select('id', 'identificador', 'calidad_morfologica')
+            ->get();
+
+        Log::info("Ovocitos maduros y disponibles para fertilización: " . $ovocitosDisponibles->count());
+
+        return view('operador.fertilizacionCarga', compact('paciente', 'tiposFertilizacion', 'estadosEmbrion', 'ovocitosDisponibles', 'tratamiento_id'));
+    }
+
+    public function guardarFertilizacion(Request $request)
+    {
+        $request->validate([
+            'paciente_id' => 'required|exists:usuarios,id',
+            'fecha_fertilizacion' => 'required|date',
+            'hora_fertilizacion' => 'required',
+            'tipo_fertilizacion_id' => 'required|exists:tipos_fertilizacion,id',
+            'embriones' => 'required|array',
+            'embriones.*.ovocito_id' => 'required|exists:ovocitos,id',
+            'embriones.*.calidad_morfologica' => 'required|in:1,2,3,4,5',
+            'embriones.*.identificador' => 'required|string',
+            'embriones.*.fuente_semen' => 'required|in:pareja,donado',
+            'embriones.*.accion' => 'required|in:descartar,criopreservar,transferir',
+            'embriones.*.motivo_descarte' => 'required_if:embriones.*.accion,descartar',
+        ]);
+
+        try {
+
+            DB::beginTransaction();
+
+            // Crear fertilización
+            $fertilizacion = Fertilizacion::create([
+                'tipo_fertilizacion_id' => $request->tipo_fertilizacion_id,
+                'operador_id' => session('user_id'),
+                'paciente_id' => $request->paciente_id,
+                'tratamiento_id' => $request->tratamiento_id,
+                'fecha_fertilizacion' => $request->fecha_fertilizacion,
+            ]);
+
+            // Crear embriones
+            foreach ($request->embriones as $embrionData) {
+
+                $embrion = \App\Models\Embrion::create([
+                    'identificador' => $embrionData['identificador'],
+                    'guardado_id' => null, // Se asignará cuando se criopreserve
+                    'fertilizacion_id' => $fertilizacion->id,
+                    'ovocito_id' => $embrionData['ovocito_id'],
+                    'calidad_morfologica' => $embrionData['calidad_morfologica'],
+                ]);
+
+                switch ($embrionData['fuente_semen']) {
+                    case 'pareja':
+                        try {
+
+                            $dni_pareja = Tratamiento::where('id', $request->tratamiento_id)->first()->antecedentesPareja->dni;
+
+                            try {
+                                // aca tengo que maracar como utilizado el semen en la API.
+                                $response = Http::withHeaders([
+                                    'Content-Type' => 'application/json',
+                                    'token' => 'token-grupo-4'
+                                ])->post(
+                                    'https://bmcgxbtbcmlzoetyqajn.supabase.co/functions/v1/dni-tiene-muestra',
+                                    [
+                                        'group_id' => 5,
+                                        'dni' => $dni_pareja,
+                                    ]
+                                );
+
+                                if (!$response->successful()) {
+                                    Log::error('Error al buscar la muestra: El dni no tiene muestra de semen criopreservado', [
+                                        'status' => $response->status(),
+                                        'body'   => $response->body()
+                                    ]);
+                                    return redirect()->back()
+                                        ->withInput()
+                                        ->with('error', 'Error al buscar la muestra: El dni no tiene muestra de semen criopreservado.');
+                                } else {
+
+                                    $responseData = Http::withHeaders([
+                                        'Content-Type' => 'application/json',
+                                        'token' => 'token-grupo-4'
+                                    ])->post(
+                                        'https://bmcgxbtbcmlzoetyqajn.supabase.co/functions/v1/descongelar-semen',
+                                        [
+                                            'group_id' => 5,
+                                            'dni' => $dni_pareja,
+                                        ]
+                                    );
+
+                                    if (!$responseData->successful()) {
+                                        Log::error('Error al marcar el semen como utilizado', [
+                                            'status' => $responseData->status(),
+                                            'body'   => $responseData->body()
+                                        ]);
+                                        return redirect()->back()
+                                            ->withInput()
+                                            ->with('error', 'Error guardar el ovocito.');
+                                    }
+                                }
+                            } catch (\Exception $e) {
+                                Log::error('Error en la conexión a la API de semen: ' . $e->getMessage());
+                                return redirect()->back()
+                                    ->withInput()
+                                    ->with('error', 'Error de conexión al buscar la muestra de semen.');
+                            }
+
+                            $embrion->update([
+                                'semen_dni' => $dni_pareja
+                            ]);
+                        } catch (\Exception $e) {
+                            Log::error('Error al obtener DNI de la pareja: ' . $e->getMessage());
+                            $dni_pareja = null;
+                        }
+
+                        break;
+                    case 'donado':
+                        //Aca tengo que ir buscar el gameto a la api con los datos de fenotipo ingresados.
+
+                        break;
+                }
+
+                // Procesar acción del embrión
+                switch ($embrionData['accion']) {
+                    case 'descartar':
+                        $embrion->update([
+                            'motivo_descarte' => $embrionData['motivo_descarte']
+                        ]);
+                        break;
+
+                    case 'criopreservar':
+                        // Llamar al método de criopreservación
+                        $response = Http::withHeaders([
+                            'Content-Type' => 'application/json',
+                        ])->post(
+                            'https://ssewaxrnlmnyizqsbzxe.supabase.co/functions/v1/assign-ovocyte',
+                            [
+                                'nro_grupo' => 5,
+                                'ovocito_id' => $embrion->id,
+                            ]
+                        );
+
+                        if (!$response->successful()) {
+                            Log::error('Error al registrar criopreservación', [
+                                'status' => $response->status(),
+                                'body'   => $response->body()
+                            ]);
+                            return false;
+                        }
+
+                        $data = $response->json();
+
+                        if (!is_array($data) || empty($data)) {
+                            Log::error("Respuesta inesperada del módulo", ['data' => $data]);
+                            return false;
+                        }
+
+                        $registro = $data[0];
+
+                        Log::info('Criopreservación asignada correctamente', $registro);
+
+                        // Guardar en la tabla guardados
+                        $guardado = Guardado::create([
+                            'id_tanque'   => $registro['tanque_id'],
+                            'id_rack'     => $registro['rack_id'],
+                        ]);
+
+                        $embrion->update([
+                            'guardado_id' => $guardado->id
+                        ]);
+                        break;
+                    case 'transferir':
+                        $embrion->update([
+                            'transferir' => true
+                        ]);
+                        break;
+                }
+
+                // Crear registro inicial en el historial del embrión
+                $descripcion_inicial = "Embrión creado a partir del ovocito {$ovocito->identificador}";
+
+                // Determinar estado inicial según la acción
+                switch ($embrionData['accion']) {
+                    case 'descartar':
+                        $accion_inicial = 'Descartar';
+                        $descripcion_inicial .= " - Marcado para descarte";
+                        break;
+                    case 'criopreservar':
+                        $accion_inicial = 'Criopreservar';
+                        $descripcion_inicial .= " - Enviado a criopreservación";
+                        break;
+                    case 'transferir':
+                        $accion_inicial = 'Transferir';
+                        $descripcion_inicial .= " - Marcado para transferencia";
+                        break;
+                }
+
+                HistorialEmbrion::create([
+                    'embrion_id' => $embrion->id,
+                    'operador_id' => session('user_id'),
+                    'accion' => $accion_inicial,
+                    'descripcion' => $descripcion_inicial,
+                    'motivo_descarte_anterior' => null,
+                    'motivo_descarte_nuevo' => $embrionData['accion'] === 'descartar' ? $embrionData['motivo_descarte'] : null,
+                    'transferir_anterior' => null,
+                    'transferir_nuevo' => $embrionData['accion'] === 'transferir' ? true : null,
+                    'guardado_id_anterior' => null,
+                    'guardado_id_nuevo' => $embrionData['accion'] === 'criopreservar' ? ($guardado->id ?? null) : null,
+                ]);
+
+                // Registrar en historial que el ovocito fue usado para fertilización
+                $ovocito = \App\Models\Ovocito::find($embrionData['ovocito_id']);
+                if ($ovocito) {
+                    // Marcar el ovocito como utilizado
+                    $ovocito->update(['utilizado' => true]);
+
+                    \App\Models\HistorialOvocito::create([
+                        'ovocito_id' => $ovocito->id,
+                        'fecha_cambio' => now(),
+                        'accion' => 'fertilizacion',
+                        'descripcion' => "Ovocito utilizado para fertilización #{$fertilizacion->id}",
+                        'usuario_id' => session('user_id'),
+                        'estado_anterior_id' => $ovocito->estado_ovocito->tipo_estado_ovocito_id,
+                        'estado_nuevo_id' => $ovocito->estado_ovocito->tipo_estado_ovocito_id,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            Log::info("Fertilización creada exitosamente", [
+                'fertilizacion_id' => $fertilizacion->id,
+                'embriones_creados' => count($request->embriones),
+                'paciente_id' => $request->paciente_id
+            ]);
+
+            return redirect()->route('operador.fertilizacion', ['paciente_id' => $request->paciente_id])
+                ->with('success', "Fertilización registrada exitosamente. Se crearon " . count($request->embriones) . " embriones.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al guardar fertilización: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error al registrar la fertilización. Por favor, inténtelo nuevamente.');
+        }
+    }
+
+    //CRIOPRESERVACION DE SEMEN
+
+    public function criopreservarSemen(Request $request)
+    {
+        $request->validate([
+            'paciente_id' => 'required|integer'
+        ]);
+
+        $groupId = 5;
+        // Obtener usuario/paciente
+        $user = \App\Models\User::find($request->paciente_id);
+        $dni = $user->obtenerDniPareja();
+
+        Log::info("Entró al método y encontro el dni correctamente", ['dni' => $dni]);
+
+        $headers = [
+            'token' => 'token-grupo-4'
+        ];
+
+        // 1) Intento inicial
+        $response = Http::withHeaders($headers)
+            ->withoutVerifying()
+            ->post(
+                'https://bmcgxbtbcmlzoetyqajn.supabase.co/functions/v1/congelar-semen',
+                [
+                    'group_id' => $groupId,
+                    'dni' => $dni
+                ]
+            );
+
+        Log::info("Respuesta inicial congelar semen", [
+            'status' => $response->status(),
+            'body' => $response->body()
+        ]);
+
+        if ($response->successful()) {
+
+            return back()->with('success', 'Semen congelado correctamente.');
+        }
+
+        // 404 o 409 -> no hay rack o no hay lugar
+        if ($response->status() == 404 || $response->status() == 409) {
+
+            Log::warning("No hay tanques / No hay lugar, creando tanque…");
+
+            // Crear tanque
+            $createTank = Http::withHeaders($headers)
+                ->withoutVerifying()
+                ->post(
+                    'https://bmcgxbtbcmlzoetyqajn.supabase.co/functions/v1/crear-tanque',
+                    [
+                        'group_id' => $groupId
+                    ]
+                );
+
+            Log::info("Respuesta creación tanque", [
+                'status' => $createTank->status(),
+                'body' => $createTank->body()
+            ]);
+
+            if ($createTank->failed()) {
+                return back()->with('error', 'No se pudo crear un nuevo tanque.');
+            }
+
+            // Reintentar
+            $retry = Http::withHeaders($headers)
+                ->withoutVerifying()
+                ->post(
+                    'https://bmcgxbtbcmlzoetyqajn.supabase.co/functions/v1/congelar-semen',
+                    [
+                        'group_id' => $groupId,
+                        'dni' => $dni
+                    ]
+                );
+
+            Log::info("Respuesta reintento congelar semen", [
+                'status' => $retry->status(),
+                'body' => $retry->body()
+            ]);
+
+            if ($retry->successful()) {
+                return back()->with('success', 'Se creó un nuevo rack y se congeló el semen correctamente.');
+            }
+
+            return back()->with('error', 'Incluso con el nuevo tanque no se logró almacenar el semen.');
+        }
+
+        // Otros errores
+        Log::error("Error inesperado", [
+            'status' => $response->status(),
+            'body' => $response->body()
+        ]);
+
+        return back()->with('error', 'Error inesperado al congelar semen.');
     }
 }
