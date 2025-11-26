@@ -264,6 +264,10 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
 
     // 4.2. Guardar fertilización
     Route::post('/fertilizacion/guardar', [OperadorController::class, 'guardarFertilizacion'])->name('fertilizacion.guardar');
+
+    //Criopreservar de semen
+    Route::post('/criopreservar-semen', [OperadorController::class, 'criopreservarSemen'])
+        ->name('criopreservar.semen.store');
 });
 
 
