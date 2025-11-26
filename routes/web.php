@@ -14,8 +14,14 @@ use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\OperadorController;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Auth\LoginController;
-
 use App\Http\Controllers\ConsultaController;
+
+// Importaciones para los modelos de fenotipo
+use App\Models\ColorOjo;
+use App\Models\ColorPelo;
+use App\Models\Complexion;
+use App\Models\RasgoEtnico;
+use App\Models\TipoPelo;
 ## Web Routes
 Route::get('/borrar-turnos', function () {
     try {
@@ -146,15 +152,51 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
         ->name('tratamiento.enviar-orden-medica');
 
     Route::get('/consulta/partials/hombre-gametos', function () {
-        return view('medico.partials.pareja-hombre');
+        $coloresPelo = ColorPelo::all();
+        $coloresOjos = ColorOjo::all();
+        $tipoPelo = TipoPelo::all();
+        $complexiones = Complexion::all();
+        $rasgos = RasgoEtnico::all();
+
+        return view('medico.partials.pareja-hombre', compact(
+            'coloresPelo',
+            'coloresOjos',
+            'tipoPelo',
+            'complexiones',
+            'rasgos'
+        ));
     });
 
     Route::get('/consulta/partials/hombre-donado', function () {
-        return view('medico.partials.semen-donado');
+        $coloresPelo = ColorPelo::all();
+        $coloresOjos = ColorOjo::all();
+        $tipoPelo = TipoPelo::all();
+        $complexiones = Complexion::all();
+        $rasgos = RasgoEtnico::all();
+
+        return view('medico.partials.semen-donado', compact(
+            'coloresPelo',
+            'coloresOjos',
+            'tipoPelo',
+            'complexiones',
+            'rasgos'
+        ));
     });
 
     Route::get('/consulta/partials/pareja-mujer', function () {
-        return view('medico.partials.pareja-mujer');
+        $coloresPelo = ColorPelo::all();
+        $coloresOjos = ColorOjo::all();
+        $tipoPelo = TipoPelo::all();
+        $complexiones = Complexion::all();
+        $rasgos = RasgoEtnico::all();
+
+        return view('medico.partials.pareja-mujer', compact(
+            'coloresPelo',
+            'coloresOjos',
+            'tipoPelo',
+            'complexiones',
+            'rasgos'
+        ));
     });
 
 

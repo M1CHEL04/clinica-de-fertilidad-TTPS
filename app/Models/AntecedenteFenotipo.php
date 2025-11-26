@@ -12,6 +12,7 @@ class AntecedenteFenotipo extends Model
     protected $fillable = [
         'tratamiento_id',
         'color_ojos',
+        'color_pelo',
         'tipo_pelo',
         'altura',
         'complexion_corporal',

@@ -33,7 +33,10 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(res => res.text())
         .then(html => {
             contenedor.innerHTML = html;
-            inicializarFormParejas(); // <--- ACÁ, PAVOTE ❤
+            // Pequeño delay para asegurar que el DOM esté completamente renderizado
+            setTimeout(() => {
+                inicializarFormParejas();
+            }, 50);
         });
 
     });

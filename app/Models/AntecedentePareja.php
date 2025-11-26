@@ -34,6 +34,7 @@ class AntecedentePareja extends Model
         'antecedentes_personales',
         'descripcion_familiar',
         'color_ojos',
+        'color_pelo',
         'tipo_pelo',
         'altura',
         'complexion_corporal',
@@ -44,6 +45,4 @@ class AntecedentePareja extends Model
     {
         return $this->belongsTo(Tratamiento::class);
     }
-
-  
 }

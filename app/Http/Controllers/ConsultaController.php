@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ColorOjo;
+use App\Models\ColorPelo;
+use App\Models\Complexion;
+use App\Models\RasgoEtnico;
+use App\Models\TipoPelo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -10,6 +15,13 @@ class ConsultaController extends Controller
     public function create($paciente_id)
     {
         $objetivos = \App\Models\Objetivo::all();
+
+        $coloresPelo = ColorPelo::all();
+        $coloresOjos = ColorOjo::all();
+        $tipoPelo = TipoPelo::all();
+        $complexiones = Complexion::all();
+        $rasgos = RasgoEtnico::all();
+
 
         $paciente = \App\Models\User::findOrFail($paciente_id);
 
@@ -34,7 +46,17 @@ class ConsultaController extends Controller
             'paciente_id' => $paciente_id
         ]);
         $tratamiento = null;
-        return view('medico.primerConsulta', compact('objetivos', 'paciente', 'historia', 'tratamiento'));
+        return view('medico.primerConsulta', compact(
+            'objetivos',
+            'paciente',
+            'historia',
+            'tratamiento',
+            'coloresPelo',
+            'coloresOjos',
+            'tipoPelo',
+            'complexiones',
+            'rasgos'
+        ));
     }
 
 
@@ -75,12 +97,25 @@ class ConsultaController extends Controller
         $historia = \App\Models\HistoriaClinica::firstOrCreate([
             'paciente_id' => $paciente_id
         ]);
+
+        // Variables necesarias para el formulario
+        $coloresPelo = ColorPelo::all();
+        $coloresOjos = ColorOjo::all();
+        $tipoPelo = TipoPelo::all();
+        $complexiones = Complexion::all();
+        $rasgos = RasgoEtnico::all();
+
         //dd($tratamiento);
         return view('medico.primerConsulta', compact(
             'objetivos',
             'paciente',
             'historia',
-            'tratamiento'
+            'tratamiento',
+            'coloresPelo',
+            'coloresOjos',
+            'tipoPelo',
+            'complexiones',
+            'rasgos'
         ));
     }
 
@@ -160,6 +195,8 @@ class ConsultaController extends Controller
 
         // --- ANTECEDENTES FENOTIPOS ---
         $antecedentesFenotipos = $tratamiento->antecedentesFenotipos()->firstOrNew([]);
+
+
         $antecedentesFenotipos->fill([
             'color_ojos' => $request->input('color-ojos'),
             'color_pelo' => $request->input('color-pelo'),
@@ -344,6 +381,7 @@ class ConsultaController extends Controller
         if ($tratamiento->antecedentesFenotipos) {
             $tratamiento->antecedentesFenotipos->update([
                 'color_ojos' => $request->input('color-ojos'),
+                'color_pelo' => $request->input('color-pelo'),
                 'tipo_pelo' => $request->input('tipo-pelo'),
                 'altura' => $request->altura,
                 'complexion_corporal' => $request->complexion,

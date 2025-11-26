@@ -14,7 +14,36 @@ function inicializarFormParejas() {
     ============================================ */
     function prefill(id, value) {
         const el = document.getElementById(id);
-        if (el) el.value = value ?? "";
+        if (el) {
+            if (el.tagName === 'SELECT') {
+                // Para selects, buscar la opción correcta
+                const option = el.querySelector(`option[value="${value}"]`);
+                if (option) {
+                    el.value = value;
+                } else {
+                    console.warn(`Opción no encontrada para ${id}: ${value}`);
+                }
+            } else {
+                el.value = value ?? "";
+            }
+        }
+    }
+
+    function prefillSelect(id, value) {
+        const el = document.getElementById(id);
+        if (el && value) {
+            console.log(`Intentando establecer ${id} = ${value}`);
+            // Esperar a que el DOM esté listo
+            setTimeout(() => {
+                el.value = value;
+                if (el.value !== value) {
+                    console.warn(`No se pudo establecer valor ${value} para ${id}`);
+                    console.log(`Opciones disponibles:`, Array.from(el.options).map(opt => opt.value));
+                } else {
+                    console.log(`✅ Valor establecido correctamente ${id} = ${value}`);
+                }
+            }, 100);
+        }
     }
 
     function prefillList(listId, items, hiddenName) {
@@ -222,19 +251,22 @@ function inicializarFormParejas() {
     ============================================ */
     const CAMPOS = [
         "dni",
-        "ciclo_regular",
+        "ciclo_regular", 
         "duracion",
         "caracteristicas_sangrado",
-        "tipo_pelo",
-        "color_pelo",
-        "color_ojos",
         "altura",
-        "complexion_corporal",
-        "rasgos_etnicos",
         "AB",
-        "G",
+        "G", 
         "CT",
         "P",
+    ];
+
+    const CAMPOS_SELECT = [
+        "tipo_pelo",
+        "color_pelo", 
+        "color_ojos",
+        "complexion_corporal",
+        "rasgos_etnicos"
     ];
 
     /* ============================================
@@ -243,9 +275,14 @@ function inicializarFormParejas() {
     function inicializarPersona(data) {
         const prefijo = "p_";
 
-        // Campos simples
+        // Campos simples (inputs y textareas)
         CAMPOS.forEach((c) => {
             prefill(prefijo + c, data[c]);
+        });
+
+        // Campos select (necesitan tratamiento especial)
+        CAMPOS_SELECT.forEach((c) => {
+            prefillSelect(prefijo + c, data[c]);
         });
 
         // Lista antecedentes personales
@@ -286,6 +323,8 @@ function inicializarFormParejas() {
        EJECUTAR (fusión pareja + hombre)
     ============================================ */
     const datosUnificados = { ...pareja, ...hombre };
+    
+    console.log('Datos unificados para prellenar:', datosUnificados);
 
     inicializarPersona(datosUnificados);
 }
