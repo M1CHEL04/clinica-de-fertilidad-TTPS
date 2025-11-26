@@ -544,12 +544,14 @@ class OperadorController extends Controller
                 switch ($embrionData['fuente_semen']) {
                     case 'pareja':
                         try {
+
                             $dni_pareja = Tratamiento::where('id', $request->tratamiento_id)->first()->antecedentesPareja->dni;
 
                             try {
                                 // aca tengo que maracar como utilizado el semen en la API.
                                 $response = Http::withHeaders([
                                     'Content-Type' => 'application/json',
+                                    'token' => 'token-grupo-4'
                                 ])->post(
                                     'https://bmcgxbtbcmlzoetyqajn.supabase.co/functions/v1/dni-tiene-muestra',
                                     [
@@ -570,6 +572,7 @@ class OperadorController extends Controller
 
                                     $responseData = Http::withHeaders([
                                         'Content-Type' => 'application/json',
+                                        'token' => 'token-grupo-4'
                                     ])->post(
                                         'https://bmcgxbtbcmlzoetyqajn.supabase.co/functions/v1/descongelar-semen',
                                         [

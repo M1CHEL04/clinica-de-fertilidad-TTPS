@@ -18,5 +18,10 @@ class DatabaseSeeder extends Seeder
         $this->call(\Database\Seeders\TipoEstadoOvocitoSeeder::class);
         $this->call(\Database\Seeders\TipoFertilizacionSeeder::class);
         $this->call(\Database\Seeders\EtapaSeeder::class);
+        $this->call(\Database\Seeders\complexionSeeder::class);
+        $this->call(\Database\Seeders\rasgosEtnicosSeeder::class);
+        $this->call(\Database\Seeders\TipoPeloSeeder::class);
+        $this->call(\Database\Seeders\ColorOjosSeeder::class);
+        $this->call(\Database\Seeders\ColorPeloSeeder::class);
     }
 }

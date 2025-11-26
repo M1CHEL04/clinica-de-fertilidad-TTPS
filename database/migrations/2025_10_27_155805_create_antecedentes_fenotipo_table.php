@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(\App\Models\Tratamiento::class);
             $table->string('color_ojos');
+            $table->string('color_pelo');
             $table->string('tipo_pelo');
             $table->string('altura');
             $table->string('complexion_corporal');
