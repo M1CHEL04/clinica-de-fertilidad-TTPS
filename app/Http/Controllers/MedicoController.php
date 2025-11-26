@@ -11,6 +11,8 @@ use App\Models\TipoMedicacion;
 use App\Models\Monitoreo;
 use App\Models\PostTransferencia;
 use Illuminate\Http\Request;
+use App\Http\Controllers\MailController;
+use App\Models\User;
 
 class MedicoController extends Controller
 {
@@ -25,6 +27,7 @@ class MedicoController extends Controller
             ->join('historias_clinica', 'tratamientos.historia_clinica_id', '=', 'historias_clinica.id')
             ->join('usuarios', 'historias_clinica.paciente_id', '=', 'usuarios.id')
             ->join('estados_tratamiento', 'tratamientos.estado_tratamiento_id', '=', 'estados_tratamiento.id')
+            ->where('tratamientos.medico_id', $medicoId)
             ->select(
                 'usuarios.id as paciente_id',
                 'usuarios.nombre',
@@ -33,12 +36,20 @@ class MedicoController extends Controller
                 'usuarios.dni',
                 'usuarios.fecha_nacimiento',
                 'usuarios.telefono',
-                'estados_tratamiento.nombre as estado_tratamiento',
-                'tratamientos.created_at as fecha_inicio'
+                DB::raw('MAX(estados_tratamiento.nombre) as estado_tratamiento'),
+                DB::raw('MIN(tratamientos.created_at) as fecha_inicio')
             )
-            ->where('tratamientos.medico_id', $medicoId)
-            ->distinct()
+            ->groupBy(
+                'usuarios.id',
+                'usuarios.nombre',
+                'usuarios.apellido',
+                'usuarios.mail',
+                'usuarios.dni',
+                'usuarios.fecha_nacimiento',
+                'usuarios.telefono'
+            )
             ->get();
+
 
 
 
@@ -60,6 +71,7 @@ class MedicoController extends Controller
                 'tratamientos.id',
                 'usuarios.id as paciente_id',
                 'objetivos.nombre as objetivo',
+                'usuarios.id as id_usuario',
                 'usuarios.nombre',
                 'usuarios.apellido',
                 'usuarios.mail',
@@ -313,6 +325,53 @@ class MedicoController extends Controller
             'fecha_sugerida_fin' => $fechaFin,
             'updated_at' => now(),
         ]);
+
+        return redirect()->back()->with('success', 'Consulta agendada correctamente.');
+    }
+
+
+
+    //POST TRANSFERENCIA
+
+
+    public function agendarConsulta(Request $request, $id)
+    {
+        $fechaHoy = date('Y-m-d');
+        $fechaInicio = date('Y-m-d', strtotime($request->fecha_inicio));
+        $fechaFin = date('Y-m-d', strtotime($request->fecha_fin));
+
+        // Validaciones
+        if ($fechaInicio < $fechaHoy) {
+            return redirect()->back()->with('error', 'La fecha de inicio no puede ser anterior a hoy.');
+        }
+
+        if ($fechaInicio > $fechaFin) {
+            return redirect()->back()->with('error', 'La fecha de inicio no puede ser mayor que la fecha de fin.');
+        }
+
+        $tratamiento = DB::table('tratamientos')->where('id', $id)->update([
+            'fecha_sugerida_inicio' => $fechaInicio,
+            'fecha_sugerida_fin' => $fechaFin,
+            'updated_at' => now(),
+        ]);
+        $trat = Tratamiento::findOrFail($id);
+        $user = $trat->historiaClinica->paciente;
+        $nombre = session('nombre');
+        $apellido = session('apellido');
+        $mailController = new MailController();
+
+        $mailController->enviarMail(
+            [$user->mail],
+            'Dias sugeridos para tu consulta',
+            'mails.horariosSugeridos',
+            [
+                'fechaInicio' => $fechaInicio,
+                'fechaFin' => $fechaFin,
+                'nombre' => $nombre,
+                'apellido' => $apellido
+            ]
+        );
+
 
         return redirect()->back()->with('success', 'Consulta agendada correctamente.');
     }

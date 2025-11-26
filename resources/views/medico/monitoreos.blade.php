@@ -83,14 +83,31 @@
     <div class="space-y-6">
 
         <div class="card p-6">
+         @if(session('rol') == 3)
+         
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 flex items-center">
+                <i class="fas a-plus-circle text-green-600 mr-2"></i> Solo puedes ver los monitoreos registrados
+            </h3>
+        @else
+        
             <h3 class="text-lg font-semibold mb-4 text-gray-900 flex items-center">
                 <i class="fas a-plus-circle text-green-600 mr-2"></i> Nueva Acción
             </h3>
+        @endif    
 
+            @if(session('rol') == 3)
+           <button 
+    disabled
+    class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
+>
+    <i class="fas fa-heartbeat"></i> Cargar Monitoreo
+</button>
+            @else
             <button onclick="document.getElementById('modalMonitoreo').classList.remove('hidden')"
-                class="btn-primary w-full flex items-center justify-center gap-2">
-                <i class="fas fa-heartbeat"></i> Cargar Monitoreo
-            </button>
+                            class="btn-primary w-full flex items-center justify-center gap-2">
+                            <i class="fas fa-heartbeat"></i> Cargar Monitoreo
+         </button>
+            @endif
         </div>
 
         <div class="card p-4 bg-blue-50 border border-blue-200">

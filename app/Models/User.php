@@ -23,6 +23,7 @@ class User extends Authenticatable
         'telefono',
         'password',
         'dni',
+        'cambio_password',
         'fecha_nacimiento',
         'ocupacion',
         'obra_social_id',
@@ -67,6 +68,8 @@ class User extends Authenticatable
     {
         return $this->hasOne(HistoriaClinica::class, 'paciente_id');
     }
+
+    
 
     public function ovocitos()
     {

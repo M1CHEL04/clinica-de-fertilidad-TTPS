@@ -8,27 +8,6 @@ use Illuminate\Support\Facades\Validator;
 
 class RegistroController extends Controller
 {
-    // Mostrar formulario de registro
-    public function show()
-    {
-        // Aquí deberías cargar las obras sociales desde la base de datos
-        // Por ahora uso datos estáticos, pero deberías reemplazar con:
-        // $obrasSociales = ObraSocial::all();
-        $obrasSociales = [
-            ['id' => 1, 'sigla' => 'OSDE'],
-            ['id' => 2, 'sigla' => 'Swiss Medical'],
-            ['id' => 3, 'sigla' => 'Medicus'],
-            ['id' => 4, 'sigla' => 'Galeno'],
-            ['id' => 5, 'sigla' => 'IOMA'],
-            ['id' => 6, 'sigla' => 'PAMI'],
-            ['id' => 7, 'sigla' => 'Obra Social UOM'],
-            ['id' => 8, 'sigla' => 'OSPAT'],
-            ['id' => 9, 'sigla' => 'OSECAC'],
-            ['id' => 10, 'sigla' => 'Otra'],
-        ];
-
-        return view('usuario.register', compact('obrasSociales'));
-    }
 
     // Guardar usuario
     public function store(Request $request)
