@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use App\Models\HistorialOvocito;
 use App\Models\TipoEstadoOvocito;
-use App\Models\DonantesSemen;
 class OperadorController extends Controller
 {
  public function Pacientes()
@@ -419,23 +418,20 @@ public function updateOvocito(Request $request)
 }
 
 
-//DONACION DE SEMEN
-public function crearDonanteSemen()
-{
-    return view('operador.donantes-semen');
-}
+//CRIOPRESERVACION DE SEMEN
 
-
-public function storeDonanteSemen(Request $request)
+public function criopreservarSemen(Request $request)
 {
     $request->validate([
-        'dni' => 'required|string'
+            'paciente_id' => 'required|integer'
     ]);
 
-    $dni = $request->dni;
     $groupId = 5;
+    // Obtener usuario/paciente
+    $user = \App\Models\User::find($request->paciente_id);
+    $dni = $user->obtenerDniPareja();
 
-    Log::info("Entró al método storeDonanteSemen", ['dni' => $dni]);
+    Log::info("Entró al método y encontro el dni correctamente", ['dni' => $dni]);
 
     $headers = [
         'token' => 'token-grupo-4'
@@ -458,7 +454,6 @@ public function storeDonanteSemen(Request $request)
     ]);
 
     if ($response->successful()) {
-        DonantesSemen::create(['dni' => $dni]);
 
         return back()->with('success', 'Semen congelado correctamente.');
     }
@@ -504,7 +499,6 @@ public function storeDonanteSemen(Request $request)
         ]);
 
         if ($retry->successful()) {
-            DonantesSemen::create(['dni' => $dni]);
             return back()->with('success', 'Se creó un nuevo rack y se congeló el semen correctamente.');
         }
 

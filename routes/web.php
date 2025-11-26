@@ -174,12 +174,9 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
         [App\Http\Controllers\OperadorController::class, 'guardarPuncion'])
         ->name('puncion.guardar');
 
-    //Donacion de semen
-    Route::get('/donantes-semen/crear', [OperadorController::class, 'crearDonanteSemen'])
-    ->name('donantes.semen.form');
-
-    Route::post('/donantes-semen', [OperadorController::class, 'guardarDonanteSemen'])
-    ->name('donantes.semen.store');
+    //Criopreservar de semen
+    Route::post('/criopreservar-semen', [OperadorController::class, 'criopreservarSemen'])
+    ->name('criopreservar.semen.store');
 });
 
 
