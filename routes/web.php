@@ -12,6 +12,7 @@ use App\Http\Controllers\AvisosController;
 use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\OperadorController;
+use App\Http\Controllers\Auth\LoginController;
 
 use App\Http\Controllers\ConsultaController;
 ## Web Routes
@@ -33,6 +34,11 @@ Route::get('/registro', function () {
     $obrasSociales = $response->json()['data'];
     return view('usuario.register', compact('obrasSociales'));
 })->name('registro');
+Route::get('/perfil', [App\Http\Controllers\Auth\LoginController::class, 'perfil'])->name('verPerfil');
+Route::get('/ver-perfil', [App\Http\Controllers\Auth\LoginController::class, 'verPerfilNoUsuario'])->name('verPerfilNoUsuario');
+Route::put('/usuario/perfil', [LoginController::class, 'updatePerfil'])
+    ->name('usuario.updatePerfil');
+
 Route::get('/login', function () {
     return view('usuario.login');
 })->name('login');
@@ -69,6 +75,13 @@ Route::post('ovocitos/actualizar', [OperadorController::class, 'updateOvocito'])
 
 Route::get('/ovocito/{id}/json', [OperadorController::class, 'getJson'])->name('ovocito.json');
 
+// Ruta para mostrar el formulario de cambio de contraseña
+Route::get('/cambiar-contraseña/{email}', [LoginController::class, 'showChangePasswordForm'])->name('change.password');
+Route::get('/cambiar-contraseña-private/{email}', [LoginController::class, 'showChangePasswordFormPrivate'])->name('change.password.private');
+
+// Ruta para actualizar la contraseña
+Route::post('/cambiar-contraseña', [LoginController::class, 'updatePassword'])->name('update.password');
+Route::post('/cambiar-contraseña-usuario', [LoginController::class, 'updatePasswordUser'])->name('update.password.user');
 
 ###########################################################
 # Rutas para el medico
@@ -153,6 +166,8 @@ Route::prefix('admin')->middleware([AuthMiddleware::class . ':admin'])->group(fu
     Route::post('/baja_user', [App\Http\Controllers\AdminController::class, 'baja_user'])->name('admin.baja_user');
     Route::post('/alta_user', [App\Http\Controllers\AdminController::class, 'alta_user'])->name('admin.alta_user');
     Route::post('/set_horarios', [AdminController::class, 'set_horarios'])->name('admin.set_horarios');
+    Route::get('/usuarios', [AdminController::class, 'index'])->name('admin.usuarios.index');
+    Route::get('/pago/{id}/marcar-pagado', [AdminController::class, 'marcarPagado'])->name('admin.pago.marcar-pagado');
 });
 
 ###########################################################

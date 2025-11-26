@@ -66,9 +66,19 @@
                 </div>
 
                 <div class="mt-6 flex justify-end">
+                  @if(session('rol') == 3)
+                    <button 
+                        disabled
+                        class="btn-primary opacity-50 cursor-not-allowed"
+                    >
+                        <i class="fas fa-save mr-2"></i> Solo puedes ver los estudios
+                    </button>
+                @else
                     <button class="btn-primary">
                         <i class="fas fa-save mr-2"></i> Guardar Resultados
                     </button>
+                @endif
+
                 </div>
 
             </form>

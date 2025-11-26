@@ -12,4 +12,10 @@ class etapa extends Model
         'nombre',
     ];
 
+    public function tratamientos()
+{
+    return $this->hasMany(Tratamiento::class, 'etapa_id');
+}
+
+
 }
