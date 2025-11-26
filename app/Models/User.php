@@ -90,4 +90,52 @@ class User extends Authenticatable
     {
         return $this->hasMany(Fertilizacion::class, 'medico_id');
     }
+
+    public function obtenerDniPareja()
+    {
+        \Log::info("Buscando pareja para paciente", [
+            'paciente_id' => $this->id
+        ]);
+
+        $historia = $this->historiasClinicas;
+
+        if (!$historia) {
+            \Log::warning("Paciente NO tiene historia clínica", [
+                'paciente_id' => $this->id
+            ]);
+            return null;
+        }
+
+        \Log::info("Historia clínica encontrada", [
+            'historia_id' => $historia->id
+        ]);
+
+        $tratamiento = $historia->tratamientos()->latest()->first();
+
+        if (!$tratamiento) {
+            \Log::warning("Historia sin tratamientos", [
+                'historia_id' => $historia->id
+            ]);
+            return null;
+        }
+
+        \Log::info("Tratamiento encontrado", [
+            'tratamiento_id' => $tratamiento->id
+        ]);
+
+        $antecedente = $tratamiento->antecedentesPareja;
+
+        if (!$antecedente) {
+            \Log::warning("Tratamiento SIN antecedente pareja", [
+                'tratamiento_id' => $tratamiento->id
+            ]);
+            return null;
+        }
+
+        \Log::info("Antecedente pareja encontrado", [
+            'dni' => $antecedente->dni
+        ]);
+
+        return $antecedente->dni;
+    }
 };

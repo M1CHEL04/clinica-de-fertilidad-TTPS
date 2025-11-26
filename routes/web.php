@@ -194,6 +194,10 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
     Route::post('/puncion/guardar',
         [App\Http\Controllers\OperadorController::class, 'guardarPuncion'])
         ->name('puncion.guardar');
+
+    //Criopreservar de semen
+    Route::post('/criopreservar-semen', [OperadorController::class, 'criopreservarSemen'])
+    ->name('criopreservar.semen.store');
 });
 
 

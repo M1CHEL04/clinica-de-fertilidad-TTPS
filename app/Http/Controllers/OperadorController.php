@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use App\Models\HistorialOvocito;
 use App\Models\TipoEstadoOvocito;
-
 class OperadorController extends Controller
 {
  public function Pacientes()
@@ -418,6 +417,102 @@ public function updateOvocito(Request $request)
     return redirect()->back()->with('success', "Ovocito {$ovocito->identificador} actualizado correctamente.");
 }
 
+
+//CRIOPRESERVACION DE SEMEN
+
+public function criopreservarSemen(Request $request)
+{
+    $request->validate([
+            'paciente_id' => 'required|integer'
+    ]);
+
+    $groupId = 5;
+    // Obtener usuario/paciente
+    $user = \App\Models\User::find($request->paciente_id);
+    $dni = $user->obtenerDniPareja();
+
+    Log::info("Entró al método y encontro el dni correctamente", ['dni' => $dni]);
+
+    $headers = [
+        'token' => 'token-grupo-4'
+    ];
+
+    // 1) Intento inicial
+    $response = Http::withHeaders($headers)
+        ->withoutVerifying()
+        ->post(
+            'https://bmcgxbtbcmlzoetyqajn.supabase.co/functions/v1/congelar-semen',
+            [
+                'group_id' => $groupId,
+                'dni' => $dni
+            ]
+        );
+
+    Log::info("Respuesta inicial congelar semen", [
+        'status' => $response->status(),
+        'body' => $response->body()
+    ]);
+
+    if ($response->successful()) {
+
+        return back()->with('success', 'Semen congelado correctamente.');
+    }
+
+    // 404 o 409 -> no hay rack o no hay lugar
+    if ($response->status() == 404 || $response->status() == 409) {
+
+        Log::warning("No hay tanques / No hay lugar, creando tanque…");
+
+        // Crear tanque
+        $createTank = Http::withHeaders($headers)
+            ->withoutVerifying()
+            ->post(
+                'https://bmcgxbtbcmlzoetyqajn.supabase.co/functions/v1/crear-tanque',
+                [
+                    'group_id' => $groupId
+                ]
+            );
+
+        Log::info("Respuesta creación tanque", [
+            'status' => $createTank->status(),
+            'body' => $createTank->body()
+        ]);
+
+        if ($createTank->failed()) {
+            return back()->with('error', 'No se pudo crear un nuevo tanque.');
+        }
+
+        // Reintentar
+        $retry = Http::withHeaders($headers)
+            ->withoutVerifying()
+            ->post(
+                'https://bmcgxbtbcmlzoetyqajn.supabase.co/functions/v1/congelar-semen',
+                [
+                    'group_id' => $groupId,
+                    'dni' => $dni
+                ]
+            );
+
+        Log::info("Respuesta reintento congelar semen", [
+            'status' => $retry->status(),
+            'body' => $retry->body()
+        ]);
+
+        if ($retry->successful()) {
+            return back()->with('success', 'Se creó un nuevo rack y se congeló el semen correctamente.');
+        }
+
+        return back()->with('error', 'Incluso con el nuevo tanque no se logró almacenar el semen.');
+    }
+
+    // Otros errores
+    Log::error("Error inesperado", [
+        'status' => $response->status(),
+        'body' => $response->body()
+    ]);
+
+    return back()->with('error', 'Error inesperado al congelar semen.');
+}
 
 
 }
