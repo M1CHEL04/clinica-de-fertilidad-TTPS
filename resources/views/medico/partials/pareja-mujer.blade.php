@@ -10,13 +10,13 @@
 </style>
 
 <div class="form-section">
-<h3 class="mb-3">Datos de la pareja</h3>
+<h3 class="mb-3">Datos de la pareja (Mujer)</h3>
 
 {{-- DNI --}}
 <div class="row mb-3">
     <div class="col-md-4">
         <label class="form-label">DNI</label>
-        <input type="number" name="dni" class="form-control" placeholder="Ej: 12345678">
+        <input id="p_dni" type="number" name="p_dni" class="form-control" placeholder="Ej: 12345678">
     </div>
 </div>
 
@@ -25,25 +25,26 @@
 
 <div class="mb-3 position-relative">
     <div class="dropdown w-100">
-        <input id="pareja-antecedente-input"
+        <input id="p_antecedentes_personales_input"
                type="text"
                class="form-control"
                placeholder="Buscar término médico..."
                autocomplete="off">
 
-        <div id="pareja-antecedente-dropdown"
+        <div id="p_antecedentes_personales_dropdown"
              class="dropdown-menu w-100 p-2"
              style="max-height:200px; overflow-y:auto;"></div>
     </div>
 
-    <ul id="pareja-antecedente-list" class="list-group mt-2"></ul>
+    <ul id="p_antecedentes_personales_list" class="list-group mt-2"></ul>
 </div>
 
 {{-- Antecedentes familiares --}}
 <h4 class="mt-4">Antecedentes familiares</h4>
 
-<div class="mb-2" id="pareja-familiares-container"></div>
-<button type="button" id="add-pareja-familiar" class="btn btn-secondary mb-3">
+<div class="mb-2" id="p_familiares_container"></div>
+
+<button type="button" id="p_btn_add_familiar" class="btn btn-secondary mb-3">
     Añadir familiar
 </button>
 
@@ -53,7 +54,7 @@
 <div class="row">
     <div class="col-md-4 mb-3">
         <label class="form-label">Ciclos</label>
-        <select name="pareja_ciclos" class="form-select">
+        <select id="p_ciclo_regular" name="p_ciclo_regular" class="form-select">
             <option value="">Seleccione...</option>
             <option value="regular">Regular</option>
             <option value="irregular">Irregular</option>
@@ -62,34 +63,38 @@
 
     <div class="col-md-4 mb-3">
         <label class="form-label">Duración</label>
-        <input type="number" name="pareja_duracion" class="form-control" placeholder="Ej: 21">
+        <input id="p_duracion" type="number" name="p_duracion" class="form-control" placeholder="Ej: 21">
     </div>
 
     <div class="col-md-4 mb-3">
         <label class="form-label">Características del sangrado</label>
-        <input type="text" name="pareja_caracteristica" class="form-control" placeholder="Ej: abundante, leve">
+        <input id="p_caracteristicas_sangrado"
+               type="text"
+               name="p_caracteristicas_sangrado"
+               class="form-control"
+               placeholder="Ej: abundante, leve">
     </div>
 </div>
 
 <div class="row mt-2">
     <div class="col-md-3 mb-3">
         <label class="form-label">G</label>
-        <input type="number" name="pareja_g" class="form-control" placeholder="Cantidad de embarazos">
+        <input id="p_G" type="number" name="p_g" class="form-control" placeholder="Cantidad de embarazos">
     </div>
 
     <div class="col-md-3 mb-3">
         <label class="form-label">P</label>
-        <input type="number" name="pareja_p" class="form-control" placeholder="Cantidad de partos">
+        <input id="p_P" type="number" name="p_p" class="form-control" placeholder="Cantidad de partos">
     </div>
 
     <div class="col-md-3 mb-3">
         <label class="form-label">AB</label>
-        <input type="number" name="pareja_ab" class="form-control" placeholder="Cantidad de abortos">
+        <input id="p_AB" type="number" name="p_ab" class="form-control" placeholder="Cantidad de abortos">
     </div>
 
     <div class="col-md-3 mb-3">
         <label class="form-label">CT</label>
-        <input type="number" name="pareja_ct" class="form-control" placeholder="Cantidad de embarazos ectopicos">
+        <input id="p_CT" type="number" name="p_ct" class="form-control" placeholder="Cantidad de embarazos ectópicos">
     </div>
 </div>
 
@@ -99,7 +104,7 @@
 <div class="row">
     <div class="col-md-4 mb-3">
         <label class="form-label">Color de ojos</label>
-        <select name="pareja_ojos" class="form-select">
+        <select id="p_color_ojos" name="p_color_ojos" class="form-select">
             <option value="">Seleccione...</option>
             <option value="ambar">Ámbar</option>
             <option value="castaño">Castaño</option>
@@ -112,7 +117,7 @@
 
     <div class="col-md-4 mb-3">
         <label class="form-label">Color de pelo</label>
-        <select name="pareja_pelo" class="form-select">
+        <select id="p_color_pelo" name="p_color_pelo" class="form-select">
             <option value="">Seleccione...</option>
             <option value="negro">Negro</option>
             <option value="castaño">Castaño</option>
@@ -123,7 +128,7 @@
 
     <div class="col-md-4 mb-3">
         <label class="form-label">Tipo de pelo</label>
-        <select name="pareja_tipo_pelo" class="form-select">
+        <select id="p_tipo_pelo" name="p_tipo_pelo" class="form-select">
             <option value="">Seleccione...</option>
             <option value="liso">Liso</option>
             <option value="ondulado">Ondulado</option>
@@ -135,17 +140,17 @@
 <div class="row">
     <div class="col-md-4 mb-3">
         <label class="form-label">Altura (en cm)</label>
-        <input type="number" name="pareja_altura" class="form-control" placeholder="Ej: 178">
+        <input id="p_altura" type="number" name="p_altura" class="form-control" placeholder="Ej: 165">
     </div>
 
     <div class="col-md-4 mb-3">
         <label class="form-label">Complexión</label>
-        <input type="text" name="pareja_complexion" class="form-control" placeholder="Ej: delgada, robusta">
+        <input id="p_complexion_corporal" type="text" name="p_complexion" class="form-control" placeholder="Ej: delgada, robusta">
     </div>
 
     <div class="col-md-4 mb-3">
         <label class="form-label">Rasgos étnicos</label>
-        <input type="text" name="pareja_etnia" class="form-control" placeholder="Ej: asiatico">
+        <input id="p_rasgos_etnicos" type="text" name="p_etnia" class="form-control" placeholder="Ej: asiático">
     </div>
 </div>
 </div>

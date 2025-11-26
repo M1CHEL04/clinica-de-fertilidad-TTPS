@@ -146,9 +146,15 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
 
 
     Route::post('/consulta', [ConsultaController::class, 'store'])->name('consulta.store');
+    Route::post('/consulta/update/{tratamiento}', [ConsultaController::class, 'update'])->name('consulta.update');
+
+
 
     Route::get('/consulta/{paciente_id}', [ConsultaController::class, 'create'])
         ->name('medico.primerConsulta.create');
+
+    Route::get('/verConsulta/{paciente_id}', [ConsultaController::class, 'ver'])
+        ->name('medico.verConsulta');    
 
     Route::post('/estudios', [EstudiosController::class, 'store'])->name('estudios.store');
     Route::get('/estudios/{paciente_id}', [EstudiosController::class, 'estudios'])

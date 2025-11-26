@@ -1,54 +1,56 @@
-
 let currentStep = 1;
 
 function showStep(step) {
-    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-    document.getElementById("step-" + step).classList.add('active');
+    document
+        .querySelectorAll(".step")
+        .forEach((s) => s.classList.remove("active"));
+    document.getElementById("step-" + step).classList.add("active");
 
-    document.querySelectorAll('.nav-step').forEach(n => n.classList.remove('active'));
-    document.querySelector('.nav-step[data-step="'+step+'"]').classList.add('active');
+    document
+        .querySelectorAll(".nav-step")
+        .forEach((n) => n.classList.remove("active"));
+    document
+        .querySelector('.nav-step[data-step="' + step + '"]')
+        .classList.add("active");
 
     currentStep = step;
 }
 
-
 function nextStep() {
-
     // --- VALIDACIÓN DEL PASO 1 ---
     if (currentStep === 1) {
-        const fuma = document.getElementById('fuma');
-        const alcohol = document.getElementById('alcohol');
-        const droga = document.getElementById('droga');
-        const dia = document.getElementById('cant_cigarros');
-        const semana = document.getElementById('dias_fuma');
-        const anio = document.getElementById('anios_fuma');
-        const frecuencia = document.getElementById('frecuencia');
-        const bebida = document.getElementById('bebida-alcohol');
+        const fuma = document.getElementById("fuma");
+        const alcohol = document.getElementById("alcohol");
+        const droga = document.getElementById("droga");
+        const dia = document.getElementById("cant_cigarros");
+        const semana = document.getElementById("dias_fuma");
+        const anio = document.getElementById("anios_fuma");
+        const frecuencia = document.getElementById("frecuencia");
+        const bebida = document.getElementById("bebida-alcohol");
 
         if (!fuma.value) {
             alert("Debe indicar si fuma.");
             return;
-        }else if (fuma.value == "si"){
-            if (!dia.value){
-                alert("Debe indicar la cantidad por dia")
-            }
-            if (!semana.value){
-                alert("Debe indicar la cantidad de dias por semana")
-            }
-            if (!anio.value){
-                alert("Debe indicar la cantidad de años")
-            }
-            
+        } else if (fuma.value == "si") {
+            // if (!dia.value){
+            //     alert("Debe indicar la cantidad por dia")
+            // }
+            // if (!semana.value){
+            //     alert("Debe indicar la cantidad de dias por semana")
+            // }
+            // if (!anio.value){
+            //     alert("Debe indicar la cantidad de años")
+            // }
         }
         if (!alcohol.value) {
             alert("Debe indicar si consume alcohol.");
             return;
-        }else if (alcohol.value == "si"){
-             if (!frecuencia.value){
-                alert("Debe indicar la frecuencia")
+        } else if (alcohol.value == "si") {
+            if (!frecuencia.value) {
+                alert("Debe indicar la frecuencia");
             }
-            if (!bebida.value){
-                alert("Debe indicar el tipo de bebida")
+            if (!bebida.value) {
+                alert("Debe indicar el tipo de bebida");
             }
         }
         if (!droga.value) {
@@ -57,19 +59,17 @@ function nextStep() {
         }
     }
 
-
     // --- VALIDACIÓN DEL PASO 3 ---
     if (currentStep === 3) {
-        const ciclos = document.getElementById('ciclos');
-        const duracion = document.getElementById('duracion');
-        const menarca = document.getElementById('menarca');
-        const caracteristica = document.getElementById('caracteristica');
-        const examen_fisico = document.getElementById('examen_fisico');
-        const embarazos = document.getElementById('embarazos');
-        const partos = document.getElementById('partos');
-        const abortos = document.getElementById('abortos');
-        const ectopicos = document.getElementById('ectopicos');
-                
+        const ciclos = document.getElementById("ciclos");
+        const duracion = document.getElementById("duracion");
+        const menarca = document.getElementById("menarca");
+        const caracteristica = document.getElementById("caracteristica");
+        const examen_fisico = document.getElementById("examen_fisico");
+        const embarazos = document.getElementById("embarazos");
+        const partos = document.getElementById("partos");
+        const abortos = document.getElementById("abortos");
+        const ectopicos = document.getElementById("ectopicos");
 
         if (!ciclos.value) {
             alert("Debe indicar si el ciclo es regular.");
@@ -108,19 +108,17 @@ function nextStep() {
             return;
         }
     }
-     if (currentStep === 5) {
-        const objetivo = document.getElementById('objetivo');
+    if (currentStep === 5) {
+        const objetivo = document.getElementById("objetivo");
 
-        
         if (!objetivo.value) {
             alert("Debe seleccionar un objetivo.");
             return;
         }
-     }
+    }
     if (currentStep < 5) showStep(currentStep + 1);
 }
 
 function prevStep() {
     if (currentStep > 1) showStep(currentStep - 1);
 }
-
