@@ -20,18 +20,21 @@ return new class extends Migration
         Schema::create('embriones', function (Blueprint $table) {
             $table->id();
             $table->string('identificador')->unique();
-            $table->foreignIdFor(Guardado::class);
+            $table->boolean('criopreservado')->default(false);
             $table->foreignIdFor(Fertilizacion::class);
             $table->foreignIdFor(Ovocito::class);
             $table->enum('calidad_morfologica', [1, 2, 3, 4, 5]);
             $table->string('motivo_descarte')->nullable();
             $table->boolean('transferir')->nullable();
+            $table->boolean('utilizado')->default(false);
 
             $table->string('semen_dni')->nullable();
             $table->unsignedBigInteger('gameto_id')->nullable();
+            $table->float('compatibilidad_gameto')->nullable();
 
             //hay que ver como se guarda el PGT
-            $table->string('urlPGT')->nullable();
+            $table->boolean('realizo_PGT');
+            $table->boolean('pgt_positivo')->nullable();
             $table->timestamps();
         });
     }

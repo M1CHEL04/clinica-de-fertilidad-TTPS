@@ -13,13 +13,19 @@ class Embrion extends Model
 
     protected $fillable = [
         'identificador',
-        'guardado_id',
+        'criopreservado',
+        'utilizado',
         'estado_embrion_id',
         'fertilizacion_id',
         'ovocito_id',
         'calidad_morfologica',
+        'realizo_PGT',
+        'pgt_positivo',
         'semen_dni',
+        'transferir',
+        'motivo_descarte',
         'gameto_id',
+        'compatibilidad_gameto',
         'urlPGT'
     ];
 

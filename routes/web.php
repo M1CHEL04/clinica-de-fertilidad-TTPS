@@ -268,6 +268,8 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
     //Criopreservar de semen
     Route::post('/criopreservar-semen', [OperadorController::class, 'criopreservarSemen'])
         ->name('criopreservar.semen.store');
+
+    Route::post('/embrion/update', [OperadorController::class, 'updateEmbrion'])->name('embrion.update');
 });
 
 

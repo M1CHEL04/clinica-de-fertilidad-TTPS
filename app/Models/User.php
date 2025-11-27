@@ -9,6 +9,7 @@ use App\Models\RolTrabajador;
 use App\Models\HistoriaClinica;
 use App\Models\Ovocito;
 use App\Models\Puncion;
+use Illuminate\Support\Facades\Log;
 
 class User extends Authenticatable
 {
@@ -69,7 +70,7 @@ class User extends Authenticatable
         return $this->hasOne(HistoriaClinica::class, 'paciente_id');
     }
 
-    
+
 
     public function ovocitos()
     {
@@ -93,46 +94,46 @@ class User extends Authenticatable
 
     public function obtenerDniPareja()
     {
-        \Log::info("Buscando pareja para paciente", [
+        Log::info("Buscando pareja para paciente", [
             'paciente_id' => $this->id
         ]);
 
         $historia = $this->historiasClinicas;
 
         if (!$historia) {
-            \Log::warning("Paciente NO tiene historia clínica", [
+            Log::warning("Paciente NO tiene historia clínica", [
                 'paciente_id' => $this->id
             ]);
             return null;
         }
 
-        \Log::info("Historia clínica encontrada", [
+        Log::info("Historia clínica encontrada", [
             'historia_id' => $historia->id
         ]);
 
         $tratamiento = $historia->tratamientos()->latest()->first();
 
         if (!$tratamiento) {
-            \Log::warning("Historia sin tratamientos", [
+            Log::warning("Historia sin tratamientos", [
                 'historia_id' => $historia->id
             ]);
             return null;
         }
 
-        \Log::info("Tratamiento encontrado", [
+        Log::info("Tratamiento encontrado", [
             'tratamiento_id' => $tratamiento->id
         ]);
 
         $antecedente = $tratamiento->antecedentesPareja;
 
         if (!$antecedente) {
-            \Log::warning("Tratamiento SIN antecedente pareja", [
+            Log::warning("Tratamiento SIN antecedente pareja", [
                 'tratamiento_id' => $tratamiento->id
             ]);
             return null;
         }
 
-        \Log::info("Antecedente pareja encontrado", [
+        Log::info("Antecedente pareja encontrado", [
             'dni' => $antecedente->dni
         ]);
 

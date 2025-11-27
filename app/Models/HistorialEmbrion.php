@@ -10,10 +10,15 @@ class HistorialEmbrion extends Model
 
     protected $fillable = [
         'embrion_id',
-        'estado_anterior',
-        'estado_nuevo',
-        'fecha_cambio',
-        'observaciones'
+        'operador_id',
+        'accion',
+        'motivo_descarte_anterior',
+        'motivo_descarte_nuevo',
+        'transeferir_anterior',
+        'transeferir_nuevo',
+        'descripcion',
+        'guardado_id_anterior',
+        'guardado_id_nuevo',
     ];
 
     public function embrion()

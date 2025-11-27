@@ -20,7 +20,6 @@
     @csrf
     <input type="hidden" name="paciente_id" value="{{ $paciente->id }}">
     <input type="hidden" name="tratamiento_id" value="{{ $tratamiento_id }}">
-    <input type="hidden" name="tratamiento_id" value="{{ $tratamiento_id }}">
 
     <!-- DATOS DE LA FERTILIZACIÓN -->
     <div class="card p-6">
@@ -207,7 +206,16 @@ function toggleOvocito(ovocitoId, identificador, calidad) {
     const checkbox = document.getElementById(`ovocito_${ovocitoId}`);
     
     if (checkbox.checked) {
-        // Agregar ovocito seleccionado
+        // Si hay un ovocito ya seleccionado, deseleccionarlo primero
+        if (ovocitosSeleccionados.length > 0) {
+            const ovocitoAnterior = ovocitosSeleccionados[0];
+            const checkboxAnterior = document.getElementById(`ovocito_${ovocitoAnterior.id}`);
+            checkboxAnterior.checked = false;
+            removerEmbrion(ovocitoAnterior.id);
+            ovocitosSeleccionados = [];
+        }
+        
+        // Agregar el nuevo ovocito seleccionado
         ovocitosSeleccionados.push({
             id: ovocitoId,
             identificador: identificador,
@@ -261,6 +269,40 @@ function crearEmbrion(ovocitoId, identificador, calidad) {
                         <option value="4">4 - Buena</option>
                         <option value="5">5 - Excelente</option>
                     </select>
+                </div>
+
+                <!-- PGT -->
+                <div>
+                    <label class="form-label">¿Realizó PGT? *</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center p-2 bg-gray-50 rounded border cursor-pointer hover:bg-gray-100">
+                            <input type="radio" name="embriones[${ovocitoId}][realizo_pgt]" value="si" 
+                                   class="mr-3 pgt-radio" data-ovocito="${ovocitoId}">
+                            <span class="text-sm text-gray-700">Sí</span>
+                        </label>
+                        <label class="flex items-center p-2 bg-gray-50 rounded border cursor-pointer hover:bg-gray-100">
+                            <input type="radio" name="embriones[${ovocitoId}][realizo_pgt]" value="no" 
+                                   class="mr-3 pgt-radio" data-ovocito="${ovocitoId}">
+                            <span class="text-sm text-gray-700">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Resultados PGT (condicional) -->
+                <div id="resultados_pgt_${ovocitoId}" class="hidden">
+                    <label class="form-label">Resultado PGT *</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center p-2 bg-gray-50 rounded border cursor-pointer hover:bg-gray-100">
+                            <input type="radio" name="embriones[${ovocitoId}][resultado_pgt]" value="positivo" 
+                                   class="mr-3" required>
+                            <span class="text-sm text-green-700 font-medium">Positivo</span>
+                        </label>
+                        <label class="flex items-center p-2 bg-gray-50 rounded border cursor-pointer hover:bg-gray-100">
+                            <input type="radio" name="embriones[${ovocitoId}][resultado_pgt]" value="negativo" 
+                                   class="mr-3" required>
+                            <span class="text-sm text-red-700 font-medium">Negativo</span>
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Fuente de gametos -->
@@ -336,6 +378,14 @@ function agregarEventListenersEmbrion(ovocitoId) {
             manejarCambioAccion(ovocitoId, this.value);
         });
     }
+    
+    // Event listeners para radio buttons de PGT
+    const radioButtonsPGT = document.querySelectorAll(`input[name="embriones[${ovocitoId}][realizo_pgt]"]`);
+    radioButtonsPGT.forEach(radio => {
+        radio.addEventListener('change', function() {
+            manejarCambioPGT(ovocitoId, this.value);
+        });
+    });
 }
 
 /* -------------------------
@@ -377,6 +427,29 @@ function manejarCambioAccion(ovocitoId, accion) {
 }
 
 /* -------------------------
+   MANEJAR CAMBIO PGT
+------------------------- */
+function manejarCambioPGT(ovocitoId, realizoPgt) {
+    const resultadosPgtDiv = document.getElementById(`resultados_pgt_${ovocitoId}`);
+    const resultadoPgtRadios = document.querySelectorAll(`input[name="embriones[${ovocitoId}][resultado_pgt]"]`);
+    
+    if (realizoPgt === 'si') {
+        resultadosPgtDiv.classList.remove('hidden');
+        // Hacer requerido el campo de resultado cuando se muestra
+        resultadoPgtRadios.forEach(radio => {
+            radio.required = true;
+        });
+    } else {
+        resultadosPgtDiv.classList.add('hidden');
+        // Limpiar la selección y remover requerimiento cuando se oculta
+        resultadoPgtRadios.forEach(radio => {
+            radio.checked = false;
+            radio.required = false;
+        });
+    }
+}
+
+/* -------------------------
    REMOVER EMBRIÓN
 ------------------------- */
 function removerEmbrion(ovocitoId) {
@@ -401,11 +474,11 @@ function actualizarEstadoProceso() {
     const btnGuardar = document.getElementById('btnGuardar');
     
     if (ovocitosSeleccionados.length === 0) {
-        estadoProceso.textContent = 'Seleccione ovocitos para fertilizar';
+        estadoProceso.textContent = 'Seleccione un ovocito para fertilizar';
         btnGuardar.disabled = true;
         btnGuardar.className = 'btn-secondary';
     } else {
-        estadoProceso.textContent = `${ovocitosSeleccionados.length} ovocitos seleccionados para fertilización`;
+        estadoProceso.textContent = `1 ovocito seleccionado para fertilización`;
         btnGuardar.disabled = false;
         btnGuardar.className = 'btn-primary';
     }
@@ -417,40 +490,39 @@ function actualizarEstadoProceso() {
 document.getElementById('formFertilizacion').addEventListener('submit', function(e) {
     if (ovocitosSeleccionados.length === 0) {
         e.preventDefault();
-        alert('Debe seleccionar al menos un ovocito para fertilizar');
+        alert('Debe seleccionar un ovocito para fertilizar');
         return;
     }
     
-    // Validar que todos los embriones tengan los campos obligatorios
+    // Validar que el embrión tenga todos los campos obligatorios
     const errores = [];
+    const ovo = ovocitosSeleccionados[0]; // Solo un ovocito
     
-    ovocitosSeleccionados.forEach(ovo => {
-        // Validar calidad morfológica
-        const calidad = document.querySelector(`select[name="embriones[${ovo.id}][calidad_morfologica]"]`);
-        if (!calidad || !calidad.value) {
-            errores.push(`${ovo.identificador}: Falta calidad morfológica`);
+    // Validar calidad morfológica
+    const calidad = document.querySelector(`select[name="embriones[${ovo.id}][calidad_morfologica]"]`);
+    if (!calidad || !calidad.value) {
+        errores.push(`${ovo.identificador}: Falta calidad morfológica`);
+    }
+    
+    // Validar fuente de semen
+    const fuenteSemen = document.querySelector(`input[name="embriones[${ovo.id}][fuente_semen]"]:checked`);
+    if (!fuenteSemen) {
+        errores.push(`${ovo.identificador}: Debe seleccionar fuente de semen`);
+    }
+    
+    // Validar acción
+    const accion = document.querySelector(`select[name="embriones[${ovo.id}][accion]"]`);
+    if (!accion || !accion.value) {
+        errores.push(`${ovo.identificador}: Debe seleccionar una acción`);
+    }
+    
+    // Validar motivo de descarte si la acción es descartar
+    if (accion && accion.value === 'descartar') {
+        const motivoDescarte = document.querySelector(`textarea[name="embriones[${ovo.id}][motivo_descarte]"]`);
+        if (!motivoDescarte || !motivoDescarte.value.trim()) {
+            errores.push(`${ovo.identificador}: Debe especificar motivo de descarte`);
         }
-        
-        // Validar fuente de semen
-        const fuenteSemen = document.querySelector(`input[name="embriones[${ovo.id}][fuente_semen]"]:checked`);
-        if (!fuenteSemen) {
-            errores.push(`${ovo.identificador}: Debe seleccionar fuente de semen`);
-        }
-        
-        // Validar acción
-        const accion = document.querySelector(`select[name="embriones[${ovo.id}][accion]"]`);
-        if (!accion || !accion.value) {
-            errores.push(`${ovo.identificador}: Debe seleccionar una acción`);
-        }
-        
-        // Validar motivo de descarte si la acción es descartar
-        if (accion && accion.value === 'descartar') {
-            const motivoDescarte = document.querySelector(`textarea[name="embriones[${ovo.id}][motivo_descarte]"]`);
-            if (!motivoDescarte || !motivoDescarte.value.trim()) {
-                errores.push(`${ovo.identificador}: Debe especificar motivo de descarte`);
-            }
-        }
-    });
+    }
     
     if (errores.length > 0) {
         e.preventDefault();

@@ -181,6 +181,7 @@
                                    title="Fertilización">
                                     <i class="fas fa-seedling"></i>
                                 </a>
+                                @endif
                                 <!-- CRIOPRESERVAR SEMEN (PAREJA) -->
                                 @php
                                     $user = \App\Models\User::find($paciente->paciente_id); //polemico esto

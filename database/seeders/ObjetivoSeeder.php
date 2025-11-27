@@ -14,9 +14,9 @@ class ObjetivoSeeder extends Seeder
     public function run(): void
     {
         Objetivo::insert([
-            ['nombre' => 'Embarazo con gametos propios pareja hombre'],
-            ['nombre' => 'Embarazo con esperma donado pareja hombre'],
-            ['nombre' => 'Metodo ROPA pareja mujer'],
+            ['nombre' => 'Embarazo con gametos propios (Pareja masculina)'],
+            ['nombre' => 'Embarazo con esperma donado (Pareja masculina)'],
+            ['nombre' => 'Metodo ROPA'],
             ['nombre' => 'Conservar ovocitos'],
             ['nombre' => 'Embarazo sin pareja'],
         ]);
