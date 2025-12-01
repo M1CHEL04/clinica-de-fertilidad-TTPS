@@ -69,6 +69,28 @@
         </div>
     </div>
 
+    <!-- Sección Donación de Gametos -->
+    <div class="card p-6 mb-6">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+
+            <div>
+                <h2 class="text-xl font-bold text-gray-900">Donación de Gametos</h2>
+                <p class="text-gray-600 mt-1">
+                    Registro de donaciones de gametos.
+                </p>
+            </div>
+
+            <div>
+                <a href="{{ route('donacion.nueva') }}"
+                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow hover:bg-blue-700 transition">
+                    <i class="fas fa-vial mr-2"></i>
+                    Donar gametos
+                </a>
+            </div>
+
+        </div>
+    </div>
+
     <!-- Filtros y Búsqueda -->
     <div class="card p-6 mb-6">
         <div class="flex flex-col md:flex-row gap-4">
