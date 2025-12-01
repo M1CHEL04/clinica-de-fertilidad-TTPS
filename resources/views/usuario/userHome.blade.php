@@ -103,40 +103,49 @@
         </div>
     </div>
 
-    @if(auth()->check())
-        <button id="openChatbotBtn" class="fixed bottom-6 right-6 z-50 p-4 bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 transition-all focus:outline-none" title="Abrir Chatbot">
-        <i class="fas fa-robot text-white text-2xl"></i>
-        </button>
+@if(auth()->check())
+<button id="openChatbotBtn"
+    class="fixed bottom-6 right-6 z-50 p-4 bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 transition-all focus:outline-none"
+    title="Abrir Chatbot">
+    <i class="fas fa-robot text-white text-2xl"></i>
+</button>
 
-        <div id="chatbotModal" class="hidden fixed bottom-[80px] right-6 w-full max-w-sm h-[80vh] max-h-[500px] bg-white rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden border border-gray-200">
-            
-            <div class="p-4 bg-blue-600 text-white flex justify-between items-center shadow-md">
-                <h5 class="text-lg font-semibold"><i class="fas fa-heartbeat mr-2"></i> Asistente de Fertilia</h5>
-                <button id="closeChatbotBtn" class="text-white hover:text-gray-200 focus:outline-none">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+<div id="chatbotModal"
+    class="hidden fixed bottom-0 right-0 w-full md:bottom-[80px] md:right-6 md:max-w-sm h-[85vh] md:h-[500px]
+           bg-white rounded-t-2xl md:rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden border border-gray-200">
+
+    <!-- Header -->
+    <div class="p-4 bg-blue-600 text-white flex justify-between items-center shadow-md">
+        <h5 class="text-lg font-semibold flex items-center gap-2">
+            <i class="fas fa-heartbeat"></i> Asistente de Fertilia
+        </h5>
+        <button id="closeChatbotBtn" class="text-white hover:text-gray-200 focus:outline-none">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Chat scroll -->
+    <div id="chatHistory" class="flex-grow p-4 overflow-y-auto space-y-4 bg-gray-50">
+        <div class="flex justify-center mb-4">
+            <div class="text-center text-sm text-gray-500 p-2 rounded-lg bg-gray-100">
+                ¡Hola! Soy tu asistente de Fertilia. ¿En qué puedo ayudarte hoy?
             </div>
-            
-            <div id="chatHistory" class="flex-grow p-4 overflow-y-auto space-y-4">
-                <div class="flex justify-center mb-4">
-                    <div class="text-center text-sm text-gray-400 p-2 rounded-lg bg-gray-100">
-                        ¡Hola! Soy tu asistente de fertilia. ¿En qué puedo ayudarte hoy?
-                    </div>
-                </div>
-            </div>
-            
-            <form id="chatForm" class="p-4 border-t border-gray-200 bg-gray-50">
-                <div class="flex">
-                    <input type="text" id="userInput" placeholder="Escribe tu mensaje..." required 
-                        class="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <button type="submit" id="sendBtn" 
-                            class="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">
-                        <i class="fas fa-paper-plane" style="font-size: 15px;"></i>
-                    </button>
-                </div>
-            </form>
         </div>
-    @endif
+    </div>
+
+    <!-- Input -->
+    <form id="chatForm" class="p-4 border-t border-gray-200 bg-white">
+        <div class="flex">
+            <input type="text" id="userInput" placeholder="Escribe tu mensaje..."
+                class="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="submit" id="sendBtn"
+                class="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">
+                <i class="fas fa-paper-plane text-sm"></i>
+            </button>
+        </div>
+    </form>
+</div>
+@endif
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
