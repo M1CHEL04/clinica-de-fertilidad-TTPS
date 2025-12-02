@@ -15,6 +15,7 @@ use App\Http\Controllers\OperadorController;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ConsultaController;
+use App\Http\Controllers\GametosController;
 
 // Importaciones para los modelos de fenotipo
 use App\Models\ColorOjo;
@@ -270,6 +271,11 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
         ->name('criopreservar.semen.store');
 
     Route::post('/embrion/update', [OperadorController::class, 'updateEmbrion'])->name('embrion.update');
+
+    //Donacion de gametos
+    Route::get('/donacion-gametos/nueva', [GametosController::class, 'nuevaDonacion'])->name('donacion.nueva');
+    Route::post('/donacion-gametos/registrar', [GametosController::class, 'registrar'])
+    ->name('donacion.registrar');
 });
 
 
