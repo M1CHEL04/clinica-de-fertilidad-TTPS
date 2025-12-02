@@ -7,11 +7,19 @@
         <h1 class="page-title">Detalle del Tratamiento</h1>
         <p class="page-subtitle">Información detallada del paciente y su tratamiento actual</p>
     </div>
+    @if (session('rol') == 3 )
     <div>
-        <a href="{{ url()->previous() }}" class="btn-secondary">
+        <a href="/operador/home" class="btn-secondary">
             <i class="fas fa-arrow-left mr-2"></i> Volver a Pacientes
         </a>
     </div>
+    @else
+    <div>
+        <a href="/medico/home" class="btn-secondary">
+            <i class="fas fa-arrow-left mr-2"></i> Volver a Pacientes
+        </a>
+    </div>
+    @endif
 </div>
 @endsection
 
@@ -218,18 +226,7 @@
         @endif
     </div>
     
-
-    <!-- 🧰 Panel lateral -->
-    @if ($tratamiento->estado_tratamiento == 'Activo') 
-    <div class="space-y-4">
-        <div class="card p-6">
-            <h3 class="text-lg font-semibold mb-4 text-gray-900 flex items-center">
-                <i class="fas fa-tasks text-indigo-600 mr-2"></i> Acciones del Tratamiento
-            </h3>
-            
-            <div class="space-y-3">
-
-    {{-- Normalizar el nombre de etapa para comparación --}}
+     {{-- Normalizar el nombre de etapa para comparación --}}
     @php
         $etapa = trim(strtolower($tratamiento->etapa));
     @endphp
@@ -276,6 +273,89 @@
             'finalizado'
         ]);
     @endphp
+    <!-- 🧰 Panel lateral -->
+    @if ($tratamiento->estado_tratamiento == 'Activo') 
+    <div class="space-y-4">
+        <div class="card p-6">
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 flex items-center">
+                <i class="fas fa-tasks text-indigo-600 mr-2"></i> Acciones del Tratamiento
+            </h3>
+            
+    
+    @if (session('rol') == 3)
+        {{-- 6️⃣ Cargar objetivo (desde etapa 1) --}}
+
+    <div class="space-y-3">    
+    
+     <a href="{{ route('operador.verConsulta', $tratamiento->paciente_id) }}" class="btn-primary w-full flex items-center justify-center gap-2"
+            {{ !$etapa1 ? 'disabled' : '' }}>
+        <i class="fas fa-bullseye"></i> Seccion de primera consulta
+    </a>
+
+    {{-- 1️⃣ Recetar estudios (desde etapa 1) --}}
+    @if ($etapa1)
+    <a href="{{ route('operador.estudios.index', $tratamiento->paciente_id) }}"
+   class="btn-primary w-full flex items-center justify-center gap-2">
+    <i class="fas fa-vials"></i> Recetar estudios
+</a>
+
+@else
+    <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+        <i class="fas fa-vials"></i> Recetar estudios
+    </a>
+@endif
+
+
+   
+     @if ($etapa2)
+        <a href="{{ route('operador.tratamiento.cargar-estudios', $tratamiento->id) }}"
+           class="btn-primary w-full flex items-center justify-center gap-2">
+            <i class="fas fa-file-upload"></i> Sección Estudios
+        </a>
+    @else
+        <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+            <i class="fas fa-file-upload"></i> Sección Estudios
+        </a>
+    @endif
+    
+
+   
+    {{--  Protocolo de Estimulación (desde etapa 2) --}}
+    
+        <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+            <i class="fas fa-dna"></i> Protocolo de Estimulación
+        </a>
+    
+
+     {{-- 4️⃣ Monitoreos (desde etapa 3) --}}
+    @if ($etapa3)
+        <a href="{{ route('operador.monitoreos', $tratamiento->id) }}"
+           class="btn-primary w-full flex items-center justify-center gap-2">
+            <i class="fas fa-heartbeat"></i> Sección de Monitoreos
+        </a>
+    @else
+        <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+            <i class="fas fa-heartbeat"></i> Sección de Monitoreos
+        </a>
+    @endif
+
+   
+    @if ($etapa4)
+        <a href="{{ route('operador.tratamiento.post', $tratamiento->id) }}"
+        class="btn-primary w-full flex items-center justify-center gap-2">
+            <i class="fas fa-leaf"></i> Post-transferencia
+        </a>
+    @else
+        <button class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+        <i class="fas fa-seedling"></i> Post-transferencia
+        </button>
+    </div>    
+    @endif
+    @else
+    
+    <div class="space-y-3">
+
+   
 
 
     {{-- 6️⃣ Cargar objetivo (desde etapa 1) --}}
@@ -359,6 +439,7 @@
     
 
 </div>
+@endif
 
 
         <div class="card p-4 bg-blue-50 border border-blue-200">

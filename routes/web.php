@@ -240,7 +240,78 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
         ->name('operador.tratamiento.detalle');
     Route::get('paciente/{id}/puncion', [App\Http\Controllers\OperadorController::class, 'puncion'])
         ->name('tratamiento.puncion');
+    Route::get('/estudios/{paciente_id}', [EstudiosController::class, 'estudios'])
+        ->name('operador.estudios.index');
+    
+    Route::get('/consulta/partials/hombre-gametos', function () {
+        $coloresPelo = ColorPelo::all();
+        $coloresOjos = ColorOjo::all();
+        $tipoPelo = TipoPelo::all();
+        $complexiones = Complexion::all();
+        $rasgos = RasgoEtnico::all();
+
+        return view('medico.partials.pareja-hombre', compact(
+            'coloresPelo',
+            'coloresOjos',
+            'tipoPelo',
+            'complexiones',
+            'rasgos'
+        ));
+    });
+
+    Route::get('/consulta/partials/hombre-donado', function () {
+        $coloresPelo = ColorPelo::all();
+        $coloresOjos = ColorOjo::all();
+        $tipoPelo = TipoPelo::all();
+        $complexiones = Complexion::all();
+        $rasgos = RasgoEtnico::all();
+
+        return view('medico.partials.semen-donado', compact(
+            'coloresPelo',
+            'coloresOjos',
+            'tipoPelo',
+            'complexiones',
+            'rasgos'
+        ));
+    });
+
+    Route::get('/consulta/partials/pareja-mujer', function () {
+        $coloresPelo = ColorPelo::all();
+        $coloresOjos = ColorOjo::all();
+        $tipoPelo = TipoPelo::all();
+        $complexiones = Complexion::all();
+        $rasgos = RasgoEtnico::all();
+
+        return view('medico.partials.pareja-mujer', compact(
+            'coloresPelo',
+            'coloresOjos',
+            'tipoPelo',
+            'complexiones',
+            'rasgos'
+        ));
+    });    
+
+     Route::get('/consulta/{paciente_id}', [ConsultaController::class, 'create'])
+        ->name('operador.primerConsulta.create');
+
+    Route::get('/verConsulta/{paciente_id}', [ConsultaController::class, 'ver'])
+        ->name('operador.verConsulta');
+
+    Route::get('/tratamiento/{id}/protocolo', [MedicoController::class, 'protocolo'])
+        ->name('operador.tratamiento.protocolo');    
+
+    Route::get('/tratamiento/{id}/cargar-estudios', [MedicoController::class, 'cargarEstudios'])
+        ->name('operador.tratamiento.cargar-estudios');    
+
+    Route::get(
+        '/tratamiento/{id}/post-transferencia',
+        [MedicoController::class, 'postTransferenciaForm']
+    )->name('operador.tratamiento.post');    
+    Route::get('/tratamientos/{id}/monitoreos', [MedicoController::class, 'monitoreos'])
+        ->name('operador.monitoreos');
     // 1. Formulario general de punción
+
+    
     Route::get(
         '/puncion/{paciente_id}',
         [App\Http\Controllers\OperadorController::class, 'formPuncion']

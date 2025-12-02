@@ -8,11 +8,19 @@
         <h1 class="page-title">Post Transferencia</h1>
         <p class="page-subtitle">Resultados posteriores a la transferencia embrionaria</p>
     </div>
+    @if(session('rol') == 3)
+    <div>
+        <a href="{{ route('operador.tratamiento.detalle', $tratamiento->id) }}" class="btn-secondary">
+            <i class="fas fa-arrow-left mr-2"></i> Volver al tratamiento
+        </a>
+    </div>
+    @else
     <div>
         <a href="{{ route('medico.tratamiento.detalle', $tratamiento->id) }}" class="btn-secondary">
             <i class="fas fa-arrow-left mr-2"></i> Volver al tratamiento
         </a>
     </div>
+    @endif
 </div>
 @endsection
 

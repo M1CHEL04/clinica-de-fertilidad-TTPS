@@ -7,11 +7,19 @@
         <h1 class="page-title">Monitoreos del Tratamiento</h1>
         <p class="page-subtitle">Control y seguimiento del tratamiento actual</p>
     </div>
+    @if(session('rol') == 3)
+    <div>
+        <a href="{{ route('operador.tratamiento.detalle', $tratamiento->id) }}" class="btn-secondary">
+            <i class="fas fa-arrow-left mr-2"></i> Volver al Detalle
+        </a>
+    </div>
+    @else
     <div>
         <a href="{{ route('medico.tratamiento.detalle', $tratamiento->id) }}" class="btn-secondary">
             <i class="fas fa-arrow-left mr-2"></i> Volver al Detalle
         </a>
     </div>
+    @endif
 </div>
 @endsection
 

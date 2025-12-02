@@ -44,7 +44,7 @@
     align-items: center;
     padding: 40px;
     ">
-
+        
         <div class="card shadow p-4" style="max-width: 900px; width: 100%;">
 
 
@@ -414,7 +414,11 @@
                     <div id="antecedentePareja"></div>
 
                     <button type="button" onclick="prevStep()" class="btn btn-secondary">← Atrás</button>
+                    @if (session('rol') == 3)
+                     <button type="submit" class="btn btn-primary float-end" disabled  style="opacity: 0.4; cursor: not-allowed;">Solo puedes ver los datos, no editar</button>
+                    @else
                     <button type="submit" class="btn btn-primary float-end">Guardar consulta</button>
+                    @endif
                 </div>
 
             </form>
@@ -428,6 +432,7 @@
 @section('scripts')
     <script>
         window.tratamiento = {!! json_encode($tratamiento ?? null) !!};
+        window.rol ={!! json_encode( session('rol') ?? null) !!}
     </script>
 
     <script src="{{ asset('js/terminos.js') }}"></script>
