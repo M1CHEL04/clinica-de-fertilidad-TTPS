@@ -125,14 +125,31 @@
     
 @php
     $deshabilitado = $tratamiento->etapa !== "Monitoreos";
+    $habilitado = $tratamiento->etapa == "Transferencia";
 @endphp
 
-<button 
-    class="btn-primary {{ $deshabilitado ? 'btn-disabled' : '' }}"
-    @if($deshabilitado) disabled @else onclick="abrirModal()" @endif
->
-    <i class="fas fa-plus mr-2"></i> Agendar nueva consulta
-</button>
+<div style="display:flex; gap:10px;">
+    <button 
+        class="btn-primary {{ $deshabilitado ? 'btn-disabled' : '' }}"
+        @if($deshabilitado) disabled @else onclick="abrirModal()" @endif
+    >
+        <i class="fas fa-plus mr-2"></i> Agendar nueva consulta
+    </button>
+
+    <form method="POST" action="{{ route('tratamiento.notificar-transferencia', $tratamiento->id) }}">
+        @csrf
+        <button 
+            type="submit"
+            class="btn btn-primary {{ $habilitado ? '' : 'btn-disabled' }}"
+            {{ $habilitado ? '' : 'disabled' }}
+        >
+            <i class="fas fa-plus mr-2"></i>
+            Notificar etapa de transferencia al paciente
+        </button>
+    </form>
+</div>
+
+
 
 <div id="modal-agendar" class="modal-overlay" style="display:none;">
     <div class="modal-content">
@@ -379,14 +396,6 @@
 @endif
 
 
-   
-
-    <!-- {{-- 3️⃣ Cargar antecedentes (desde etapa 1) --}}
-    <button class="btn-primary w-full flex items-center justify-center gap-2 {{ !$etapa1 ? 'opacity-50 cursor-not-allowed' : '' }}"
-            {{ !$etapa1 ? 'disabled' : '' }}>
-        <i class="fas fa-user-md"></i> Cargar antecedentes
-    </button>
-     -->
      @if ($etapa2)
         <a href="{{ route('tratamiento.cargar-estudios', $tratamiento->id) }}"
            class="btn-primary w-full flex items-center justify-center gap-2">

@@ -347,6 +347,29 @@ class MedicoController extends Controller
         return redirect()->back()->with('success', 'Consulta agendada correctamente.');
     }
 
+     public function notificarTransferencia(Request $request, $id)
+    {
+       
+        $trat = Tratamiento::findOrFail($id);
+        $user = $trat->historiaClinica->paciente;
+        $nombre = session('nombre');
+        $apellido = session('apellido');
+        $mailController = new MailController();
+
+        $mailController->enviarMail(
+            [$user->mail],
+            'Estado actual del tratamiento',
+            'mails.notificarTransferencia',
+            [
+                'nombre' => $nombre,
+                'apellido' => $apellido
+            ]
+        );
+
+
+        return redirect()->back()->with('success', 'Aviso enviado correctamente.');
+    }
+
 
 
     //POST TRANSFERENCIA
