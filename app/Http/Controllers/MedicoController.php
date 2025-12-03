@@ -207,6 +207,23 @@ class MedicoController extends Controller
         return back()->with('success', 'Consentimiento informado cargado.');
     }
 
+    public function descargarConsentimiento($id)
+    {
+        $tratamiento = Tratamiento::findOrFail($id);
+
+        if (!$tratamiento->consentimiento_pdf) {
+            abort(404, 'No hay archivo cargado');
+        }
+
+        $path = storage_path('app/public/' . $tratamiento->consentimiento_pdf);
+
+        if (!file_exists($path)) {
+            abort(404, 'Archivo no encontrado');
+        }
+
+        return response()->download($path);
+    }
+
     public function monitoreos($id)
     {
         $tratamiento = Tratamiento::findOrFail($id);

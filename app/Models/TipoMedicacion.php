@@ -9,6 +9,8 @@ class TipoMedicacion extends Model
 {
     protected $table = 'tipos_medicacion';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'nombre',
     ];

@@ -80,16 +80,16 @@
         @if($tratamiento->consentimiento_pdf)
             <div class="bg-green-100 p-4 rounded-md mb-4">
                 <p class="font-semibold">PDF cargado correctamente.</p>
-                <a href="{{ asset('storage/'.$tratamiento->consentimiento_pdf) }}"
-                   target="_blank"
-                   class="text-blue-600 underline">
-                    Ver PDF
+                <a href="{{ route('tratamiento.descargar-consentimiento', $tratamiento->id) }}"
+                class="text-blue-600 underline hover:text-blue-800">
+                    Descargar consentimiento
                 </a>
             </div>
         @else
             <p class="mb-4 text-gray-600">Aún no se ha cargado el consentimiento.</p>
         @endif
 
+        @if($tratamiento->consentimiento_pdf == null)
         <form action="{{ route('tratamiento.subir-consentimiento', $tratamiento->id) }}"
               method="POST"
               enctype="multipart/form-data"
@@ -107,6 +107,7 @@
                 Subir consentimiento
             </button>
         </form>
+        @endif
     </div>
 
 
