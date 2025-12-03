@@ -19,6 +19,7 @@ class EtapaSeeder extends Seeder
             ['nombre' => 'Segunda consulta'],
             ['nombre' => 'Monitoreos'],
             ['nombre' => 'Puncion'],
+            ['nombre'=> 'Fertilizacion'],
             ['nombre' => 'Transferencia'],
             ['nombre' => 'Control de embarazo'],
             ['nombre' => 'Finalizado'],

@@ -127,7 +127,7 @@ button:hover,
 
     {{-- CONTENEDOR CENTRADO CORRECTAMENTE --}}
     <div class="main-content-container">
-
+        
         {{-- Contenedor principal con estilo de card --}}
         <div class="card consult-card p-4">
 
@@ -143,7 +143,7 @@ button:hover,
             </div>
 
             <form
-                action="{{ $tratamiento ? route('consulta.update', $tratamiento->id) : route('consulta.store') }}"
+                action="{{ $tratamiento ? route('jefe.consulta.update', $tratamiento->id) : route('jefe.consulta.store') }}"
                 method="POST">
 
                 @csrf

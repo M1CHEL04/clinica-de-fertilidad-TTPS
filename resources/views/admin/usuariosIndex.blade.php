@@ -16,7 +16,7 @@
 @section('content')
 
     <!-- Filtros -->
-    <form method="GET" action="{{ route('admin.usuarios.index') }}" class="card p-6 mb-6">
+    <form method="GET" action="{{ route('jefe.usuarios.index') }}" class="card p-6 mb-6">
 
         <div class="flex flex-col md:flex-row gap-4">
             <div class="flex-1">
@@ -37,7 +37,7 @@
             </button>
 
             <!-- Ruta correcta -->
-            <a href="{{ route('admin.usuarios.index') }}" class="btn-secondary">
+            <a href="{{ route('jefe.usuarios.index') }}" class="btn-secondary">
                 <i class="fas fa-refresh mr-2"></i> Limpiar
             </a>
         </div>
@@ -270,7 +270,7 @@ function openPagosModal(id) {
                 <div class="flex justify-center">
                     ${
                         puedePagar
-                        ? `<a href="/admin/pago/${p.id}/marcar-pagado" class="btn-primary px-3 py-1 text-sm">Pagar</a>`
+                        ? `<a href="/jefe/pago/${p.id}/marcar-pagado" class="btn-primary px-3 py-1 text-sm">Pagar</a>`
                         : `<span class="text-gray-400">—</span>`
                     }
                 </div>

@@ -1,11 +1,25 @@
 @extends('layouts.layoutInterno')
 
 @section('content')
+@if(session('rol') == 3)
+<a href="{{ route('operador.tratamiento.detalle', $tratamiento->id) }}"
+   class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold mb-4">
+    <i class="fas fa-arrow-left"></i>
+    Volver
+</a>
+@elseif(session('rol') == 5)
+<a href="{{ route('jefe.tratamiento.detalle', $tratamiento->id) }}"
+   class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold mb-4">
+    <i class="fas fa-arrow-left"></i>
+    Volver
+</a>
+@else
 <a href="{{ route('medico.tratamiento.detalle', $tratamiento->id) }}"
    class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold mb-4">
     <i class="fas fa-arrow-left"></i>
     Volver
 </a>
+@endif
 <div class="max-w-4xl mx-auto mt-10 space-y-10">
 
     {{-- ========================= --}}
@@ -32,7 +46,12 @@
         @endif
 
         {{-- Formulario para cargar protocolo --}}
-        <form method="POST" action="{{ route('tratamiento.guardar-protocolo', $tratamiento->id) }}" class="space-y-4">
+       <form method="POST"
+      action="{{ session('rol') == 5
+            ? route('jefe.tratamiento.guardar-protocolo', $tratamiento->id)
+            : route('tratamiento.guardar-protocolo', $tratamiento->id) }}"
+      class="space-y-4">
+
             @csrf
 
             <div>
@@ -80,16 +99,16 @@
         @if($tratamiento->consentimiento_pdf)
             <div class="bg-green-100 p-4 rounded-md mb-4">
                 <p class="font-semibold">PDF cargado correctamente.</p>
-                <a href="{{ asset('storage/'.$tratamiento->consentimiento_pdf) }}"
-                   target="_blank"
-                   class="text-blue-600 underline">
-                    Ver PDF
+                <a href="{{ route('tratamiento.descargar-consentimiento', $tratamiento->id) }}"
+                class="text-blue-600 underline hover:text-blue-800">
+                    Descargar consentimiento
                 </a>
             </div>
         @else
             <p class="mb-4 text-gray-600">Aún no se ha cargado el consentimiento.</p>
         @endif
 
+        @if($tratamiento->consentimiento_pdf == null)
         <form action="{{ route('tratamiento.subir-consentimiento', $tratamiento->id) }}"
               method="POST"
               enctype="multipart/form-data"
@@ -107,6 +126,7 @@
                 Subir consentimiento
             </button>
         </form>
+        @endif
     </div>
 
 

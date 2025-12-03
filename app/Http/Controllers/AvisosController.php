@@ -27,8 +27,8 @@ class AvisosController extends Controller
 
     // Armamos el payload
     $payload = [
-        "group" => 5, // tu grupo fijo
-        "toEmails" => ["hohif95563@feralrex.com"], //aca puse un mail temporal
+        "group" => 5, 
+        "toEmails" => ["filad48402@cexch.com"], //aca puse un mail temporal
         "subject" => "Orden Médica - ".$tratamiento->nombre." ".$tratamiento->apellido,
         "htmlBody" => $html
     ];

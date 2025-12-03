@@ -56,6 +56,42 @@ class MedicoController extends Controller
         return view('medico.home', compact('pacientes', 'rol_id'));
     }
 
+    public function todosPacientes()
+    {
+        $medicoId = session('user_id');
+        $rol_id = session('rol');
+
+
+        // Trae pacientes con tratamientos del médico logueado
+        $pacientes = DB::table('tratamientos')
+            ->join('historias_clinica', 'tratamientos.historia_clinica_id', '=', 'historias_clinica.id')
+            ->join('usuarios', 'historias_clinica.paciente_id', '=', 'usuarios.id')
+            ->join('estados_tratamiento', 'tratamientos.estado_tratamiento_id', '=', 'estados_tratamiento.id')
+            ->select(
+                'usuarios.id as paciente_id',
+                'usuarios.nombre',
+                'usuarios.apellido',
+                'usuarios.mail',
+                'usuarios.dni',
+                'usuarios.fecha_nacimiento',
+                'usuarios.telefono',
+                DB::raw('MAX(estados_tratamiento.nombre) as estado_tratamiento'),
+                DB::raw('MIN(tratamientos.created_at) as fecha_inicio')
+            )
+            ->groupBy(
+                'usuarios.id',
+                'usuarios.nombre',
+                'usuarios.apellido',
+                'usuarios.mail',
+                'usuarios.dni',
+                'usuarios.fecha_nacimiento',
+                'usuarios.telefono'
+            )
+            ->get();
+
+        return view('jefe.home', compact('pacientes', 'rol_id'));
+    }
+
     public function detalleTratamiento($id)
     {
 
@@ -176,10 +212,15 @@ class MedicoController extends Controller
                 }
             }
         }
-
-        return redirect()
-            ->route('tratamiento.cargar-estudios', $id)
-            ->with('success', 'Resultados cargados correctamente.');
+        if (session('rol') == 5) {
+            return redirect()
+                ->route('jefe.tratamiento.cargar-estudios', $id)
+                ->with('success', 'Resultados cargados correctamente.');
+        } else {
+            return redirect()
+                ->route('tratamiento.cargar-estudios', $id)
+                ->with('success', 'Resultados cargados correctamente.');
+        }
     }
 
     public function protocolo($id)
@@ -187,7 +228,6 @@ class MedicoController extends Controller
         $tratamiento = Tratamiento::findOrFail($id);
         $protocolo = ProtocoloEstimulacion::where('tratamiento_id', $id)->get();
         $tiposMedicacion = TipoMedicacion::all();
-
         return view('medico.protocolo', compact('tratamiento', 'protocolo', 'tiposMedicacion'));
     }
 
@@ -226,6 +266,23 @@ class MedicoController extends Controller
         return back()->with('success', 'Consentimiento informado cargado.');
     }
 
+    public function descargarConsentimiento($id)
+    {
+        $tratamiento = Tratamiento::findOrFail($id);
+
+        if (!$tratamiento->consentimiento_pdf) {
+            abort(404, 'No hay archivo cargado');
+        }
+
+        $path = storage_path('app/public/' . $tratamiento->consentimiento_pdf);
+
+        if (!file_exists($path)) {
+            abort(404, 'Archivo no encontrado');
+        }
+
+        return response()->download($path);
+    }
+
     public function monitoreos($id)
     {
         $tratamiento = Tratamiento::findOrFail($id);
@@ -256,9 +313,10 @@ class MedicoController extends Controller
         2 => 'Segunda Consulta',
         3 => 'Monitoreos',
         4 => 'Punción',
-        5 => 'Transferencia',
-        6 => 'Control de embarazo',
-        7 => 'Finalizado',
+        5 => 'Fertilizacion',
+        6 => 'Transferencia',
+        7 => 'Control de embarazo',
+        8 => 'Finalizado',
     ];
 
 
@@ -272,7 +330,7 @@ class MedicoController extends Controller
 
         $actual = (int) $tratamiento->etapa_id;
 
-        if ($actual >= 7) {
+        if ($actual >= 8) {
             return back()->with('error', 'No se puede avanzar más la etapa.');
         }
 
@@ -364,6 +422,29 @@ class MedicoController extends Controller
 
 
         return redirect()->back()->with('success', 'Consulta agendada correctamente.');
+    }
+
+    public function notificarTransferencia(Request $request, $id)
+    {
+
+        $trat = Tratamiento::findOrFail($id);
+        $user = $trat->historiaClinica->paciente;
+        $nombre = session('nombre');
+        $apellido = session('apellido');
+        $mailController = new MailController();
+
+        $mailController->enviarMail(
+            [$user->mail],
+            'Estado actual del tratamiento',
+            'mails.notificarTransferencia',
+            [
+                'nombre' => $nombre,
+                'apellido' => $apellido
+            ]
+        );
+
+
+        return redirect()->back()->with('success', 'Aviso enviado correctamente.');
     }
 
 

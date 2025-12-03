@@ -87,6 +87,9 @@ Route::post('/tratamiento/{id}/retroceder', [MedicoController::class, 'retrocede
 Route::post('/tratamiento/{id}/agendar-consulta', [MedicoController::class, 'agendarConsulta'])
     ->name('tratamiento.agendar-consulta');
 
+    Route::post('/tratamiento/{id}/notificar-transferencia', [MedicoController::class, 'notificarTransferencia'])
+    ->name('tratamiento.notificar-transferencia');
+
 Route::get('/ovocitos/{id}/editar', [OperadorController::class, 'editar'])->name('ovocito.editar');
 Route::post('ovocitos/actualizar', [OperadorController::class, 'updateOvocito'])->name('ovocito.actualizar');
 
@@ -105,8 +108,6 @@ Route::post('/cambiar-contraseña-usuario', [LoginController::class, 'updatePass
 ###########################################################
 Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(function () {
 
-
-    Route::get('/home', [MedicoController::class, 'misPacientes'])->name('medico.home');
 
     Route::get('/home', [MedicoController::class, 'misPacientes'])->name('medico.home');
 
@@ -133,6 +134,9 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
 
     Route::post('/tratamiento/{id}/consentimiento', [MedicoController::class, 'subirConsentimiento'])
         ->name('tratamiento.subir-consentimiento');
+    
+    Route::get('/tratamientos/{id}/descargar-consentimiento', [MedicoController::class, 'descargarConsentimiento'])
+    ->name('tratamiento.descargar-consentimiento');
 
     Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\MedicoController::class, 'tratamientosDeUnPaciente']);
 
@@ -200,11 +204,9 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
         ));
     });
 
-
     Route::post('/consulta', [ConsultaController::class, 'store'])->name('consulta.store');
+
     Route::post('/consulta/update/{tratamiento}', [ConsultaController::class, 'update'])->name('consulta.update');
-
-
 
     Route::get('/consulta/{paciente_id}', [ConsultaController::class, 'create'])
         ->name('medico.primerConsulta.create');
@@ -220,60 +222,133 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
 # Rutas para el admin
 ###########################################################
 Route::prefix('admin')->middleware([AuthMiddleware::class . ':admin'])->group(function () {
+
     Route::get('/home', [App\Http\Controllers\AdminController::class, 'home'])->name('admin.home');
+
     Route::get('/create_user', [App\Http\Controllers\AdminController::class, 'create_user'])->name('admin.create_user');
+
     Route::post('/create_user', [App\Http\Controllers\AdminController::class, 'store_user'])->name('admin.store_user');
+
     Route::post('/baja_user', [App\Http\Controllers\AdminController::class, 'baja_user'])->name('admin.baja_user');
+
     Route::post('/alta_user', [App\Http\Controllers\AdminController::class, 'alta_user'])->name('admin.alta_user');
+
     Route::post('/set_horarios', [AdminController::class, 'set_horarios'])->name('admin.set_horarios');
-    Route::get('/usuarios', [AdminController::class, 'index'])->name('admin.usuarios.index');
-    Route::get('/pago/{id}/marcar-pagado', [AdminController::class, 'marcarPagado'])->name('admin.pago.marcar-pagado');
 });
 
 ###########################################################
 # Rutas para el operador
 ###########################################################
 Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->group(function () {
+
     Route::get('/home', [OperadorController::class, 'Pacientes'])->name('operador.home');
+
     Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\OperadorController::class, 'tratamientosDeUnPaciente']);
+
     Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
         ->name('operador.tratamiento.detalle');
+
     Route::get('paciente/{id}/puncion', [App\Http\Controllers\OperadorController::class, 'puncion'])
         ->name('tratamiento.puncion');
-    // 1. Formulario general de punción
+
+    Route::get('/estudios/{paciente_id}', [EstudiosController::class, 'estudios'])
+        ->name('operador.estudios.index');
+    
+    Route::get('/consulta/partials/hombre-gametos', function () {
+        $coloresPelo = ColorPelo::all();
+        $coloresOjos = ColorOjo::all();
+        $tipoPelo = TipoPelo::all();
+        $complexiones = Complexion::all();
+        $rasgos = RasgoEtnico::all();
+
+        return view('medico.partials.pareja-hombre', compact(
+            'coloresPelo',
+            'coloresOjos',
+            'tipoPelo',
+            'complexiones',
+            'rasgos'
+        ));
+    });
+
+    Route::get('/consulta/partials/hombre-donado', function () {
+        $coloresPelo = ColorPelo::all();
+        $coloresOjos = ColorOjo::all();
+        $tipoPelo = TipoPelo::all();
+        $complexiones = Complexion::all();
+        $rasgos = RasgoEtnico::all();
+
+        return view('medico.partials.semen-donado', compact(
+            'coloresPelo',
+            'coloresOjos',
+            'tipoPelo',
+            'complexiones',
+            'rasgos'
+        ));
+    });
+
+    Route::get('/consulta/partials/pareja-mujer', function () {
+        $coloresPelo = ColorPelo::all();
+        $coloresOjos = ColorOjo::all();
+        $tipoPelo = TipoPelo::all();
+        $complexiones = Complexion::all();
+        $rasgos = RasgoEtnico::all();
+
+        return view('medico.partials.pareja-mujer', compact(
+            'coloresPelo',
+            'coloresOjos',
+            'tipoPelo',
+            'complexiones',
+            'rasgos'
+        ));
+    });    
+
+     Route::get('/consulta/{paciente_id}', [ConsultaController::class, 'create'])
+        ->name('operador.primerConsulta.create');
+
+    Route::get('/verConsulta/{paciente_id}', [ConsultaController::class, 'ver'])
+        ->name('operador.verConsulta');
+
+    Route::get('/tratamiento/{id}/protocolo', [MedicoController::class, 'protocolo'])
+        ->name('operador.tratamiento.protocolo');    
+
+    Route::get('/tratamiento/{id}/cargar-estudios', [MedicoController::class, 'cargarEstudios'])
+        ->name('operador.tratamiento.cargar-estudios');    
+
+    Route::get(
+        '/tratamiento/{id}/post-transferencia',
+        [MedicoController::class, 'postTransferenciaForm']
+    )->name('operador.tratamiento.post');    
+
+    Route::get('/tratamientos/{id}/monitoreos', [MedicoController::class, 'monitoreos'])
+        ->name('operador.monitoreos');
+
     Route::get(
         '/puncion/{paciente_id}',
         [App\Http\Controllers\OperadorController::class, 'formPuncion']
     )
         ->name('puncion.form');
 
-    // 2. Buscar paciente por nombre+apellido o DNI
     Route::post(
         '/puncion/buscar-paciente',
         [App\Http\Controllers\OperadorController::class, 'buscarPaciente']
     )
         ->name('puncion.buscarPaciente');
 
-    // 3. Guardar punción
     Route::post('/puncion/guardar', [App\Http\Controllers\OperadorController::class, 'guardarPuncion'])->name('puncion.guardar');
 
-    // 4. Fertilización
     Route::get('/fertilizacion/{paciente_id}', [OperadorController::class, 'fertilizacion'])->name('operador.fertilizacion');
 
-    // 4.1. Nueva fertilización
     Route::get('/fertilizacion/{paciente_id}/nueva', [OperadorController::class, 'nuevaFertilizacion'])->name('fertilizacion.nueva');
 
-    // 4.2. Guardar fertilización
     Route::post('/fertilizacion/guardar', [OperadorController::class, 'guardarFertilizacion'])->name('fertilizacion.guardar');
 
-    //Criopreservar de semen
     Route::post('/criopreservar-semen', [OperadorController::class, 'criopreservarSemen'])
         ->name('criopreservar.semen.store');
 
     Route::post('/embrion/update', [OperadorController::class, 'updateEmbrion'])->name('embrion.update');
 
-    //Donacion de gametos
     Route::get('/donacion-gametos/nueva', [GametosController::class, 'nuevaDonacion'])->name('donacion.nueva');
+
     Route::post('/donacion-gametos/registrar', [GametosController::class, 'registrar'])
     ->name('donacion.registrar');
 });
@@ -283,9 +358,117 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
 # Rutas para el jefe
 ###########################################################
 Route::prefix('jefe')->middleware([AuthMiddleware::class . ':jefe'])->group(function () {
-    Route::get('/home', function () {
-        return view('jefe.home');
-    })->name('jefe.home');
+    
+    Route::get('/home', [MedicoController::class, 'todosPacientes'])->name('jefe.home');
+
+    Route::get('/usuarios', [AdminController::class, 'index'])->name('jefe.usuarios.index');
+
+    Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\OperadorController::class, 'tratamientosDeUnPaciente']);
+
+    Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
+        ->name('jefe.tratamiento.detalle');
+
+     Route::get('/pago/{id}/marcar-pagado', [AdminController::class, 'marcarPagado'])->name('jefe.pago.marcar-pagado');    
+
+    Route::get('/tratamientos/{id}/monitoreos', [MedicoController::class, 'monitoreos'])
+        ->name('jefe.monitoreos');
+
+    Route::post('/tratamientos/monitoreos', [MedicoController::class, 'storeMonitoreo'])
+        ->name('jefe.monitoreos.store');
+
+    Route::get('/tratamiento/{id}/cargar-estudios', [MedicoController::class, 'cargarEstudios'])
+        ->name('jefe.tratamiento.cargar-estudios');
+
+    Route::post('/tratamientos/{id}/estudios/guardar', [MedicoController::class, 'guardarEstudios'])
+        ->name('jefe.tratamiento.guardar-estudios');
+
+    Route::get('/tratamiento/{id}/protocolo', [MedicoController::class, 'protocolo'])
+        ->name('jefe.tratamiento.protocolo');
+
+    Route::post('/tratamiento/{id}/protocolo', [MedicoController::class, 'guardarProtocolo'])
+        ->name('jefe.tratamiento.guardar-protocolo');
+
+    Route::post('/tratamiento/{id}/consentimiento', [MedicoController::class, 'subirConsentimiento'])
+        ->name('jefe.tratamiento.subir-consentimiento');
+
+    Route::post('paciente/{id}/tratamiento/dar-de-baja', [MedicoController::class, 'darDeBajaTratamiento'])
+        ->name('jefe.tratamiento.dar-baja');
+
+    Route::get(
+        '/tratamiento/{id}/post-transferencia',
+        [MedicoController::class, 'postTransferenciaForm']
+    )->name('jefe.tratamiento.post');
+
+    Route::post(
+        '/tratamiento/{id}/post-transferencia',
+        [MedicoController::class, 'guardarPostTransferencia']
+    )->name('jefe.tratamiento.guardar-post');
+
+    Route::post('/tratamiento/{id}/enviar-orden-medica', [AvisosController::class, 'enviarOrdenMedica'])
+        ->name('jefe.tratamiento.enviar-orden-medica');
+
+    Route::get('/consulta/partials/hombre-gametos', function () {
+        $coloresPelo = ColorPelo::all();
+        $coloresOjos = ColorOjo::all();
+        $tipoPelo = TipoPelo::all();
+        $complexiones = Complexion::all();
+        $rasgos = RasgoEtnico::all();
+
+        return view('medico.partials.pareja-hombre', compact(
+            'coloresPelo',
+            'coloresOjos',
+            'tipoPelo',
+            'complexiones',
+            'rasgos'
+        ));
+    });
+
+    Route::get('/consulta/partials/hombre-donado', function () {
+        $coloresPelo = ColorPelo::all();
+        $coloresOjos = ColorOjo::all();
+        $tipoPelo = TipoPelo::all();
+        $complexiones = Complexion::all();
+        $rasgos = RasgoEtnico::all();
+
+        return view('medico.partials.semen-donado', compact(
+            'coloresPelo',
+            'coloresOjos',
+            'tipoPelo',
+            'complexiones',
+            'rasgos'
+        ));
+    });
+
+    Route::get('/consulta/partials/pareja-mujer', function () {
+        $coloresPelo = ColorPelo::all();
+        $coloresOjos = ColorOjo::all();
+        $tipoPelo = TipoPelo::all();
+        $complexiones = Complexion::all();
+        $rasgos = RasgoEtnico::all();
+
+        return view('medico.partials.pareja-mujer', compact(
+            'coloresPelo',
+            'coloresOjos',
+            'tipoPelo',
+            'complexiones',
+            'rasgos'
+        ));
+    });
+
+    Route::post('/consulta', [ConsultaController::class, 'store'])->name('jefe.consulta.store');
+    
+    Route::post('/consulta/update/{tratamiento}', [ConsultaController::class, 'update'])->name('jefe.consulta.update');
+
+    Route::get('/consulta/{paciente_id}', [ConsultaController::class, 'create'])
+        ->name('jefe.primerConsulta.create');
+
+    Route::get('/verConsulta/{paciente_id}', [ConsultaController::class, 'ver'])
+        ->name('jefe.verConsulta');
+
+    Route::post('/estudios', [EstudiosController::class, 'store'])->name('jefe.estudios.store');
+
+    Route::get('/estudios/{paciente_id}', [EstudiosController::class, 'estudios'])
+        ->name('jefe.estudios.index');
 });
 
 
@@ -296,14 +479,4 @@ Route::get('/register', [RegistroController::class, 'show'])->name('register');
 # Rutas de prueba primer consulta
 ############################################################
 
-
 Route::get('/terminos/search', [TerminosController::class, 'search'])->name('terminos.search');
-
-
-    // Primer consulta
-
-
-
-
-
-// Nueva página de estudios
