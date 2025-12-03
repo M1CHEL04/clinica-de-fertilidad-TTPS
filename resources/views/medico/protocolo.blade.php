@@ -90,7 +90,7 @@
                                 <select name="tipo_medicacion_id" class="form-input">
                                     <option value="" selected disabled>Seleccionar tipo de medicación</option>
                                     @foreach ($tiposMedicacion as $tipo)
-                                        <option value="{{ $tipo->nombre }}">{{ $tipo->nombre }}</option>
+                                        <option value="{{ $tipo->id }}">{{ $tipo->nombre }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -207,16 +207,11 @@
                 </h3>
 
                 <div class="space-y-2 text-sm text-gray-700">
-                    <p><strong>Paciente:</strong> {{ $tratamiento->nombre ?? 'N/A' }} {{ $tratamiento->apellido ?? '' }}
+                    <p><strong>Paciente:</strong> {{ $tratamiento->historiaClinica->paciente->nombre ?? 'N/A' }}
+                        {{ $tratamiento->historiaClinica->paciente->apellido ?? '' }}
                     </p>
-                    <p><strong>DNI:</strong> {{ $tratamiento->dni ?? 'N/A' }}</p>
-                    <p><strong>Estado:</strong>
-                        <span
-                            class="badge {{ strtolower($tratamiento->estado_tratamiento ?? '') === 'activo' ? 'badge-success' : 'badge-warning' }}">
-                            {{ $tratamiento->estado_tratamiento ?? 'N/A' }}
-                        </span>
-                    </p>
-                    <p><strong>Etapa:</strong> {{ $tratamiento->etapa ?? 'N/A' }}</p>
+                    <p><strong>DNI:</strong> {{ $tratamiento->historiaClinica->paciente->dni ?? 'N/A' }}</p>
+                    <p><strong>Etapa:</strong> {{ $tratamiento->etapa->nombre ?? 'N/A' }}</p>
                 </div>
             </div>
 
