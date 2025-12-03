@@ -40,7 +40,13 @@
             </p>
         @else
 
-            <form action="{{ route('tratamiento.guardar-estudios', $tratamiento->id) }}" method="POST">
+           <form 
+                action="{{ session('rol') == 5 
+                    ? route('jefe.tratamiento.guardar-estudios', $tratamiento->id) 
+                    : route('tratamiento.guardar-estudios', $tratamiento->id) }}"
+                method="POST"
+            >
+
                 @csrf
 
                 <div class="space-y-8">

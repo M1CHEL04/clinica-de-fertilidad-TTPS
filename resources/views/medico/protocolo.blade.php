@@ -7,6 +7,12 @@
     <i class="fas fa-arrow-left"></i>
     Volver
 </a>
+@elseif(session('rol') == 5)
+<a href="{{ route('jefe.tratamiento.detalle', $tratamiento->id) }}"
+   class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold mb-4">
+    <i class="fas fa-arrow-left"></i>
+    Volver
+</a>
 @else
 <a href="{{ route('medico.tratamiento.detalle', $tratamiento->id) }}"
    class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold mb-4">
@@ -40,7 +46,12 @@
         @endif
 
         {{-- Formulario para cargar protocolo --}}
-        <form method="POST" action="{{ route('tratamiento.guardar-protocolo', $tratamiento->id) }}" class="space-y-4">
+       <form method="POST"
+      action="{{ session('rol') == 5
+            ? route('jefe.tratamiento.guardar-protocolo', $tratamiento->id)
+            : route('tratamiento.guardar-protocolo', $tratamiento->id) }}"
+      class="space-y-4">
+
             @csrf
 
             <div>

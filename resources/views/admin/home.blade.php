@@ -8,11 +8,7 @@
             <p class="page-subtitle">Gestión de usuarios internos del sistema</p>
         </div>
         <div class="ml-auto flex items-center gap-3">
-            <!-- Botón Ver Pagos -->
-            <a href="{{ route('admin.usuarios.index') }}" class="btn-secondary inline-flex items-center">
-                <i class="fas fa-receipt mr-2"></i>
-                Ver pagos
-            </a>
+           
         <div class="ml-auto">
             <a href="{{ route('admin.create_user') }}" class="btn-primary inline-flex items-center">
                 <i class="fas fa-user-plus mr-2"></i>
