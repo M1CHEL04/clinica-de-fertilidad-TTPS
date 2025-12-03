@@ -13,6 +13,13 @@ class TipoMedicacionSeeder extends Seeder
      */
     public function run(): void
     {
-        TipoMedicacion::insert([]);
+        $tipos = [
+            'Oral',
+            'Inyectable',
+            'Mixta',
+        ];
+        foreach ($tipos as $tipo) {
+            TipoMedicacion::firstOrCreate(['nombre' => $tipo]);
+        }
     }
 }

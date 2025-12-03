@@ -136,6 +136,9 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
 
     Route::post('/tratamiento/{id}/consentimiento', [MedicoController::class, 'subirConsentimiento'])
         ->name('tratamiento.subir-consentimiento');
+    
+    Route::get('/tratamientos/{id}/descargar-consentimiento', [MedicoController::class, 'descargarConsentimiento'])
+    ->name('tratamiento.descargar-consentimiento');
 
     Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\MedicoController::class, 'tratamientosDeUnPaciente']);
 
