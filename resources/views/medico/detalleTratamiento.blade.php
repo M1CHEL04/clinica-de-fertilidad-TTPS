@@ -195,13 +195,11 @@
 
             <div class="modal-actions">
                 <button type="button" class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
-                <button type="submit" class="btn btn-success"> <i class="fas fa-save me-2">Guardar</i></button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save me-2"> Guardar</i></button>
             </div>
         </form>
     </div>
 </div>
-
-
 
         </div>
         
@@ -273,7 +271,7 @@
 
                     <div class="modal-actions">
                         <button type="button" class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
-                        <button type="submit" class="btn btn-success"> <i class="fas fa-save me-2">Guardar</i></button>
+                        <button type="submit" class="btn-primary"> <i class="fas fa-save me-2">Guardar</i></button>
                     </div>
                 </form>
             </div>

@@ -124,6 +124,7 @@
 
 
 @section('content')
+
 <div class="card-centered-wrapper">
     {{-- Diseño mejorado de la tarjeta con encabezado y cuerpo --}}
     <div class="card shadow" style="max-width: 900px; width: 100%;">
