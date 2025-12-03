@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Crear item en la lista
             const li = document.createElement('li');
-            li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+            li.classList.add('list-group-item');
             li.textContent = selectedText;
 
             // Hidden input para enviar al backend
