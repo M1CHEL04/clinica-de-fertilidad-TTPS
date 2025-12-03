@@ -14,6 +14,13 @@ class EstudiosController extends Controller
         // Obtener paciente
         $paciente = \App\Models\User::findOrFail($paciente_id);
 
+        // Obtener el tratamiento activo del paciente
+        $tratamiento = \App\Models\Tratamiento::whereHas('historiaClinica', function ($query) use ($paciente_id) {
+            $query->where('paciente_id', $paciente_id);
+        })
+            ->where('estado_tratamiento_id', 1) // Asumiendo que 1 es estado activo
+            ->first();
+
         // Si necesitás la historia clínica (opcional)
         $historia = \App\Models\HistoriaClinica::firstOrCreate([
             'paciente_id' => $paciente_id
@@ -37,6 +44,7 @@ class EstudiosController extends Controller
 
         return view('medico.estudios', compact(
             'paciente',
+            'tratamiento',
             'ginecologicos',
             'hormonales',
             'prequirurgicos',
@@ -44,74 +52,75 @@ class EstudiosController extends Controller
         ));
     }
 
-   public function store(Request $request)
-{
-    $paciente = \App\Models\User::findOrFail($request->paciente_id);
+    public function store(Request $request)
+    {
+        $paciente = \App\Models\User::findOrFail($request->paciente_id);
 
-    
-    $tratamiento = $paciente->historiasClinicas()
-        ->with(['tratamientos.estadoTratamiento'])
-        ->get()
-        ->flatMap(fn($historia) => $historia->tratamientos)
-        ->first(fn($t) =>
-            $t->estadoTratamiento &&
-            strtolower($t->estadoTratamiento->nombre) == 'activo'
-        );
 
-    if (!$tratamiento) {
-        return back()->with('error', 'El paciente no tiene un tratamiento activo.');
-    }
+        $tratamiento = $paciente->historiasClinicas()
+            ->with(['tratamientos.estadoTratamiento'])
+            ->get()
+            ->flatMap(fn($historia) => $historia->tratamientos)
+            ->first(
+                fn($t) =>
+                $t->estadoTratamiento &&
+                    strtolower($t->estadoTratamiento->nombre) == 'activo'
+            );
 
-    
+        if (!$tratamiento) {
+            return back()->with('error', 'El paciente no tiene un tratamiento activo.');
+        }
 
-    
 
-    $estudios_guardados = [];
-    $tipos = ['ginecologicos', 'hormonales', 'prequirurgicos', 'semen'];
 
-    foreach ($tipos as $tipo) {
-        if ($request->has($tipo)) {
-            foreach ($request->input($tipo) as $estudio_id) {
-                // Obtener el nombre real del estudio desde la API correspondiente
-                switch ($tipo) {
-                    case 'ginecologicos':
-                        $estudio_data = Http::withoutVerifying()
-                            ->get("https://srlgceodssgoifgosyoh.supabase.co/functions/v1/estudio_ginecologico")
-                            ->json();
-                        break;
-                    case 'hormonales':
-                        $estudio_data = Http::withoutVerifying()
-                            ->get("https://srlgceodssgoifgosyoh.supabase.co/functions/v1/estudio_hormonales")
-                            ->json();
-                        break;
-                    case 'prequirurgicos':
-                        $estudio_data = Http::withoutVerifying()
-                            ->get("https://srlgceodssgoifgosyoh.supabase.co/functions/v1/get-orden-estudio-prequirurgico")
-                            ->json();
-                        break;
-                    case 'semen':
-                        $estudio_data = Http::withoutVerifying()
-                            ->get("https://srlgceodssgoifgosyoh.supabase.co/functions/v1/estudio_semen")
-                            ->json();
-                        break;
+
+
+        $estudios_guardados = [];
+        $tipos = ['ginecologicos', 'hormonales', 'prequirurgicos', 'semen'];
+
+        foreach ($tipos as $tipo) {
+            if ($request->has($tipo)) {
+                foreach ($request->input($tipo) as $estudio_id) {
+                    // Obtener el nombre real del estudio desde la API correspondiente
+                    switch ($tipo) {
+                        case 'ginecologicos':
+                            $estudio_data = Http::withoutVerifying()
+                                ->get("https://srlgceodssgoifgosyoh.supabase.co/functions/v1/estudio_ginecologico")
+                                ->json();
+                            break;
+                        case 'hormonales':
+                            $estudio_data = Http::withoutVerifying()
+                                ->get("https://srlgceodssgoifgosyoh.supabase.co/functions/v1/estudio_hormonales")
+                                ->json();
+                            break;
+                        case 'prequirurgicos':
+                            $estudio_data = Http::withoutVerifying()
+                                ->get("https://srlgceodssgoifgosyoh.supabase.co/functions/v1/get-orden-estudio-prequirurgico")
+                                ->json();
+                            break;
+                        case 'semen':
+                            $estudio_data = Http::withoutVerifying()
+                                ->get("https://srlgceodssgoifgosyoh.supabase.co/functions/v1/estudio_semen")
+                                ->json();
+                            break;
+                    }
+
+                    // Buscar el nombre del estudio por id
+                    $nombre_estudio = collect($estudio_data)->firstWhere('id', $estudio_id)['nombre'] ?? $estudio_id;
+
+                    $estudio = Estudio::create([
+                        'tratamiento_id' => $tratamiento->id,
+                        'tipo_estudio' => $tipo,
+                        'nombre' => $nombre_estudio,
+                        'resultado' => null,
+                    ]);
+
+                    $estudios_guardados[] = $estudio;
                 }
-
-                // Buscar el nombre del estudio por id
-                $nombre_estudio = collect($estudio_data)->firstWhere('id', $estudio_id)['nombre'] ?? $estudio_id;
-
-                $estudio = Estudio::create([
-                    'tratamiento_id' => $tratamiento->id,
-                    'tipo_estudio' => $tipo,
-                    'nombre' => $nombre_estudio,
-                    'resultado' => null,
-                ]);
-
-                $estudios_guardados[] = $estudio;
             }
         }
-    }
-// Construir HTML del mail en formato CARD
-$html = "
+        // Construir HTML del mail en formato CARD
+        $html = "
 <div style='
     max-width:600px;
     margin:20px auto;
@@ -131,11 +140,11 @@ $html = "
     <ul style='padding-left:18px;'>
 ";
 
-foreach ($estudios_guardados as $est) {
-    $html .= "<li>{$est->tipo_estudio} - {$est->nombre}</li>";
-}
+        foreach ($estudios_guardados as $est) {
+            $html .= "<li>{$est->tipo_estudio} - {$est->nombre}</li>";
+        }
 
-$html .= "
+        $html .= "
     </ul>
 
     <p style='margin-top:20px;'>Saludos cordiales,<br><strong>Fertilia</strong></p>
@@ -143,41 +152,36 @@ $html .= "
 ";
 
 
-    // Enviar por la API
-    $payload = [
-        "group" => 5,
-        "toEmails" => [$paciente->mail],
-        "subject" => "Estudios Médicos - {$paciente->nombre} {$paciente->apellido}",
-        "htmlBody" => $html
-    ];
+        // Enviar por la API
+        $payload = [
+            "group" => 5,
+            "toEmails" => [$paciente->mail],
+            "subject" => "Estudios Médicos - {$paciente->nombre} {$paciente->apellido}",
+            "htmlBody" => $html
+        ];
 
-    $ch = curl_init("https://mvvuegssraetbyzeifov.supabase.co/functions/v1/send_email_v2");
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $ch = curl_init("https://mvvuegssraetbyzeifov.supabase.co/functions/v1/send_email_v2");
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
-    if ($httpCode === 200) {
-        if (session('rol') == 5){
-            return redirect()
-            ->route('jefe.tratamiento.detalle', $tratamiento->id)
-            ->with('success', 'Estudios guardados y enviados al paciente correctamente.');
+        if ($httpCode === 200) {
+            if (session('rol') == 5) {
+                return redirect()
+                    ->route('jefe.tratamiento.detalle', $tratamiento->id)
+                    ->with('success', 'Estudios guardados y enviados al paciente correctamente.');
+            } else {
+                return redirect()
+                    ->route('medico.tratamiento.detalle', $tratamiento->id)
+                    ->with('success', 'Estudios guardados y enviados al paciente correctamente.');
+            }
+
+            return back()->with('error', 'Estudios guardados, pero no se pudo enviar el mail.');
         }
-        else {
-        return redirect()
-        ->route('medico.tratamiento.detalle', $tratamiento->id)
-        ->with('success', 'Estudios guardados y enviados al paciente correctamente.');
-
     }
-    
-    return back()->with('error', 'Estudios guardados, pero no se pudo enviar el mail.');
-}
-
-
-
-}
 }

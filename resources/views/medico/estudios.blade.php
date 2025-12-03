@@ -41,8 +41,8 @@
             <p class="page-subtitle">Seleccionar estudios requeridos para el paciente {{ $paciente->nombre ?? 'N/A' }}</p>
         </div>
         <div>
-            <a href="{{ route('medico.home') }}" class="btn-secondary">
-                <i class="fas fa-arrow-left mr-2"></i> Volver al Inicio
+            <a href="{{ route('medico.tratamiento.detalle', $tratamiento->id) }}" class="btn-secondary">
+                <i class="fas fa-arrow-left mr-2"></i> Volver al Tratamiento
             </a>
         </div>
     </div>
