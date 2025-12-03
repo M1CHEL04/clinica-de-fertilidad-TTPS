@@ -162,15 +162,22 @@ $html .= "
     curl_close($ch);
 
     if ($httpCode === 200) {
+        if (session('rol') == 5){
+            return redirect()
+            ->route('jefe.tratamiento.detalle', $tratamiento->id)
+            ->with('success', 'Estudios guardados y enviados al paciente correctamente.');
+        }
+        else {
         return redirect()
         ->route('medico.tratamiento.detalle', $tratamiento->id)
         ->with('success', 'Estudios guardados y enviados al paciente correctamente.');
 
     }
-
+    
     return back()->with('error', 'Estudios guardados, pero no se pudo enviar el mail.');
 }
 
 
 
+}
 }

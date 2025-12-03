@@ -56,6 +56,42 @@ class MedicoController extends Controller
         return view('medico.home', compact('pacientes', 'rol_id'));
     }
 
+    public function todosPacientes()
+    {
+        $medicoId = session('user_id');
+        $rol_id = session('rol');
+
+
+        // Trae pacientes con tratamientos del médico logueado
+        $pacientes = DB::table('tratamientos')
+            ->join('historias_clinica', 'tratamientos.historia_clinica_id', '=', 'historias_clinica.id')
+            ->join('usuarios', 'historias_clinica.paciente_id', '=', 'usuarios.id')
+            ->join('estados_tratamiento', 'tratamientos.estado_tratamiento_id', '=', 'estados_tratamiento.id')
+            ->select(
+                'usuarios.id as paciente_id',
+                'usuarios.nombre',
+                'usuarios.apellido',
+                'usuarios.mail',
+                'usuarios.dni',
+                'usuarios.fecha_nacimiento',
+                'usuarios.telefono',
+                DB::raw('MAX(estados_tratamiento.nombre) as estado_tratamiento'),
+                DB::raw('MIN(tratamientos.created_at) as fecha_inicio')
+            )
+            ->groupBy(
+                'usuarios.id',
+                'usuarios.nombre',
+                'usuarios.apellido',
+                'usuarios.mail',
+                'usuarios.dni',
+                'usuarios.fecha_nacimiento',
+                'usuarios.telefono'
+            )
+            ->get();
+
+        return view('jefe.home', compact('pacientes', 'rol_id'));
+    }
+
     public function detalleTratamiento($id)
     {
 
@@ -138,10 +174,12 @@ class MedicoController extends Controller
             ->get()
             ->groupBy('tipo_estudio');
 
-        return view(
-            'medico.cargarEstudios',
-            compact('tratamiento', 'estudiosPendientes', 'estudiosCompletados')
-        );
+        
+            return view(
+                'medico.cargarEstudios',
+                compact('tratamiento', 'estudiosPendientes', 'estudiosCompletados')
+            );
+         
     }
 
 
@@ -156,10 +194,16 @@ class MedicoController extends Controller
                     ->update(['resultado' => $resultado]);
             }
         }
-
+        if (session('rol') == 5){
+            return redirect()
+            ->route('jefe.tratamiento.cargar-estudios', $id)
+            ->with('success', 'Resultados cargados correctamente.');
+        }
+        else {
         return redirect()
             ->route('tratamiento.cargar-estudios', $id)
             ->with('success', 'Resultados cargados correctamente.');
+        }    
     }
 
     public function protocolo($id)
@@ -167,7 +211,6 @@ class MedicoController extends Controller
         $tratamiento = Tratamiento::findOrFail($id);
         $protocolo = ProtocoloEstimulacion::where('tratamiento_id', $id)->get();
         $tiposMedicacion = TipoMedicacion::all();
-
         return view('medico.protocolo', compact('tratamiento', 'protocolo', 'tiposMedicacion'));
     }
 

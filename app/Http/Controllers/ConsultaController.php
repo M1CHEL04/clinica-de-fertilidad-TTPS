@@ -46,6 +46,21 @@ class ConsultaController extends Controller
             'paciente_id' => $paciente_id
         ]);
         $tratamiento = null;
+       
+        if(session('rol') == 5){
+            return view('jefe.primerConsulta', compact(
+                'objetivos',
+            'paciente',
+            'historia',
+            'tratamiento',
+            'coloresPelo',
+            'coloresOjos',
+            'tipoPelo',
+            'complexiones',
+            'rasgos'
+            ));
+        }
+        else {
         return view('medico.primerConsulta', compact(
             'objetivos',
             'paciente',
@@ -57,6 +72,7 @@ class ConsultaController extends Controller
             'complexiones',
             'rasgos'
         ));
+    }
     }
 
 
@@ -106,17 +122,33 @@ class ConsultaController extends Controller
         $rasgos = RasgoEtnico::all();
 
         //dd($tratamiento);
-        return view('medico.primerConsulta', compact(
-            'objetivos',
-            'paciente',
-            'historia',
-            'tratamiento',
-            'coloresPelo',
-            'coloresOjos',
-            'tipoPelo',
-            'complexiones',
-            'rasgos'
-        ));
+
+        if(session('rol') == 5){
+            return view('jefe.primerConsulta', compact(
+                'objetivos',
+                'paciente',
+                'historia',
+                'tratamiento',
+                'coloresPelo',
+                'coloresOjos',
+                'tipoPelo',
+                'complexiones',
+                'rasgos'
+            ));
+        }
+        else {
+            return view('medico.primerConsulta', compact(
+                'objetivos',
+                'paciente',
+                'historia',
+                'tratamiento',
+                'coloresPelo',
+                'coloresOjos',
+                'tipoPelo',
+                'complexiones',
+                'rasgos'
+            ));
+        }
     }
 
 
@@ -310,10 +342,16 @@ class ConsultaController extends Controller
             );
         }
         $tratamiento->update(['etapa_id' => 1]);
-
+        if (session('rol') == 5){
+            return redirect()
+            ->route('jefe.tratamiento.detalle', $tratamiento->id)
+            ->with('success', 'Antecedentes guardados correctamente.');
+        }
+        else {
         return redirect()
             ->route('medico.tratamiento.detalle', $tratamiento->id)
             ->with('success', 'Antecedentes guardados correctamente.');
+        }
     }
 
 
@@ -428,9 +466,15 @@ class ConsultaController extends Controller
         }
 
         $tratamiento->update(['etapa_id' => 1]);
-
+         if (session('rol') == 5){
+            return redirect()
+            ->route('jefe.tratamiento.detalle', $tratamiento->id)
+            ->with('success', 'Antecedentes guardados correctamente.');
+        }
+        else {
         return redirect()
             ->route('medico.tratamiento.detalle', $tratamiento->id)
             ->with('success', 'Antecedentes actualizados correctamente.');
     }
+}
 }

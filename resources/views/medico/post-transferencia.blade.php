@@ -14,6 +14,12 @@
             <i class="fas fa-arrow-left mr-2"></i> Volver al tratamiento
         </a>
     </div>
+    @elseif(session('rol') == 5)
+    <div>
+        <a href="{{ route('jefe.tratamiento.detalle', $tratamiento->id) }}" class="btn-secondary">
+            <i class="fas fa-arrow-left mr-2"></i> Volver al tratamiento
+        </a>
+    </div>
     @else
     <div>
         <a href="{{ route('medico.tratamiento.detalle', $tratamiento->id) }}" class="btn-secondary">
@@ -113,8 +119,14 @@
 
     @endif
 
-    <form action="{{ route('tratamiento.guardar-post', $tratamiento->id) }}" 
-          method="POST" class="space-y-6">
+    <form 
+    action="{{ session('rol') == 5
+        ? route('jefe.tratamiento.guardar-post', $tratamiento->id)
+        : route('tratamiento.guardar-post', $tratamiento->id) }}"
+    method="POST"
+>
+
+          
         @csrf
 
         {{-- BETA --}}
@@ -205,9 +217,15 @@
     @endphp
         {{-- BOTÓN --}}
         @if(!$completo)
-            <button class="btn-primary w-full flex items-center justify-center gap-2">
+            @if(session('rol') == 3)
+            <button class="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed " disabled>
+                <i class="fas fa-save"></i> Solo puede visualizar los datos
+            </button>
+            @else
+                <button class="btn-primary w-full flex items-center justify-center gap-2">
                 <i class="fas fa-save"></i> Guardar Datos
             </button>
+            @endif
         @endif
 
     </form>

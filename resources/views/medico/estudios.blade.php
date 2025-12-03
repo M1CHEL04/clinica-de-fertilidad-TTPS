@@ -135,8 +135,9 @@
         <div class="card-body p-4">
 
             <p class="text-muted mb-4">Seleccioná los estudios requeridos para el paciente **{{ $paciente->nombre ?? 'N/A' }}** y guardalos.</p>
+            
+            <form action="{{ session('rol') == 2 ? route('estudios.store') : route('jefe.estudios.store') }}" method="POST">
 
-            <form action="{{ route('estudios.store') }}" method="POST">
                 @csrf
                 <input type="hidden" name="paciente_id" value="{{ $paciente->id }}">
 
@@ -206,7 +207,7 @@
 
                 
                 <div class="mt-4 pt-3 border-top d-flex justify-content-end">
-                    <button type="submit" class="btn btn-success">
+                    <button type="submit" class="btn-primary">
                         <i class="fas fa-save me-2"></i> Guardar Estudios Asignados
                     </button>
                 </div>

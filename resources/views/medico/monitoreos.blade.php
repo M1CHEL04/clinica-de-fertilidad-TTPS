@@ -13,6 +13,12 @@
             <i class="fas fa-arrow-left mr-2"></i> Volver al Detalle
         </a>
     </div>
+    @elseif(session('rol') == 5)
+    <div>
+        <a href="{{ route('jefe.tratamiento.detalle', $tratamiento->id) }}" class="btn-secondary">
+            <i class="fas fa-arrow-left mr-2"></i> Volver al Detalle
+        </a>
+    </div>
     @else
     <div>
         <a href="{{ route('medico.tratamiento.detalle', $tratamiento->id) }}" class="btn-secondary">
@@ -140,7 +146,13 @@
             <i class="fas fa-heartbeat text-red-600 mr-2"></i> Nuevo Monitoreo
         </h3>
 
-        <form action="{{ route('monitoreos.store') }}" method="POST">
+        <form 
+    action="{{ session('rol') == 5 
+        ? route('jefe.monitoreos.store') 
+        : route('monitoreos.store') }}" 
+    method="POST"
+>
+
     @csrf
 
     <input type="hidden" name="tratamiento_id" value="{{ $tratamiento->id }}">
