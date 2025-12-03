@@ -138,9 +138,12 @@ class MedicoController extends Controller
             ->get()
             ->groupBy('tipo_estudio');
 
+        // Obtener antecedentes de pareja por tratamiento_id
+        $antecedentePareja = $tratamiento->antecedentesPareja;
+
         return view(
             'medico.cargarEstudios',
-            compact('tratamiento', 'estudiosPendientes', 'estudiosCompletados')
+            compact('tratamiento', 'estudiosPendientes', 'estudiosCompletados', 'antecedentePareja')
         );
     }
 
@@ -148,12 +151,29 @@ class MedicoController extends Controller
     public function guardarEstudios($id)
     {
         $resultados = request('resultados');
+        $viabilidadSemen = request('viabilidad_semen_' . $id);
 
-        foreach ($resultados as $estudioId => $resultado) {
-            if (trim($resultado) !== '') {
-                Estudio::where('id', $estudioId)
-                    ->where('tratamiento_id', $id)
-                    ->update(['resultado' => $resultado]);
+        // Actualizar viabilidad del semen si se proporcionó
+        if ($viabilidadSemen !== null) {
+            $semenViable = null;
+            if ($viabilidadSemen === 'positivo') {
+                $semenViable = true;
+            } elseif ($viabilidadSemen === 'negativo') {
+                $semenViable = false;
+            }
+
+            $antecedentesPareja = Tratamiento::find($id)->antecedentesPareja;
+            $antecedentesPareja->update(['semen_viable' => $semenViable]);
+        }
+
+        // Guardar resultados de estudios
+        if ($resultados) {
+            foreach ($resultados as $estudioId => $resultado) {
+                if (trim($resultado) !== '') {
+                    Estudio::where('id', $estudioId)
+                        ->where('tratamiento_id', $id)
+                        ->update(['resultado' => $resultado]);
+                }
             }
         }
 
@@ -174,7 +194,6 @@ class MedicoController extends Controller
     public function guardarProtocolo(Request $request, $id)
     {
         $request->validate([
-            'tipo_medicacion_id' => 'required|exists:tipos_medicacion,id',
             'dosis' => 'required',
             'tiempo' => 'required',
             'droga' => 'required'

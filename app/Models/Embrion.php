@@ -25,6 +25,7 @@ class Embrion extends Model
         'transferir',
         'motivo_descarte',
         'gameto_id',
+        'semen_fresco',
         'compatibilidad_gameto',
         'urlPGT'
     ];

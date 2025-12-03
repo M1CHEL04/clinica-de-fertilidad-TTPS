@@ -29,6 +29,7 @@ return new class extends Migration
             $table->boolean('utilizado')->default(false);
 
             $table->string('semen_dni')->nullable();
+            $table->boolean('semen_fresco')->nullable();
             $table->unsignedBigInteger('gameto_id')->nullable();
             $table->float('compatibilidad_gameto')->nullable();
 

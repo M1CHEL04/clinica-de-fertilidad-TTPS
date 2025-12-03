@@ -514,7 +514,7 @@ class OperadorController extends Controller
             'embriones.*.realizo_pgt' => 'required|in:si,no',
             'embriones.*.resultado_pgt' => 'required_if:embriones.*.realizo_pgt,si|in:positivo,negativo',
             'embriones.*.identificador' => 'required|string',
-            'embriones.*.fuente_semen' => 'required|in:pareja,donado',
+            'embriones.*.fuente_semen' => 'required|in:pareja,donado,fresco',
             'embriones.*.accion' => 'required|in:descartar,criopreservar,transferir',
             'embriones.*.motivo_descarte' => 'required_if:embriones.*.accion,descartar',
         ]);
@@ -532,6 +532,7 @@ class OperadorController extends Controller
                 'fecha_fertilizacion' => $request->fecha_fertilizacion,
             ]);
 
+            $semen_pareja_usado = false;
 
             // Crear embriones
             foreach ($request->embriones as $embrionData) {
@@ -559,8 +560,42 @@ class OperadorController extends Controller
                 $tratamiento = Tratamiento::where('id', $request->tratamiento_id)->first();
 
                 $objetivo_tratamiento = $tratamiento->objetivo->id;
-
                 switch ($embrionData['fuente_semen']) {
+                    case 'fresco':
+                        try {
+                            switch ($objetivo_tratamiento) {
+                                case 2:
+                                case 3:
+                                case 5:
+                                    return redirect()->back()
+                                        ->withInput()
+                                        ->with('error', 'Este tratamiento no tiene como objetivo utilizar semen de la pareja. Por favor, verifique los datos ingresados.');
+                                    break;
+                                case 1:
+                                    $dni_pareja = Tratamiento::where('id', $request->tratamiento_id)->first()->antecedentesPareja->dni;
+
+                                    if (!$dni_pareja) {
+                                        throw new \Exception("DNI de la pareja no encontrado.");
+                                    }
+
+                                    $semen_viable = Tratamiento::where('id', $request->tratamiento_id)->first()->antecedentesPareja->semen_viable;
+
+                                    if ($semen_viable !== 1) {
+                                        Log::error('El semen fresco de la pareja no es viable para el tratamiento ID: ' . $request->tratamiento_id);
+                                        return redirect()->back()
+                                            ->withInput()
+                                            ->with('error', 'El semen fresco de la pareja no es viable para este tratamiento. Por favor, verifique los datos ingresados.');
+                                    }
+
+                                    $embrion->update([
+                                        'semen_fresco' => true
+                                    ]);
+                                    break;
+                            }
+                        } catch (\Exception $e) {
+                            Log::error('Error al obtener DNI de la pareja fresco: ' . $e->getMessage());
+                        }
+                        break;
                     case 'pareja':
                         try {
                             switch ($objetivo_tratamiento) {
@@ -578,55 +613,58 @@ class OperadorController extends Controller
                                         throw new \Exception("DNI de la pareja no encontrado.");
                                     }
 
-                                    try {
-                                        // aca tengo que maracar como utilizado el semen en la API.
-                                        $response = Http::withHeaders([
-                                            'Content-Type' => 'application/json',
-                                            'token' => 'token-grupo-4'
-                                        ])->post(
-                                            'https://bmcgxbtbcmlzoetyqajn.supabase.co/functions/v1/dni-tiene-muestra',
-                                            [
-                                                'group_id' => 5,
-                                                'dni' => $dni_pareja,
-                                            ]
-                                        );
-
-                                        if (!$response->successful()) {
-                                            Log::error('Error al buscar la muestra: El dni no tiene muestra de semen criopreservado', [
-                                                'status' => $response->status(),
-                                                'body'   => $response->body()
-                                            ]);
-                                            return redirect()->back()
-                                                ->withInput()
-                                                ->with('error', 'Error al buscar la muestra: El dni no tiene muestra de semen criopreservado.');
-                                        } else {
-
-                                            $responseData = Http::withHeaders([
+                                    if (!$semen_pareja_usado) {
+                                        try {
+                                            // aca tengo que maracar como utilizado el semen en la API.
+                                            $response = Http::withHeaders([
                                                 'Content-Type' => 'application/json',
                                                 'token' => 'token-grupo-4'
                                             ])->post(
-                                                'https://bmcgxbtbcmlzoetyqajn.supabase.co/functions/v1/descongelar-semen',
+                                                'https://bmcgxbtbcmlzoetyqajn.supabase.co/functions/v1/dni-tiene-muestra',
                                                 [
                                                     'group_id' => 5,
                                                     'dni' => $dni_pareja,
                                                 ]
                                             );
 
-                                            if (!$responseData->successful()) {
-                                                Log::error('Error al marcar el semen como utilizado', [
-                                                    'status' => $responseData->status(),
-                                                    'body'   => $responseData->body()
+                                            if (!$response->successful()) {
+                                                Log::error('Error al buscar la muestra: El dni no tiene muestra de semen criopreservado', [
+                                                    'status' => $response->status(),
+                                                    'body'   => $response->body()
                                                 ]);
                                                 return redirect()->back()
                                                     ->withInput()
-                                                    ->with('error', 'Error al utilizar la muestra de semen. Intente nuevamente.');
+                                                    ->with('error', 'Error al buscar la muestra: El dni no tiene muestra de semen criopreservado.');
+                                            } else {
+
+                                                $responseData = Http::withHeaders([
+                                                    'Content-Type' => 'application/json',
+                                                    'token' => 'token-grupo-4'
+                                                ])->post(
+                                                    'https://bmcgxbtbcmlzoetyqajn.supabase.co/functions/v1/descongelar-semen',
+                                                    [
+                                                        'group_id' => 5,
+                                                        'dni' => $dni_pareja,
+                                                    ]
+                                                );
+
+                                                if (!$responseData->successful()) {
+                                                    Log::error('Error al marcar el semen como utilizado', [
+                                                        'status' => $responseData->status(),
+                                                        'body'   => $responseData->body()
+                                                    ]);
+                                                    return redirect()->back()
+                                                        ->withInput()
+                                                        ->with('error', 'Error al utilizar la muestra de semen. Intente nuevamente.');
+                                                }
+                                                $semen_pareja_usado = true;
                                             }
+                                        } catch (\Exception $e) {
+                                            Log::error('Error en la conexión a la API de semen: ' . $e->getMessage());
+                                            return redirect()->back()
+                                                ->withInput()
+                                                ->with('error', 'Error de conexión al buscar la muestra de semen.');
                                         }
-                                    } catch (\Exception $e) {
-                                        Log::error('Error en la conexión a la API de semen: ' . $e->getMessage());
-                                        return redirect()->back()
-                                            ->withInput()
-                                            ->with('error', 'Error de conexión al buscar la muestra de semen.');
                                     }
 
                                     $embrion->update([
@@ -652,20 +690,39 @@ class OperadorController extends Controller
                             case 3:
                             case 5:
                                 $antecedentesPareja = $tratamiento->antecedentesPareja;
-
                                 if (!$antecedentesPareja) {
-                                    return redirect()->back()
-                                        ->withInput()
-                                        ->with('error', 'No se encontraron los antecedentes de la pareja para buscar semen donado. Por favor, verifique los datos ingresados.');
+                                    if ($objetivo_tratamiento === 5) {
+                                        $antecedentesPropios = $tratamiento->antecedentesFenotipos;
+                                        if (!$antecedentesPropios) {
+                                            return redirect()->back()
+                                                ->withInput()
+                                                ->with('error', 'No se encontraron los antecedentes fenotípicos propios para buscar semen donado. Por favor, verifique los datos ingresados.');
+                                        } else {
+                                            $fenotipo = [
+                                                'eye_color' => $antecedentesPropios->color_ojos,
+                                                'hair_color' => $antecedentesPropios->color_pelo,
+                                                'hair_type' => $antecedentesPropios->tipo_pelo,
+                                                'complexion' => $antecedentesPropios->complexion_corporal,
+                                                'height' => $antecedentesPropios->altura,
+                                                'ethnicity' => $antecedentesPropios->rasgos_etnicos,
+                                            ];
+                                        }
+                                    }
+                                    if (!$antecedentesPareja && !$antecedentesPropios) {
+                                        return redirect()->back()
+                                            ->withInput()
+                                            ->with('error', 'No se encontraron los antecedentes de la pareja para buscar semen donado. Por favor, verifique los datos ingresados.');
+                                    }
+                                } else {
+                                    $fenotipo = [
+                                        'eye_color' => $antecedentesPareja->color_ojos,
+                                        'hair_color' => $antecedentesPareja->color_pelo,
+                                        'hair_type' => $antecedentesPareja->tipo_pelo,
+                                        'complexion' => $antecedentesPareja->complexion_corporal,
+                                        'height' => $antecedentesPareja->altura,
+                                        'ethnicity' => $antecedentesPareja->rasgos_etnicos,
+                                    ];
                                 }
-                                $fenotipo = [
-                                    'eye_color' => $antecedentesPareja->color_ojos,
-                                    'hair_color' => $antecedentesPareja->color_pelo,
-                                    'hair_type' => $antecedentesPareja->tipo_pelo,
-                                    'complexion' => $antecedentesPareja->complexion_corporal,
-                                    'height' => $antecedentesPareja->altura,
-                                    'ethnicity' => $antecedentesPareja->rasgos_etnicos,
-                                ];
 
                                 try {
                                     $response = Http::post(
