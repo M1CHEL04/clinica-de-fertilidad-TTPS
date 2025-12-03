@@ -304,9 +304,16 @@ function cargarTurnosLibres(medicoId) {
         });
 }
 
-// Obtener turnos disponibles para una fecha específica
+// Obtener turnos disponibles para una fecha específica (solo si la fecha es futura)
 function getTurnosForDate(date) {
     const fechaString = date.toISOString().split('T')[0];
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // Resetear la hora para comparación exacta
+    
+    // No mostrar turnos para fechas pasadas
+    if (date < hoy) {
+        return [];
+    }
     
     // Usar directamente todos los turnos libres cargados
     // (ya están filtrados por rango en el backend si es fecha sugerida)
@@ -324,7 +331,8 @@ function getTurnosForDate(date) {
             }
 
             const turnoFechaString = turnoFecha.toISOString().split('T')[0];
-            return turnoFechaString === fechaString;
+            // Verificar que la fecha del turno coincida y que sea futura
+            return turnoFechaString === fechaString && turnoFecha >= hoy;
         } catch (error) {
             console.error('Error al procesar fecha del turno:', turno, error);
             return false;
@@ -352,13 +360,16 @@ function isDateInSuggestedRange(date) {
     return dateString >= suggestedDateStart && dateString <= suggestedDateEnd;
 }
 
-// Encontrar el primer mes que contenga turnos disponibles
+// Encontrar el primer mes que contenga turnos disponibles (solo fechas futuras)
 function encontrarPrimerMesConTurnos() {
     if (!turnosLibres || turnosLibres.length === 0) {
         return null;
     }
     
-    // Obtener todas las fechas de los turnos y ordenarlas
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // Resetear la hora para comparación exacta de fechas
+    
+    // Obtener todas las fechas de los turnos que sean futuras y ordenarlas
     const fechasTurnos = turnosLibres.map(turno => {
         try {
             return new Date(turno.fecha_hora);
@@ -366,17 +377,23 @@ function encontrarPrimerMesConTurnos() {
             console.warn('Error al parsear fecha del turno:', turno.fecha_hora);
             return null;
         }
-    }).filter(fecha => fecha !== null && !isNaN(fecha.getTime()));
+    }).filter(fecha => {
+        // Filtrar fechas nulas, inválidas y fechas pasadas
+        return fecha !== null && !isNaN(fecha.getTime()) && fecha >= hoy;
+    });
     
     if (fechasTurnos.length === 0) {
+        console.log('No hay turnos disponibles en fechas futuras');
         return null;
     }
     
     // Ordenar fechas de menor a mayor
     fechasTurnos.sort((a, b) => a.getTime() - b.getTime());
     
-    // Retornar la primera fecha (más temprana)
-    return fechasTurnos[0];
+    // Retornar la primera fecha futura (más temprana)
+    const primeraFechaFutura = fechasTurnos[0];
+    console.log('Primera fecha futura con turnos encontrada:', primeraFechaFutura);
+    return primeraFechaFutura;
 }
 
 // Navegar automáticamente al mes con turnos (siempre al primer mes disponible)
@@ -400,34 +417,42 @@ function navegarAMesConTurnos() {
     return false; // No se necesitó navegar
 }
 
-// Verificar si hay turnos en un mes específico
+// Verificar si hay turnos en un mes específico (solo fechas futuras)
 function hayTurnosEnMes(year, month) {
     if (!turnosLibres || turnosLibres.length === 0) {
         return false;
     }
     
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // Resetear la hora para comparación exacta
+    
     return turnosLibres.some(turno => {
         try {
             const fechaTurno = new Date(turno.fecha_hora);
-            return fechaTurno.getFullYear() === year && fechaTurno.getMonth() === month;
+            return fechaTurno.getFullYear() === year && 
+                   fechaTurno.getMonth() === month &&
+                   fechaTurno >= hoy; // Solo fechas futuras
         } catch (error) {
             return false;
         }
     });
 }
 
-// Verificar si hay turnos en meses anteriores al mes dado
+// Verificar si hay turnos en meses anteriores al mes dado (pero no en el pasado)
 function hayTurnosEnMesesAnteriores(year, month) {
     if (!turnosLibres || turnosLibres.length === 0) {
         return false;
     }
     
     const fechaLimite = new Date(year, month, 1);
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // Resetear la hora para comparación exacta
     
     return turnosLibres.some(turno => {
         try {
             const fechaTurno = new Date(turno.fecha_hora);
-            return fechaTurno < fechaLimite;
+            // El turno debe ser anterior al mes dado, pero posterior a hoy
+            return fechaTurno < fechaLimite && fechaTurno >= hoy;
         } catch (error) {
             return false;
         }
