@@ -2,8 +2,6 @@ function inicializarFormParejas() {
     const tratamiento = window.tratamiento || {};
     const pareja = tratamiento.antecedentes_pareja || {};
     const hombre = tratamiento.antecedentes_hombre || {};
-    console.log(tratamiento);
-    console.log(pareja);
 
     const genital = document.getElementById("p_antecedentes_genitales");
     if (genital)
@@ -15,7 +13,7 @@ function inicializarFormParejas() {
     function prefill(id, value) {
         const el = document.getElementById(id);
         if (el) {
-            if (el.tagName === 'SELECT') {
+            if (el.tagName === "SELECT") {
                 // Para selects, buscar la opción correcta
                 const option = el.querySelector(`option[value="${value}"]`);
                 if (option) {
@@ -37,10 +35,17 @@ function inicializarFormParejas() {
             setTimeout(() => {
                 el.value = value;
                 if (el.value !== value) {
-                    console.warn(`No se pudo establecer valor ${value} para ${id}`);
-                    console.log(`Opciones disponibles:`, Array.from(el.options).map(opt => opt.value));
+                    console.warn(
+                        `No se pudo establecer valor ${value} para ${id}`
+                    );
+                    console.log(
+                        `Opciones disponibles:`,
+                        Array.from(el.options).map((opt) => opt.value)
+                    );
                 } else {
-                    console.log(`✅ Valor establecido correctamente ${id} = ${value}`);
+                    console.log(
+                        `✅ Valor establecido correctamente ${id} = ${value}`
+                    );
                 }
             }, 100);
         }
@@ -251,22 +256,22 @@ function inicializarFormParejas() {
     ============================================ */
     const CAMPOS = [
         "dni",
-        "ciclo_regular", 
+        "ciclo_regular",
         "duracion",
         "caracteristicas_sangrado",
         "altura",
         "AB",
-        "G", 
+        "G",
         "CT",
         "P",
     ];
 
     const CAMPOS_SELECT = [
         "tipo_pelo",
-        "color_pelo", 
+        "color_pelo",
         "color_ojos",
         "complexion_corporal",
-        "rasgos_etnicos"
+        "rasgos_etnicos",
     ];
 
     /* ============================================
@@ -323,8 +328,8 @@ function inicializarFormParejas() {
        EJECUTAR (fusión pareja + hombre)
     ============================================ */
     const datosUnificados = { ...pareja, ...hombre };
-    
-    console.log('Datos unificados para prellenar:', datosUnificados);
+
+    console.log("Datos unificados para prellenar:", datosUnificados);
 
     inicializarPersona(datosUnificados);
 }

@@ -1,11 +1,19 @@
 @extends('layouts.layoutInterno')
 
 @section('content')
+@if(session('rol') == 3)
+<a href="{{ route('operador.tratamiento.detalle', $tratamiento->id) }}"
+   class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold mb-4">
+    <i class="fas fa-arrow-left"></i>
+    Volver
+</a>
+@else
 <a href="{{ route('medico.tratamiento.detalle', $tratamiento->id) }}"
    class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold mb-4">
     <i class="fas fa-arrow-left"></i>
     Volver
 </a>
+@endif
 <div class="max-w-4xl mx-auto mt-10 space-y-10">
 
     {{-- ========================= --}}

@@ -516,16 +516,14 @@ button:hover,
                     </div>
 
 
-                    <div id="antecedentePareja" class="mb-4">
-                        {{-- Contenido generado por JS para antecedentes de pareja --}}
-                    </div>
+                    <div id="antecedentePareja"></div>
 
-                    <div class="d-flex justify-content-between pt-3 border-top">
-                        <button type="button" onclick="prevStep()" class="btn btn-secondary"><i
-                                class="fas fa-arrow-left me-2"></i>Atrás</button>
-                        <button type="submit" class="btn btn-success"><i class="fas fa-save me-2"></i>Guardar
-                            consulta</button>
-                    </div>
+                    <button type="button" onclick="prevStep()" class="btn btn-secondary">← Atrás</button>
+                    @if (session('rol') == 3)
+                     <button type="submit" class="btn btn-primary float-end" disabled  style="opacity: 0.4; cursor: not-allowed;">Solo puedes ver los datos, no editar</button>
+                    @else
+                    <button type="submit" class="btn btn-primary float-end">Guardar consulta</button>
+                    @endif
                 </div>
 
             </form>
@@ -539,6 +537,7 @@ button:hover,
 @section('scripts')
     <script>
         window.tratamiento = {!! json_encode($tratamiento ?? null) !!};
+        window.rol ={!! json_encode( session('rol') ?? null) !!}
     </script>
 
     <script src="{{ asset('js/terminos.js') }}"></script>

@@ -50,18 +50,11 @@
 <body>
 
     <div class="card">
-        <div class="title">Dias sugeridos para tu consulta</div>
+        <div class="title">Estado actual del tratamiento</div>
 
         <p class="text">
-            El médico {{$nombre}} {{$apellido}} te envía el siguiente rango de dias como sugerencia
-            para coordinar tu próxima consulta.
+            El médico {{ $nombre }} {{ $apellido }} te informa que tu tratamiento ha avanzado a la etapa de transferencia. Para continuar con el proceso, por favor solicitá un turno a la brevedad.
         </p>
-
-        <p class="text">
-             <strong>Fecha de inicio:</strong> {{ $fechaInicio }}<br>
-             <strong>Fecha de fin:</strong> {{ $fechaFin }}
-        </p>
-
 
         <p class="text">
             Estamos a tu disposición para ayudarte en lo que necesites.

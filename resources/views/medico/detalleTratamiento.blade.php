@@ -7,11 +7,19 @@
         <h1 class="page-title">Detalle del Tratamiento</h1>
         <p class="page-subtitle">Información detallada del paciente y su tratamiento actual</p>
     </div>
+    @if (session('rol') == 3 )
     <div>
-        <a href="{{ url()->previous() }}" class="btn-secondary">
+        <a href="/operador/home" class="btn-secondary">
             <i class="fas fa-arrow-left mr-2"></i> Volver a Pacientes
         </a>
     </div>
+    @else
+    <div>
+        <a href="/medico/home" class="btn-secondary">
+            <i class="fas fa-arrow-left mr-2"></i> Volver a Pacientes
+        </a>
+    </div>
+    @endif
 </div>
 @endsection
 
@@ -80,6 +88,15 @@
             </div>
         </div>
 
+        @php
+            $etapa = trim(strtolower($tratamiento->etapa));
+        @endphp
+        @php
+            $etapaOperador = in_array($etapa, [
+                    'puncion',
+                    'fertilizacion'
+                ]);
+        @endphp
         
 
         <!-- ➡️ Avanzar etapa -->
@@ -97,18 +114,32 @@
     @if (strtolower($tratamiento->etapa) !== 'finalizado')
         <form method="POST" action="{{ route('tratamiento.avanzar-etapa', $tratamiento->id) }}">
             @csrf
-            <button class="btn-primary">
-                <i class="fas fa-arrow-right mr-1"></i> Avanzar etapa
-            </button>
+            @if($etapaOperador)
+                <button
+                    class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled >
+                    <i class="fas fa-arrow-right mr-1"></i> Avanzar etapa
+                </button>
+            @else
+                <button class="btn-primary">
+                    <i class="fas fa-arrow-right mr-1"></i> Avanzar etapa
+                </button>
+            @endif
         </form>
     @endif
 
     @if (strtolower($tratamiento->etapa) !== 'primera consulta')
         <form method="POST" action="{{ route('tratamiento.retroceder-etapa', $tratamiento->id) }}">
             @csrf
-            <button class="btn-secondary">
-                <i class="fas fa-arrow-left mr-1"></i> Retroceder etapa
-            </button>
+            @if($etapaOperador)
+                <button class="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    <i class="fas fa-arrow-left mr-1"></i> Retroceder etapa
+                </button>
+            @else
+                <button class="btn-secondary">
+                    <i class="fas fa-arrow-left mr-1"></i> Retroceder etapa
+                </button>
+            @endif
         </form>
     @endif
 </div>
@@ -117,14 +148,31 @@
     
 @php
     $deshabilitado = $tratamiento->etapa !== "Monitoreos";
+    $habilitado = $tratamiento->etapa == "Transferencia";
 @endphp
 
-<button 
-    class="btn-primary {{ $deshabilitado ? 'btn-disabled' : '' }}"
-    @if($deshabilitado) disabled @else onclick="abrirModal()" @endif
->
-    <i class="fas fa-plus mr-2"></i> Agendar nueva consulta
-</button>
+<div style="display:flex; gap:10px;">
+    <button 
+        class="btn-primary {{ $deshabilitado ? 'btn-disabled' : '' }}"
+        @if($deshabilitado) disabled @else onclick="abrirModal()" @endif
+    >
+        <i class="fas fa-plus mr-2"></i> Agendar nueva consulta
+    </button>
+
+    <form method="POST" action="{{ route('tratamiento.notificar-transferencia', $tratamiento->id) }}">
+        @csrf
+        <button 
+            type="submit"
+            class="btn btn-primary {{ $habilitado ? '' : 'btn-disabled' }}"
+            {{ $habilitado ? '' : 'disabled' }}
+        >
+            <i class="fas fa-plus mr-2"></i>
+            Notificar etapa de transferencia al paciente
+        </button>
+    </form>
+</div>
+
+
 
 <div id="modal-agendar" class="modal-overlay" style="display:none;">
     <div class="modal-content">
@@ -141,7 +189,7 @@
 
             <div class="modal-actions">
                 <button type="button" class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
-                <button type="submit" class="btn-primary">Guardar</button>
+                <button type="submit" class="btn btn-success"> <i class="fas fa-save me-2">Guardar</i></button>
             </div>
         </form>
     </div>
@@ -157,22 +205,36 @@
     @if (strtolower($tratamiento->etapa) !== 'finalizado')
         <form method="POST" action="{{ route('tratamiento.avanzar-etapa', $tratamiento->id) }}">
             @csrf
-            <button
-                
+            @if($etapaOperador)
+                <button
+                class="btn-primary"
+                >
+                <i class="fas fa-arrow-right mr-1"></i> Avanzar etapa
+            </button>
+            @else
+            <button 
                 class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled >
                 <i class="fas fa-arrow-right mr-1"></i> Avanzar etapa
             </button>
+            @endif
         </form>
     @endif
 
     @if (strtolower($tratamiento->etapa) !== 'primera consulta')
         <form method="POST" action="{{ route('tratamiento.retroceder-etapa', $tratamiento->id) }}">
             @csrf
-            <button class="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled>
-                <i class="fas fa-arrow-left mr-1"></i> Retroceder etapa
-            </button>
+            @if($etapaOperador)
+                <button class="btn-secondary"
+                >
+                    <i class="fas fa-arrow-left mr-1"></i> Retroceder etapa
+                </button>
+            @else
+                <button class="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled>
+                    <i class="fas fa-arrow-left mr-1"></i> Retroceder etapa
+                </button>
+            @endif    
         </form>
     @endif
 </div>
@@ -205,7 +267,7 @@
 
             <div class="modal-actions">
                 <button type="button" class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
-                <button type="submit" class="btn-primary">Guardar</button>
+                <button type="submit" class="btn btn-success"> <i class="fas fa-save me-2">Guardar</i></button>
             </div>
         </form>
     </div>
@@ -218,21 +280,8 @@
         @endif
     </div>
     
-
-    <!-- 🧰 Panel lateral -->
-    @if ($tratamiento->estado_tratamiento == 'Activo') 
-    <div class="space-y-4">
-        <div class="card p-6">
-            <h3 class="text-lg font-semibold mb-4 text-gray-900 flex items-center">
-                <i class="fas fa-tasks text-indigo-600 mr-2"></i> Acciones del Tratamiento
-            </h3>
-            
-            <div class="space-y-3">
-
-    {{-- Normalizar el nombre de etapa para comparación --}}
-    @php
-        $etapa = trim(strtolower($tratamiento->etapa));
-    @endphp
+     {{-- Normalizar el nombre de etapa para comparación --}}
+    
 
     {{-- PRIMERA CONSULTA --}}
     @php
@@ -243,6 +292,7 @@
             'control de embarazo',
             'puncion',
             'finalizado',
+            'fertilizacion',
             'transferencia'
         ]);
     @endphp
@@ -255,9 +305,12 @@
             'control de embarazo',
             'puncion',
             'finalizado',
+            'fertilizacion',
             'transferencia'
         ]);
     @endphp
+
+    
 
     @php
         $etapa3 = in_array($etapa, [
@@ -265,6 +318,7 @@
             'control de embarazo',
             'puncion',
             'finalizado',
+            'fertilizacion',
             'transferencia'
         ]);
     @endphp
@@ -276,6 +330,89 @@
             'finalizado'
         ]);
     @endphp
+    <!-- 🧰 Panel lateral -->
+    @if ($tratamiento->estado_tratamiento == 'Activo') 
+    <div class="space-y-4">
+        <div class="card p-6">
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 flex items-center">
+                <i class="fas fa-tasks text-indigo-600 mr-2"></i> Acciones del Tratamiento
+            </h3>
+            
+    
+    @if (session('rol') == 3)
+        {{-- 6️⃣ Cargar objetivo (desde etapa 1) --}}
+
+    <div class="space-y-3">    
+    
+     <a href="{{ route('operador.verConsulta', $tratamiento->paciente_id) }}" class="btn-primary w-full flex items-center justify-center gap-2"
+            {{ !$etapa1 ? 'disabled' : '' }}>
+        <i class="fas fa-bullseye"></i> Seccion de primera consulta
+    </a>
+
+    {{-- 1️⃣ Recetar estudios (desde etapa 1) --}}
+    @if ($etapa1)
+        <a href="{{ route('operador.estudios.index', $tratamiento->paciente_id) }}"
+    class="btn-primary w-full flex items-center justify-center gap-2">
+        <i class="fas fa-vials"></i> Recetar estudios
+    </a>
+
+    @else
+        <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+            <i class="fas fa-vials"></i> Recetar estudios
+        </a>
+    @endif
+
+
+   
+     @if ($etapa2)
+        <a href="{{ route('operador.tratamiento.cargar-estudios', $tratamiento->id) }}"
+           class="btn-primary w-full flex items-center justify-center gap-2">
+            <i class="fas fa-file-upload"></i> Sección Estudios
+        </a>
+    @else
+        <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+            <i class="fas fa-file-upload"></i> Sección Estudios
+        </a>
+    @endif
+    
+
+   
+    {{--  Protocolo de Estimulación (desde etapa 2) --}}
+    
+        <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+            <i class="fas fa-dna"></i> Protocolo de Estimulación
+        </a>
+    
+
+     {{-- 4️⃣ Monitoreos (desde etapa 3) --}}
+    @if ($etapa3)
+        <a href="{{ route('operador.monitoreos', $tratamiento->id) }}"
+           class="btn-primary w-full flex items-center justify-center gap-2">
+            <i class="fas fa-heartbeat"></i> Sección de Monitoreos
+        </a>
+    @else
+        <a class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+            <i class="fas fa-heartbeat"></i> Sección de Monitoreos
+        </a>
+    @endif
+
+   
+    @if ($etapa4)
+        <a href="{{ route('operador.tratamiento.post', $tratamiento->id) }}"
+        class="btn-primary w-full flex items-center justify-center gap-2">
+            <i class="fas fa-leaf"></i> Post-transferencia
+        </a>
+    @else
+        <button class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+        <i class="fas fa-seedling"></i> Post-transferencia
+        </button>
+    </div>    
+    @endif
+    @else
+    
+    <div class="space-y-3">
+
+   
 
 
     {{-- 6️⃣ Cargar objetivo (desde etapa 1) --}}
@@ -299,14 +436,6 @@
 @endif
 
 
-   
-
-    <!-- {{-- 3️⃣ Cargar antecedentes (desde etapa 1) --}}
-    <button class="btn-primary w-full flex items-center justify-center gap-2 {{ !$etapa1 ? 'opacity-50 cursor-not-allowed' : '' }}"
-            {{ !$etapa1 ? 'disabled' : '' }}>
-        <i class="fas fa-user-md"></i> Cargar antecedentes
-    </button>
-     -->
      @if ($etapa2)
         <a href="{{ route('tratamiento.cargar-estudios', $tratamiento->id) }}"
            class="btn-primary w-full flex items-center justify-center gap-2">
@@ -359,6 +488,7 @@
     
 
 </div>
+@endif
 
 
         <div class="card p-4 bg-blue-50 border border-blue-200">

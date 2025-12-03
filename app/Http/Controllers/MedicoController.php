@@ -237,9 +237,10 @@ class MedicoController extends Controller
         2 => 'Segunda Consulta',
         3 => 'Monitoreos',
         4 => 'Punción',
-        5 => 'Transferencia',
-        6 => 'Control de embarazo',
-        7 => 'Finalizado',
+        5 => 'Fertilizacion',
+        6 => 'Transferencia',
+        7 => 'Control de embarazo',
+        8 => 'Finalizado',
     ];
 
 
@@ -253,7 +254,7 @@ class MedicoController extends Controller
 
         $actual = (int) $tratamiento->etapa_id;
 
-        if ($actual >= 7) {
+        if ($actual >= 8) {
             return back()->with('error', 'No se puede avanzar más la etapa.');
         }
 
@@ -345,6 +346,29 @@ class MedicoController extends Controller
 
 
         return redirect()->back()->with('success', 'Consulta agendada correctamente.');
+    }
+
+     public function notificarTransferencia(Request $request, $id)
+    {
+       
+        $trat = Tratamiento::findOrFail($id);
+        $user = $trat->historiaClinica->paciente;
+        $nombre = session('nombre');
+        $apellido = session('apellido');
+        $mailController = new MailController();
+
+        $mailController->enviarMail(
+            [$user->mail],
+            'Estado actual del tratamiento',
+            'mails.notificarTransferencia',
+            [
+                'nombre' => $nombre,
+                'apellido' => $apellido
+            ]
+        );
+
+
+        return redirect()->back()->with('success', 'Aviso enviado correctamente.');
     }
 
 
