@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             const removeBtn = document.createElement('button');
                             removeBtn.type = 'button';
                             removeBtn.classList.add('btn', 'btn-sm', 'btn-outline-danger');
-                            removeBtn.textContent = '✕';
+                            removeBtn.innerHTML = `<i class="fas fa-trash-alt"></i>`;
                             removeBtn.addEventListener('click', () => li.remove());
                             li.appendChild(removeBtn);
 

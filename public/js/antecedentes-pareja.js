@@ -145,18 +145,11 @@ function inicializarFormParejas() {
                                 hidden.value = item;
                                 li.appendChild(hidden);
 
-                                const removeBtn =
-                                    document.createElement("button");
-                                removeBtn.type = "button";
-                                removeBtn.classList.add(
-                                    "btn",
-                                    "btn-sm",
-                                    "btn-outline-danger"
-                                );
-                                removeBtn.textContent = "✕";
-                                removeBtn.addEventListener("click", () =>
-                                    li.remove()
-                                );
+                                const removeBtn = document.createElement('button');
+                                removeBtn.type = 'button';
+                                removeBtn.classList.add('btn', 'btn-sm', 'btn-outline-danger');
+                                removeBtn.innerHTML = `<i class="fas fa-trash-alt"></i>`;
+                                removeBtn.addEventListener('click', () => li.remove());
                                 li.appendChild(removeBtn);
 
                                 list.appendChild(li);

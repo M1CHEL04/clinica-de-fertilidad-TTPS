@@ -1,6 +1,6 @@
 @extends('layouts.layoutInterno')
 
-@section('content')
+@section('styles')
 <style>
 /* Fondo general para contraste */
 body {
@@ -43,7 +43,7 @@ body {
 /* Estilo para los campos requeridos */
 label.required::after {
     content: " *";
-    color: #e75353ff;
+    color: #412c2c8e;
     font-weight: bold;
 }
 
@@ -111,7 +111,7 @@ button,
     background-color: #007bff;
     color: white;
     border: none;
-    padding: 10px 16px;
+    padding: 8px 10px;
     border-radius: 6px;
     font-weight: 500;
     cursor: pointer;
@@ -121,18 +121,55 @@ button:hover,
 .btn:hover {
     background-color: #0056b3;
 }
+.list-group-item button.btn-outline-danger {
+    border: none;
+    background: transparent;
+    color: #495057;
+    padding: 4px 8px;
+    margin-left: 10px;
+}
+
+.list-group-item button.btn-outline-danger:hover {
+    color: #49494aff;
+}
+
 </style>
+@endsection
 
 
+@section('page-header')
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Primer consulta</h1>
+        <p class="page-subtitle">Cargar información detallada del paciente y su objetivo</p>
+    </div>
+    @if (session('rol') == 3 )
+    <div>
+        <a href="/operador/home" class="btn-secondary">
+            <i class="fas fa-arrow-left mr-2"></i> Volver a Pacientes
+        </a>
+    </div>
+    @elseif (session('rol') == 5 )
+    <div>
+        <a href="/jefe/home" class="btn-secondary">
+            <i class="fas fa-arrow-left mr-2"></i> Volver a Pacientes
+        </a>
+    </div>
+    @else
+    <div>
+        <a href="/medico/home" class="btn-secondary">
+            <i class="fas fa-arrow-left mr-2"></i> Volver a Pacientes
+        </a>
+    </div>
+    @endif
+</div>
+@endsection
 
-    {{-- CONTENEDOR CENTRADO CORRECTAMENTE --}}
+ @section('content')
     <div class="main-content-container">
         
         {{-- Contenedor principal con estilo de card --}}
         <div class="card consult-card p-4">
-
-            {{-- Título y navegación de pasos --}}
-            <h1 class="mb-4">📋 Primera Consulta</h1>
 
             <div class="wizard-nav">
                 <span class="nav-step active" data-step="1"><i class="fas fa-user-check me-2"></i>Datos iniciales</span>
@@ -332,15 +369,16 @@ button:hover,
                         @endif
                     </div>
 
-                    <div class="d-flex justify-content-between pt-3 border-top">
-                        <div>
-                            <button type="button" onclick="prevStep()" class="btn btn-secondary me-2"><i
-                                    class="fas fa-arrow-left me-2"></i>Atrás</button>
-                            <button type="button" id="add-familiar" class="btn btn-info"><i
-                                    class="fas fa-plus me-2"></i>Añadir familiar</button>
-                        </div>
+                    <div class="d-flex justify-content-between pt-3 border-top mt-4">
+                         
+                        
+                        <button type="button" onclick="prevStep()" class="btn btn-secondary"><i
+                                class="fas fa-arrow-left me-2"></i>Atrás</button>
                         <button type="button" onclick="nextStep()" class="btn btn-primary">Siguiente <i
                                 class="fas fa-arrow-right ms-2"></i></button>
+
+                                <button type="button" id="add-familiar" class="btn btn-info"><i
+                                    class="fas fa-plus me-2"></i>Añadir familiar</button>
                     </div>
                 </div>
 
