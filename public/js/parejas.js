@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         let url = "";
         if (rol == 3) url = "/operador";
+        else if (rol == 5) url = "/jefe";
         else url = "/medico";
 
         // GAMETOS PROPIOS → datos del hombre

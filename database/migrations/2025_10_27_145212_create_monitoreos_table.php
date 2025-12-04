@@ -4,6 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Models\Tratamiento;
+use App\Models\User;
 
 return new class extends Migration
 {
@@ -16,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Tratamiento::class);
             $table->string('observacion');
+            $table->foreignIdFor(User::class);
             $table->timestamps();
         });
     }
