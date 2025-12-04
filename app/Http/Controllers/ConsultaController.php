@@ -109,7 +109,7 @@ class ConsultaController extends Controller
                 ->with('error', 'El paciente no tiene un tratamiento activo con datos ya cargados.');
         }
 
-        // 📄 Recuperar historia clínica solo para mostrar
+        // Recuperar historia clínica solo para mostrar
         $historia = \App\Models\HistoriaClinica::firstOrCreate([
             'paciente_id' => $paciente_id
         ]);
