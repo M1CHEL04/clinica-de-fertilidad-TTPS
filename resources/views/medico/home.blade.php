@@ -88,15 +88,15 @@
 
                 <!-- Filtro por Estado -->
                 <!-- <div class="w-full md:w-48">
-                            <label class="form-label">Estado</label>
-                            <select class="form-input">
-                                <option value="">Todos</option>
-                                <option value="activo">Activo</option>
-                                <option value="tratamiento">En Tratamiento</option>
-                                <option value="seguimiento">Seguimiento</option>
-                                <option value="completado">Completado</option>
-                            </select>
-                        </div> -->
+                                                                    <label class="form-label">Estado</label>
+                                                                    <select class="form-input">
+                                                                        <option value="">Todos</option>
+                                                                        <option value="activo">Activo</option>
+                                                                        <option value="tratamiento">En Tratamiento</option>
+                                                                        <option value="seguimiento">Seguimiento</option>
+                                                                        <option value="completado">Completado</option>
+                                                                    </select>
+                                                                </div> -->
 
                 <!-- Botón Limpiar -->
                 <div class="flex items-end">
@@ -134,9 +134,20 @@
                                                 {{ strtoupper(substr($paciente->nombre, 0, 1)) }}{{ strtoupper(substr($paciente->apellido, 0, 1)) }}
                                             </span>
                                         </div>
-                                        <div>
-                                            <p class="font-medium text-gray-900">{{ $paciente->nombre }}
-                                                {{ $paciente->apellido }}</p>
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2">
+                                                <p class="font-medium text-gray-900">{{ $paciente->nombre }}
+                                                    {{ $paciente->apellido }}</p>
+                                                @if (isset($paciente->proximo_turno) &&
+                                                        $paciente->proximo_turno &&
+                                                        \Carbon\Carbon::parse($paciente->proximo_turno)->isToday())
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                                        <i class="fas fa-calendar-check mr-1"></i>
+                                                        Turno hoy
+                                                    </span>
+                                                @endif
+                                            </div>
                                             <p class="text-sm text-gray-500">{{ $paciente->mail }}</p>
                                         </div>
                                     </div>
@@ -150,17 +161,17 @@
                                     @endif
                                 </td>
                                 <!-- <td>
-                                        <span class="badge 
+                                                            <span class="badge 
                                 @if ($paciente->estado_tratamiento == 'Activo') badge-success
                                 @elseif($paciente->estado_tratamiento == 'Completado') badge-info
                                 @else badge-warning @endif">
-                                            {{ $paciente->estado_tratamiento }}
-                                        </span>
-                                    </td> -->
+                                                                {{ $paciente->estado_tratamiento }}
+                                                            </span>
+                                                        </td> -->
                                 <td class="text-gray-700">{{ $paciente->telefono ?? '—' }}</td>
                                 <!-- <td class="text-gray-700">
-                                        {{ $paciente->fecha_inicio ? \Carbon\Carbon::parse($paciente->fecha_inicio)->format('d/m/Y') : '—' }}
-                                    </td> -->
+                                                            {{ $paciente->fecha_inicio ? \Carbon\Carbon::parse($paciente->fecha_inicio)->format('d/m/Y') : '—' }}
+                                                        </td> -->
                                 <td>
                                     <div class="flex space-x-2">
                                         <!-- Botón ojo: abre modal -->

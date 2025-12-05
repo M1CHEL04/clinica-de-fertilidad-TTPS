@@ -36,6 +36,7 @@ class MedicoController extends Controller
                 'usuarios.dni',
                 'usuarios.fecha_nacimiento',
                 'usuarios.telefono',
+                'usuarios.proximo_turno',
                 DB::raw('MAX(estados_tratamiento.nombre) as estado_tratamiento'),
                 DB::raw('MIN(tratamientos.created_at) as fecha_inicio')
             )
@@ -46,7 +47,8 @@ class MedicoController extends Controller
                 'usuarios.mail',
                 'usuarios.dni',
                 'usuarios.fecha_nacimiento',
-                'usuarios.telefono'
+                'usuarios.telefono',
+                'usuarios.proximo_turno'
             )
             ->get();
 
@@ -75,6 +77,7 @@ class MedicoController extends Controller
                 'usuarios.dni',
                 'usuarios.fecha_nacimiento',
                 'usuarios.telefono',
+                'usuarios.proximo_turno',
                 DB::raw('MAX(estados_tratamiento.nombre) as estado_tratamiento'),
                 DB::raw('MIN(tratamientos.created_at) as fecha_inicio')
             )
@@ -85,7 +88,8 @@ class MedicoController extends Controller
                 'usuarios.mail',
                 'usuarios.dni',
                 'usuarios.fecha_nacimiento',
-                'usuarios.telefono'
+                'usuarios.telefono',
+                'usuarios.proximo_turno'
             )
             ->get();
 

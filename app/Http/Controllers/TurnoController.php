@@ -126,6 +126,14 @@ class TurnoController extends Controller
                 return redirect()->back()->with('error', 'Error al solicitar el turno. Por favor, intente nuevamente.');
             }
 
+            if ($response->successful()) {
+                $paciente = User::find($request->paciente_id);
+                $turnoFechaHora = $response->json()['turno']['fecha_hora'];
+                $turnoFecha = date('Y-m-d', strtotime($turnoFechaHora));
+                $paciente->proximo_turno = $turnoFecha;
+                $paciente->save();
+            }
+
             return redirect()->back()->with('success', 'Turno solicitado correctamente.');
         } catch (\Exception $e) {
             Log::error('Excepción al solicitar turno: ' . $e->getMessage());
