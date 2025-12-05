@@ -74,6 +74,23 @@
                             {{ \Carbon\Carbon::parse($tratamiento->fecha_inicio)->format('d/m/Y') }}
                         </p>
                     </div>
+                    <div>
+                        @php
+                            $tieneTurnoHoy =
+                                isset($tratamiento->proximo_turno) &&
+                                $tratamiento->proximo_turno &&
+                                \Carbon\Carbon::parse($tratamiento->proximo_turno)->isToday();
+                        @endphp
+                        @if ($tieneTurnoHoy && (session('rol') == 2 || session('rol') == 5))
+                            <form method="POST"
+                                action="{{ route('tratamiento.marcar-atendido', $tratamiento->paciente_id) }}">
+                                @csrf
+                                <button type="submit" class="btn-primary w-full flex items-center justify-center gap-2">
+                                    <i class="fas fa-check-circle"></i> Marcar como atendido
+                                </button>
+                            </form>
+                        @endif
+                    </div>
 
                 </div>
             </div>

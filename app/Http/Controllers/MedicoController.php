@@ -117,6 +117,7 @@ class MedicoController extends Controller
                 'usuarios.mail',
                 'usuarios.dni',
                 'usuarios.fecha_nacimiento',
+                'usuarios.proximo_turno',
                 'estados_tratamiento.nombre as estado_tratamiento',
                 'etapa.nombre as etapa',
                 'tratamientos.created_at as fecha_inicio',
@@ -526,6 +527,32 @@ class MedicoController extends Controller
         } catch (\Exception $e) {
             Log::error('Error al cancelar tratamiento: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Error interno al cancelar el tratamiento.');
+        }
+    }
+
+    public function marcarTurnoAtendido($pacienteId)
+    {
+        try {
+            // Verificar que el paciente existe
+            $paciente = User::findOrFail($pacienteId);
+
+            // Verificar que el paciente tenga un turno hoy
+            if (!$paciente->proximo_turno || !\Carbon\Carbon::parse($paciente->proximo_turno)->isToday()) {
+                return redirect()->back()->with('error', 'El paciente no tiene un turno programado para hoy.');
+            }
+
+            // Actualizar el campo proximo_turno a null
+            DB::table('usuarios')
+                ->where('id', $pacienteId)
+                ->update([
+                    'proximo_turno' => null,
+                    'updated_at' => now(),
+                ]);
+
+            return redirect()->back()->with('success', 'Turno marcado como atendido correctamente.');
+        } catch (\Exception $e) {
+            Log::error('Error al marcar turno como atendido: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al procesar la solicitud.');
         }
     }
 }
