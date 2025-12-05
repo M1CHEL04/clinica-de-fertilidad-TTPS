@@ -569,6 +569,7 @@ function selectDate(date, element) {
 
     selectedDate = date;
     document.getElementById('fecha-seleccionada').value = date.toISOString().split('T')[0];
+    validarTurno();
 
     // Mostrar horarios disponibles para esta fecha
     showAvailableTimesForDate(date);
@@ -627,6 +628,7 @@ function selectTime(time, element, turnoId) {
 
     selectedTime = time;
     document.getElementById('hora-seleccionada').value = time;
+    validarTurno();
     
     // Establecer el ID del turno seleccionado
     document.getElementById('turno-seleccionado').value = turnoId;

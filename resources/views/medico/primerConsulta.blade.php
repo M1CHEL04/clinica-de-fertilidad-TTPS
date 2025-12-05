@@ -515,9 +515,10 @@
                             <select name="complexion" id="complexion" class="form-select" required>
                                 <option value="" disabled selected>Seleccione una complexión</option>
                                 @foreach ($complexiones as $complexion)
-                                    <option value="{{ $complexion->value }}"
-                                        {{ ($f?->complexion_corporal ?? '') === $complexion->value ? 'selected' : '' }}>
-                                        {{ $complexion->nombre }}</option>
+                                    <option value="{{ $complexion->id }}"
+                                        {{ ($f?->complexion_corporal ?? '') == $complexion->id ? 'selected' : '' }}>
+                                        {{ $complexion->nombre }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
