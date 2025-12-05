@@ -87,7 +87,10 @@ Route::post('/tratamiento/{id}/retroceder', [MedicoController::class, 'retrocede
 Route::post('/tratamiento/{id}/agendar-consulta', [MedicoController::class, 'agendarConsulta'])
     ->name('tratamiento.agendar-consulta');
 
-    Route::post('/tratamiento/{id}/notificar-transferencia', [MedicoController::class, 'notificarTransferencia'])
+Route::post('/tratamiento/{pacienteId}/marcar-atendido', [MedicoController::class, 'marcarTurnoAtendido'])
+    ->name('tratamiento.marcar-atendido');
+
+Route::post('/tratamiento/{id}/notificar-transferencia', [MedicoController::class, 'notificarTransferencia'])
     ->name('tratamiento.notificar-transferencia');
 
 Route::get('/ovocitos/{id}/editar', [OperadorController::class, 'editar'])->name('ovocito.editar');
@@ -134,9 +137,9 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
 
     Route::post('/tratamiento/{id}/consentimiento', [MedicoController::class, 'subirConsentimiento'])
         ->name('tratamiento.subir-consentimiento');
-    
+
     Route::get('/tratamientos/{id}/descargar-consentimiento', [MedicoController::class, 'descargarConsentimiento'])
-    ->name('tratamiento.descargar-consentimiento');
+        ->name('tratamiento.descargar-consentimiento');
 
     Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\MedicoController::class, 'tratamientosDeUnPaciente']);
 
@@ -253,7 +256,7 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
 
     Route::get('/estudios/{paciente_id}', [EstudiosController::class, 'estudios'])
         ->name('operador.estudios.index');
-    
+
     Route::get('/consulta/partials/hombre-gametos', function () {
         $coloresPelo = ColorPelo::all();
         $coloresOjos = ColorOjo::all();
@@ -300,24 +303,24 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
             'complexiones',
             'rasgos'
         ));
-    });    
+    });
 
-     Route::get('/consulta/{paciente_id}', [ConsultaController::class, 'create'])
+    Route::get('/consulta/{paciente_id}', [ConsultaController::class, 'create'])
         ->name('operador.primerConsulta.create');
 
     Route::get('/verConsulta/{paciente_id}', [ConsultaController::class, 'ver'])
         ->name('operador.verConsulta');
 
     Route::get('/tratamiento/{id}/protocolo', [MedicoController::class, 'protocolo'])
-        ->name('operador.tratamiento.protocolo');    
+        ->name('operador.tratamiento.protocolo');
 
     Route::get('/tratamiento/{id}/cargar-estudios', [MedicoController::class, 'cargarEstudios'])
-        ->name('operador.tratamiento.cargar-estudios');    
+        ->name('operador.tratamiento.cargar-estudios');
 
     Route::get(
         '/tratamiento/{id}/post-transferencia',
         [MedicoController::class, 'postTransferenciaForm']
-    )->name('operador.tratamiento.post');    
+    )->name('operador.tratamiento.post');
 
     Route::get('/tratamientos/{id}/monitoreos', [MedicoController::class, 'monitoreos'])
         ->name('operador.monitoreos');
@@ -350,7 +353,7 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
     Route::get('/donacion-gametos/nueva', [GametosController::class, 'nuevaDonacion'])->name('donacion.nueva');
 
     Route::post('/donacion-gametos/registrar', [GametosController::class, 'registrar'])
-    ->name('donacion.registrar');
+        ->name('donacion.registrar');
 });
 
 
@@ -358,7 +361,7 @@ Route::prefix('operador')->middleware([AuthMiddleware::class . ':operador'])->gr
 # Rutas para el jefe
 ###########################################################
 Route::prefix('jefe')->middleware([AuthMiddleware::class . ':jefe'])->group(function () {
-    
+
     Route::get('/home', [MedicoController::class, 'todosPacientes'])->name('jefe.home');
 
     Route::get('/usuarios', [AdminController::class, 'index'])->name('jefe.usuarios.index');
@@ -368,7 +371,7 @@ Route::prefix('jefe')->middleware([AuthMiddleware::class . ':jefe'])->group(func
     Route::get('paciente/{id}/tratamiento', [App\Http\Controllers\MedicoController::class, 'detalleTratamiento'])
         ->name('jefe.tratamiento.detalle');
 
-     Route::get('/pago/{id}/marcar-pagado', [AdminController::class, 'marcarPagado'])->name('jefe.pago.marcar-pagado');    
+    Route::get('/pago/{id}/marcar-pagado', [AdminController::class, 'marcarPagado'])->name('jefe.pago.marcar-pagado');
 
     Route::get('/tratamientos/{id}/monitoreos', [MedicoController::class, 'monitoreos'])
         ->name('jefe.monitoreos');
@@ -456,7 +459,7 @@ Route::prefix('jefe')->middleware([AuthMiddleware::class . ':jefe'])->group(func
     });
 
     Route::post('/consulta', [ConsultaController::class, 'store'])->name('jefe.consulta.store');
-    
+
     Route::post('/consulta/update/{tratamiento}', [ConsultaController::class, 'update'])->name('jefe.consulta.update');
 
     Route::get('/consulta/{paciente_id}', [ConsultaController::class, 'create'])
