@@ -1,168 +1,173 @@
 @extends('layouts.layoutInterno')
 
 @section('styles')
-<style>
-/* Fondo general para contraste */
-body {
-    background-color: #f8f9fa;
-}
+    <style>
+        /* Fondo general para contraste */
+        body {
+            background-color: #f8f9fa;
+        }
 
-/* Estilos del flujo de pasos (wizard) */
-.step {
-    display: none;
-}
-.step.active {
-    display: block;
-}
+        /* Estilos del flujo de pasos (wizard) */
+        .step {
+            display: none;
+        }
 
-/* Navegación de pasos mejorada */
-.wizard-nav {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 30px;
-    border-bottom: 2px solid #e9ecef;
-}
-.wizard-nav span {
-    padding: 10px 15px;
-    border-radius: 6px 6px 0 0;
-    background: transparent;
-    color: #6c757d;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border-bottom: 2px solid transparent;
-    text-align: center;
-}
-.wizard-nav .active {
-    background: white;
-    color: #007bff;
-    border-bottom: 2px solid #007bff;
-    font-weight: bold;
-}
+        .step.active {
+            display: block;
+        }
 
-/* Estilo para los campos requeridos */
-label.required::after {
-    content: " *";
-    color: #412c2c8e;
-    font-weight: bold;
-}
+        /* Navegación de pasos mejorada */
+        .wizard-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e9ecef;
+        }
 
-/* Contenedor principal */
-.main-content-container {
-    min-height: 80vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 40px 15px;
-}
+        .wizard-nav span {
+            padding: 10px 15px;
+            border-radius: 6px 6px 0 0;
+            background: transparent;
+            color: #6c757d;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            text-align: center;
+        }
 
-/* Tarjeta del formulario */
-.consult-card {
-    max-width: 850px;
-    width: 100%;
-    margin-top: 20px;
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    padding: 30px;
-}
+        .wizard-nav .active {
+            background: white;
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            font-weight: bold;
+        }
 
-input[type="number"],
-select,
-textarea {
-    background-color: #ffffff;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    padding: 10px 12px;
-    width: 100%;
-    box-sizing: border-box;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-}
-/* Campos del formulario */
-input[type="text"],
-select,
-textarea {
-    background-color: #ffffff;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    padding: 10px 12px;
-    width: 100%;
-    box-sizing: border-box;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-}
-input:focus,
-select:focus,
-textarea:focus {
-    border-color: #80bdff;
-    outline: none;
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-}
+        /* Estilo para los campos requeridos */
+        label.required::after {
+            content: " *";
+            color: #412c2c8e;
+            font-weight: bold;
+        }
 
-/* Agrupación de campos */
-.form-group {
-    margin-bottom: 20px;
-}
+        /* Contenedor principal */
+        .main-content-container {
+            min-height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 15px;
+        }
 
-/* Botones */
-button,
-.btn {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 10px;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-button:hover,
-.btn:hover {
-    background-color: #0056b3;
-}
+        /* Tarjeta del formulario */
+        .consult-card {
+            max-width: 850px;
+            width: 100%;
+            margin-top: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            padding: 30px;
+        }
 
-.list-group-item button.btn-outline-danger {
-    border: none;
-    background: transparent;
-    color: #495057;
-    padding: 4px 8px;
-    margin-left: 10px;
-}
+        input[type="number"],
+        select,
+        textarea {
+            background-color: #ffffff;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            padding: 10px 12px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
 
-.list-group-item button.btn-outline-danger:hover {
-    color: #49494aff;
-}
+        /* Campos del formulario */
+        input[type="text"],
+        select,
+        textarea {
+            background-color: #ffffff;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            padding: 10px 12px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
 
-</style>
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #80bdff;
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+        }
+
+        /* Agrupación de campos */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        /* Botones */
+        button,
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover,
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .list-group-item button.btn-outline-danger {
+            border: none;
+            background: transparent;
+            color: #495057;
+            padding: 4px 8px;
+            margin-left: 10px;
+        }
+
+        .list-group-item button.btn-outline-danger:hover {
+            color: #49494aff;
+        }
+    </style>
 @endsection
 
 @section('page-header')
-<div class="page-header">
-    <div>
-        <h1 class="page-title">Primer consulta</h1>
-        <p class="page-subtitle">Cargar información detallada del paciente y su objetivo</p>
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Primer consulta</h1>
+            <p class="page-subtitle">Cargar información detallada del paciente y su objetivo</p>
+        </div>
+        @if (session('rol') == 3)
+            <div>
+                <a href="/operador/home" class="btn-secondary">
+                    <i class="fas fa-arrow-left mr-2"></i> Volver a Pacientes
+                </a>
+            </div>
+        @elseif (session('rol') == 5)
+            <div>
+                <a href="/jefe/home" class="btn-secondary">
+                    <i class="fas fa-arrow-left mr-2"></i> Volver a Pacientes
+                </a>
+            </div>
+        @else
+            <div>
+                <a href="/medico/home" class="btn-secondary">
+                    <i class="fas fa-arrow-left mr-2"></i> Volver a Pacientes
+                </a>
+            </div>
+        @endif
     </div>
-    @if (session('rol') == 3 )
-    <div>
-        <a href="/operador/home" class="btn-secondary">
-            <i class="fas fa-arrow-left mr-2"></i> Volver a Pacientes
-        </a>
-    </div>
-    @elseif (session('rol') == 5 )
-    <div>
-        <a href="/jefe/home" class="btn-secondary">
-            <i class="fas fa-arrow-left mr-2"></i> Volver a Pacientes
-        </a>
-    </div>
-    @else
-    <div>
-        <a href="/medico/home" class="btn-secondary">
-            <i class="fas fa-arrow-left mr-2"></i> Volver a Pacientes
-        </a>
-    </div>
-    @endif
-</div>
 @endsection
 
 @section('content')
@@ -182,8 +187,7 @@ button:hover,
                 <span class="nav-step" data-step="5"><i class="fas fa-bullseye me-2"></i>Objetivo</span>
             </div>
 
-            <form
-                action="{{ $tratamiento ? route('consulta.update', $tratamiento->id) : route('consulta.store') }}"
+            <form action="{{ $tratamiento ? route('consulta.update', $tratamiento->id) : route('consulta.store') }}"
                 method="POST">
 
                 @csrf
@@ -226,7 +230,7 @@ button:hover,
                                 @foreach ($antecedentes as $antecedente)
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         {{ $antecedente }}
-                                    
+
                                     </li>
                                 @endforeach
                             @endif
@@ -305,7 +309,8 @@ button:hover,
                             <div class="col-md-6 mb-2">
                                 <label for="frecuencia" class="form-label required">Frecuencia (días a la
                                     semana)</label>
-                                <input type="number" min="0" id="frecuencia" name="frecuencia" class="form-control"
+                                <input type="number" min="0" id="frecuencia" name="frecuencia"
+                                    class="form-control"
                                     value="{{ $tratamiento?->antecedentesPersonales?->frecuencia_alcohol }}"
                                     placeholder="días a la semana">
                             </div>
@@ -366,25 +371,26 @@ button:hover,
                                     </ul>
 
                                     <small class="text-danger">Nota: Los datos cargados no son editables directamente.
-                                        Debe Añadir nuevos familiares o modificar la lista de patologías si es dinámica.</small>
+                                        Debe Añadir nuevos familiares o modificar la lista de patologías si es
+                                        dinámica.</small>
                                 </div>
                             @endforeach
                         @endif
                     </div>
 
-                  
-                           
-                        
+
+
+
                     <div class="d-flex justify-content-between pt-3 border-top mt-4">
-                         
-                        
+
+
                         <button type="button" onclick="prevStep()" class="btn btn-secondary"><i
                                 class="fas fa-arrow-left me-2"></i>Atrás</button>
                         <button type="button" onclick="nextStep()" class="btn btn-primary">Siguiente <i
                                 class="fas fa-arrow-right ms-2"></i></button>
 
-                                <button type="button" id="add-familiar" class="btn btn-info"><i
-                                    class="fas fa-plus me-2"></i>Añadir familiar</button>
+                        <button type="button" id="add-familiar" class="btn btn-info"><i
+                                class="fas fa-plus me-2"></i>Añadir familiar</button>
                     </div>
                 </div>
 
@@ -509,7 +515,7 @@ button:hover,
                                 <option value="" disabled selected>Seleccione una complexión</option>
                                 @foreach ($complexiones as $complexion)
                                     <option value="{{ $complexion->value }}"
-                                        {{ ($f?->complexion ?? '') === $complexion->value ? 'selected' : '' }}>
+                                        {{ ($f?->complexion_corporal ?? '') === $complexion->value ? 'selected' : '' }}>
                                         {{ $complexion->nombre }}</option>
                                 @endforeach
                             </select>
@@ -552,7 +558,7 @@ button:hover,
                             <option value="">Seleccione...</option>
                             @foreach ($objetivos as $obj)
                                 <option value="{{ $obj->id }}"
-                                    {{ (isset($tratamiento) && $tratamiento->objetivo_id == $obj->id) ? 'selected' : '' }}>
+                                    {{ isset($tratamiento) && $tratamiento->objetivo_id == $obj->id ? 'selected' : '' }}>
                                     {{ $obj->nombre }}
                                 </option>
                             @endforeach
@@ -564,9 +570,10 @@ button:hover,
 
                     <button type="button" onclick="prevStep()" class="btn btn-secondary">← Atrás</button>
                     @if (session('rol') == 3)
-                     <button type="submit" class="btn btn-primary float-end" disabled  style="opacity: 0.4; cursor: not-allowed;">Solo puedes ver los datos, no editar</button>
+                        <button type="submit" class="btn btn-primary float-end" disabled
+                            style="opacity: 0.4; cursor: not-allowed;">Solo puedes ver los datos, no editar</button>
                     @else
-                    <button type="submit" class="btn btn-primary float-end">Guardar consulta</button>
+                        <button type="submit" class="btn btn-primary float-end">Guardar consulta</button>
                     @endif
                 </div>
 
@@ -581,7 +588,7 @@ button:hover,
 @section('scripts')
     <script>
         window.tratamiento = {!! json_encode($tratamiento ?? null) !!};
-        window.rol ={!! json_encode( session('rol') ?? null) !!}
+        window.rol = {!! json_encode(session('rol') ?? null) !!}
     </script>
 
     <script src="{{ asset('js/terminos.js') }}"></script>
@@ -593,4 +600,3 @@ button:hover,
     <script src="{{ asset('js/parejas.js') }}"></script>
     <script src="{{ asset('js/antecedentes-pareja.js') }}"></script>
 @endsection
-
