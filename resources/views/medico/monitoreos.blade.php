@@ -58,7 +58,7 @@
                                 {{ \Carbon\Carbon::parse($monitoreo->created_at)->format('d/m/Y') }}
                             </span>
                             <span class="font-medium text-gray-800">
-                                Realizado por: {{$tratamiento->medico->nombre}} {{$tratamiento->medico->apellido}}
+                                Realizado por: {{ $monitoreo->user->nombre }} {{ $monitoreo->user->apellido }}
                             </span>
 
                             <i :class="open ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-gray-600"></i>
@@ -155,6 +155,7 @@
 
     @csrf
 
+    <input type="hidden" name="user_id" value="{{ session('user_id') }}">
     <input type="hidden" name="tratamiento_id" value="{{ $tratamiento->id }}">
 
     <div class="mb-4">

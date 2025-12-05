@@ -298,11 +298,13 @@ class MedicoController extends Controller
         $validated = $request->validate([
             'tratamiento_id' => 'required|exists:tratamientos,id',
             'observacion'    => 'required|string',
+            'user_id'       => 'required|exists:usuarios,id',
         ]);
 
         Monitoreo::create([
             'tratamiento_id' => $validated['tratamiento_id'],
             'observacion'    => $validated['observacion'],
+            'user_id'   => $validated['user_id'],
         ]);
 
         return back()->with('success', 'Monitoreo cargado correctamente');
