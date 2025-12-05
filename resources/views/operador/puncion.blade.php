@@ -196,16 +196,16 @@
                                                 class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                                                 <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
 
-                                                    <!-- HEADER COMPACTO -->
+                                                    <!-- HEADER -->
                                                     <div
                                                         class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-                                                        <div class="flex items-center">
-                                                            <i class="fas fa-edit text-green-600 mr-2"></i>
-                                                            <h3 class="text-lg font-semibold text-gray-900">Editar Ovocito
-                                                            </h3>
-                                                        </div>
+                                                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                                            <i class="fas fa-edit text-green-600 mr-2"></i> Editar Ovocito
+                                                        </h3>
                                                         <button type="button" onclick="cerrarModalEdit()"
-                                                            class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+                                                            class="text-gray-400 hover:text-gray-600 text-xl">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
                                                     </div>
 
                                                     <form id="formEditOvocito" method="POST"
@@ -216,7 +216,7 @@
                                                             value="false">
                                                         <input type="hidden" name="accion" id="accion" value="false">
 
-                                                        <!-- CONTENIDO COMPACTO -->
+                                                        <!-- CONTENIDO -->
                                                         <div class="px-6 py-4 space-y-4">
 
                                                             <!-- Identificador -->
@@ -233,9 +233,9 @@
                                                             <div>
                                                                 <label
                                                                     class="block text-sm font-medium text-gray-700 mb-1">Estado
-                                                                    inicial</label>
+                                                                    inicial *</label>
                                                                 <select id="editEstadoInicial" name="estado_inicial"
-                                                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                                                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                                                                     onchange="actualizarCamposEdit()" required>
                                                                     <option value="">Seleccione un estado</option>
                                                                     <option value="muy_inmaduro">Muy inmaduro</option>
@@ -249,16 +249,16 @@
 
                                                         </div>
 
-                                                        <!-- FOOTER COMPACTO -->
+                                                        <!-- FOOTER -->
                                                         <div
-                                                            class="flex justify-end space-x-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
+                                                            class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
                                                             <button type="button" onclick="cerrarModalEdit()"
-                                                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                                                class="btn-secondary">
                                                                 Cancelar
                                                             </button>
                                                             <button type="submit"
-                                                                class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700">
-                                                                Guardar cambios
+                                                                class="btn-primary bg-green-600 hover:bg-green-700">
+                                                                <i class="fas fa-save mr-2"></i> Guardar cambios
                                                             </button>
                                                         </div>
 
@@ -308,23 +308,25 @@
 
 
             <!-- MODAL PRINCIPAL -->
+            <div id="modalPuncion" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] flex flex-col">
 
-            <div id="modalPuncion" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-
-                <div class="bg-white rounded-xl shadow-lg w-full max-w-3xl p-6 
-                max-h-[90vh] flex flex-col">
-
-                    <!-- HEADER (NO SCROLLEA) -->
-                    <h3 class="text-xl font-semibold mb-4 flex items-center text-gray-900">
-                        <i class="fas fa-syringe text-indigo-600 mr-2"></i> Registrar Nueva Punción
-                    </h3>
+                    <!-- HEADER -->
+                    <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i class="fas fa-syringe text-indigo-600 mr-2"></i> Registrar Nueva Punción
+                        </h3>
+                        <button type="button" onclick="cerrarModal()" class="text-gray-400 hover:text-gray-600 text-xl">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
 
                     <form id="formPuncion" method="POST" action="{{ route('puncion.guardar') }}"
-                        class="flex flex-col h-full">
+                        class="flex flex-col flex-1 overflow-hidden">
                         @csrf
 
-                        <!-- CUERPO SCROLLEABLE REAL -->
-                        <div class="flex-1 overflow-y-auto max-h-[65vh] pr-2">
+                        <!-- CONTENIDO SCROLLEABLE -->
+                        <div class="flex-1 overflow-y-auto px-6 py-4">
 
                             <input type="hidden" name="paciente_id" value="{{ $paciente->id }}">
                             <input type="hidden" id="pacienteNombre"
@@ -333,52 +335,55 @@
                             <!-- DATOS PRINCIPALES -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                 <div>
-                                    <label class="font-medium text-gray-700">Fecha</label>
-                                    <input type="date" name="fecha" id="fechaPuncion" class="input" required>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha *</label>
+                                    <input type="date" name="fecha" id="fechaPuncion"
+                                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        required>
                                 </div>
 
                                 <div>
-                                    <label class="font-medium text-gray-700">Hora</label>
-                                    <input type="time" name="hora" id="horaPuncion" class="input" required>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Hora *</label>
+                                    <input type="time" name="hora" id="horaPuncion"
+                                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        required>
                                 </div>
 
                                 <div>
-                                    <label class="font-medium text-gray-700">Número de quirófano</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Nº Quirófano *</label>
                                     <input type="text" name="numero_quirofano" id="quirofanoPuncion"
-                                        class="input bg-gray-100" required>
+                                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        required>
                                 </div>
                             </div>
 
                             <!-- PACIENTE -->
                             <div class="mb-4">
-                                <label class="font-medium text-gray-700">Nombre y apellido del paciente</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Paciente</label>
                                 <input type="text" value="{{ $paciente->nombre }} {{ $paciente->apellido }}"
-                                    class="input bg-gray-100 cursor-not-allowed" readonly>
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed"
+                                    readonly>
                             </div>
 
                             <!-- OVOCITOS -->
-                            <div class="border rounded-lg p-4 bg-gray-50 mb-4">
+                            <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
                                 <div class="flex justify-between items-center mb-3">
-                                    <span class="font-semibold">Ovocitos</span>
-
+                                    <span class="text-sm font-semibold text-gray-900">Ovocitos</span>
                                     <button type="button" onclick="agregarOvocito()"
-                                        class="px-3 py-1 bg-indigo-600 text-white rounded-md text-sm">
-                                        + Agregar ovocito
+                                        class="px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 transition-colors">
+                                        <i class="fas fa-plus mr-1"></i> Agregar
                                     </button>
                                 </div>
-
-                                <div id="contenedorOvocitos"></div>
+                                <div id="contenedorOvocitos" class="space-y-3"></div>
                             </div>
                         </div>
 
-                        <!-- FOOTER (NO SCROLLEA) -->
-                        <div class="flex justify-end gap-3 mt-4">
+                        <!-- FOOTER -->
+                        <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
                             <button type="button" onclick="cerrarModal()" class="btn-secondary">
                                 Cancelar
                             </button>
-
                             <button type="button" onclick="mostrarConfirmacion()" class="btn-primary">
-                                Guardar Punción
+                                <i class="fas fa-save mr-2"></i> Guardar Punción
                             </button>
                         </div>
 
@@ -391,26 +396,26 @@
 
             <!-- MODAL CONFIRMACIÓN -->
             <div id="confirmModal"
-                class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[60]">
+                class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
 
-                <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">Confirmar acción</h3>
+                    </div>
 
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Confirmar acción</h3>
+                    <div class="px-6 py-4">
+                        <p class="text-sm text-gray-600">
+                            ¿Está seguro de que desea registrar esta punción?
+                        </p>
+                    </div>
 
-                    <p class="text-gray-700 mb-6">
-                        ¿Está seguro de que desea registrar esta punción?
-                    </p>
-
-                    <div class="flex justify-end gap-3">
-
+                    <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
                         <button type="button" onclick="cerrarConfirmacion()" class="btn-secondary">
                             Cancelar
                         </button>
-
                         <button onclick="document.querySelector('#formPuncion').submit()" class="btn-primary">
-                            Confirmar
+                            <i class="fas fa-check mr-2"></i> Confirmar
                         </button>
-
                     </div>
                 </div>
             </div>
@@ -668,23 +673,23 @@
                         cont.insertAdjacentHTML(
                             "beforeend",
                             `
-        <div class="border rounded-md p-3 mb-3 bg-white" id="ovocito_${index}">
+        <div class="border border-gray-200 rounded-lg p-3 bg-white" id="ovocito_${index}">
             
-            <div class="flex justify-between items-center">
-                <p class="font-medium text-gray-800">
-                    Ovocito ${index} —
-                    <span class="text-xs text-gray-500">${id}</span>
+            <div class="flex justify-between items-center mb-3">
+                <p class="text-sm font-medium text-gray-900">
+                    Ovocito ${index}
+                    <span class="text-xs text-gray-500 ml-1">${id}</span>
                 </p>
-                <button type="button" onclick="quitarOvocito(${index})" class="text-red-500 text-sm">
+                <button type="button" onclick="quitarOvocito(${index})" class="text-red-500 hover:text-red-700 text-sm">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
 
             <input type="hidden" name="ovocitos[${index}][id]" value="${id}">
 
-            <div class="mt-2">
-                <label class="text-sm text-gray-700">Estado inicial</label>
-                <select class="input mt-1"
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Estado inicial *</label>
+                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         name="ovocitos[${index}][estado_inicial]"
                         onchange="actualizarCampos(${index})"
                         required>
@@ -724,39 +729,45 @@
 
                         if (estado === "muy_inmaduro") {
                             box.innerHTML = `
-            <label class="text-sm text-gray-700">Acción</label>
-            <select class="input mt-1" 
-                    name="ovocitos[${i}][accion_muy_inmaduro]"
-                    onchange="actualizarSubCampos(${i})"
-                    required>
-                <option value="">Seleccione</option>
-                <option value="descartar">Descartar</option>
-                <option value="tratar_inmaduro">Tratar como inmaduro</option>
-            </select>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Acción *</label>
+                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                        name="ovocitos[${i}][accion_muy_inmaduro]"
+                        onchange="actualizarSubCampos(${i})"
+                        required>
+                    <option value="">Seleccione</option>
+                    <option value="descartar">Descartar</option>
+                    <option value="tratar_inmaduro">Tratar como inmaduro</option>
+                </select>
+            </div>
 
-            <div id="desc_${i}" class="mt-2"></div>
+            <div id="desc_${i}" class="mt-3"></div>
         `;
                         } else if (estado === "inmaduro") {
                             box.innerHTML = `
-            <label class="text-sm text-gray-700">Tiempo de maduración (hs)</label>
-            <input type="number" min="1" class="input mt-1 bg-gray-100"
-                   name="ovocitos[${i}][tiempo_maduracion]">
-            <div id="desc_${i}" class="mt-2"></div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tiempo de maduración (horas)</label>
+                <input type="number" min="1" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       name="ovocitos[${i}][tiempo_maduracion]" placeholder="Ej: 24">
+            </div>
+            <div id="desc_${i}" class="mt-3"></div>
         `;
                         } else if (estado === "maduro") {
                             box.innerHTML = `
-            <label class="text-sm text-gray-700">Destino</label>
-            <select class="input mt-1" 
-                    name="ovocitos[${i}][destino_maduro]"
-                    onchange="actualizarSubCampos(${i})"
-                    required>
-                <option value="">Seleccione</option>
-                <option value="fecundar">Fecundación</option>
-                <option value="criopreservar">Criopreservación</option>
-                <option value="descartar">Descartar</option>
-            </select>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Destino *</label>
+                <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                        name="ovocitos[${i}][destino_maduro]"
+                        onchange="actualizarSubCampos(${i})"
+                        required>
+                    <option value="">Seleccione</option>
+                    <option value="fecundar">Fecundación</option>
+                    <option value="criopreservar">Criopreservación</option>
+                    <option value="descartar">Descartar</option>
+                </select>
+            </div>
 
-            <div id="desc_${i}" class="mt-2"></div>
+            <div id="desc_${i}" class="mt-3"></div>
         `;
                         }
                     }
@@ -778,9 +789,11 @@
                         ------------------------- */
                         if (estado === "muy_inmaduro" && accion === "descartar") {
                             zone.innerHTML = `
-            <label class="text-sm text-gray-700">Motivo de descarte</label>
-            <textarea class="input mt-1 bg-gray-100" 
-                      name="ovocitos[${i}][motivo_descarte]"></textarea>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Motivo de descarte</label>
+                <textarea class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                          name="ovocitos[${i}][motivo_descarte]" rows="2" placeholder="Especifique el motivo..."></textarea>
+            </div>
         `;
                         }
 
@@ -790,11 +803,14 @@
                         ------------------------- */
                         else if (estado === "muy_inmaduro" && accion === "tratar_inmaduro") {
                             zone.innerHTML = `
-            <label class="text-sm text-gray-700">Tiempo de maduración (hs)</label>
-            <input type="number" min="1" 
-                   class="input mt-1 bg-gray-100"
-                   name="ovocitos[${i}][tiempo_maduracion]" 
-                   required>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tiempo de maduración (horas) *</label>
+                <input type="number" min="1" 
+                       class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       name="ovocitos[${i}][tiempo_maduracion]" 
+                       placeholder="Ej: 24"
+                       required>
+            </div>
         `;
                         }
 
@@ -804,16 +820,18 @@
                         ------------------------- */
                         else if (estado === "maduro" && ["fecundar", "criopreservar"].includes(destino)) {
                             zone.innerHTML = `
-        <label class="text-sm text-gray-700">Calidad morfológica</label>
-        <select class="input mt-1 bg-gray-100" 
-                name="ovocitos[${i}][calidad_morfologica]" required>
-            <option value="">Seleccione</option>
-            <option value="1">1 — Muy baja</option>
-            <option value="2">2 — Baja</option>
-            <option value="3">3 — Media</option>
-            <option value="4">4 — Buena</option>
-            <option value="5">5 — Excelente</option>
-        </select>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Calidad morfológica *</label>
+            <select class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                    name="ovocitos[${i}][calidad_morfologica]" required>
+                <option value="">Seleccione</option>
+                <option value="1">1 — Muy baja</option>
+                <option value="2">2 — Baja</option>
+                <option value="3">3 — Media</option>
+                <option value="4">4 — Buena</option>
+                <option value="5">5 — Excelente</option>
+            </select>
+        </div>
     `;
                         }
 
@@ -823,9 +841,11 @@
                         ------------------------- */
                         else if (estado === "maduro" && destino === "descartar") {
                             zone.innerHTML = `
-            <label class="text-sm text-gray-700">Motivo de descarte</label>
-            <textarea class="input mt-1 bg-gray-100" 
-                      name="ovocitos[${i}][motivo_descarte]"></textarea>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Motivo de descarte</label>
+                <textarea class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                          name="ovocitos[${i}][motivo_descarte]" rows="2" placeholder="Especifique el motivo..."></textarea>
+            </div>
         `;
                         }
                     }

@@ -55,7 +55,7 @@ class OperadorController extends Controller
 
 
     public function tratamientosDeUnPaciente($pacienteId)
-    {  
+    {
         $tratamientos = DB::table('tratamientos')
             ->leftJoin('historias_clinica', 'tratamientos.historia_clinica_id', '=', 'historias_clinica.id')
             ->leftJoin('usuarios', 'historias_clinica.paciente_id', '=', 'usuarios.id')
@@ -852,11 +852,13 @@ class OperadorController extends Controller
         switch ($request->nueva_accion) {
             case 'descartar':
                 $embrion->update([
+                    'criopreservado' => false,
                     'motivo_descarte' => $request->motivo_descarte
                 ]);
                 break;
             case 'transferir':
                 $embrion->update([
+                    'criopreservado' => false,
                     'transferir' => true
                 ]);
                 break;

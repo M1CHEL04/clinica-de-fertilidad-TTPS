@@ -148,11 +148,11 @@
                                         $estadoTexto = 'Descartado';
                                         $estadoIcono = 'fas fa-trash';
                                         $estadoClase = 'bg-red-100 text-red-700';
-                                    } elseif ($embrion->transferir) {
+                                    } elseif ($embrion->transferir && !$embrion->utilizado) {
                                         $estadoTexto = 'Para Transferir';
                                         $estadoIcono = 'fas fa-arrow-right';
                                         $estadoClase = 'bg-green-100 text-green-700';
-                                    } elseif ($embrion->criopreservado) {
+                                    } elseif ($embrion->criopreservado && !$embrion->transferir) {
                                         $estadoTexto = 'Criopreservado';
                                         $estadoIcono = 'fas fa-snowflake';
                                         $estadoClase = 'bg-blue-100 text-blue-700';
@@ -342,8 +342,8 @@
         function getEstadoActual(embrion) {
             if (embrion.motivo_descarte) return 'Descartado';
             if (embrion.utilizado) return 'Utilizado';
-            if (embrion.transferir) return 'Marcado para transferir';
-            if (embrion.criopreservado) return 'Criopreservado';
+            if (embrion.transferir && !embrion.criopreservado) return 'Marcado para transferir';
+            if (embrion.criopreservado && !embrion.transferir) return 'Criopreservado';
             return 'En desarrollo';
         }
 
@@ -460,7 +460,6 @@
                             <p><strong>Fecha Creación:</strong> ${new Date(embrion.created_at).toLocaleDateString()}</p>
                             <p><strong>Estado Actual:</strong> ${getEstadoActual(embrion)}</p>
                             <p><strong>Origen del Semen:</strong> ${origenSemen}</p>
-                            <p><strong>Utilizado:</strong> <span class="${embrion.utilizado ? 'text-green-600 font-medium' : 'text-gray-600'}">${embrion.utilizado ? 'Sí' : 'No'}</span></p>
                         </div>
                     </div>
                 </div>
@@ -472,17 +471,17 @@
                 
                 <!-- Estado y Acciones - Solo visible si está criopreservado -->
                 ${embrion.criopreservado ? `
-                                                <div class="bg-blue-50 rounded-lg p-4">
-                                                    <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
-                                                        <i class="fas fa-exchange-alt text-orange-600 mr-2"></i>
-                                                        Gestión de Estado
-                                                    </h4>
-                                                    <p class="text-sm text-gray-600 mb-4">
-                                                        Este embrión está criopreservado y disponible para transferencia o descarte. 
-                                                        Puede cambiar su estado usando el botón de abajo.
-                                                    </p>
-                                                    
-                                                    ${!embrion.transferir && !embrion.motivo_descarte ? `
+                                                                        <div class="bg-blue-50 rounded-lg p-4">
+                                                                            <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                                                                                <i class="fas fa-exchange-alt text-orange-600 mr-2"></i>
+                                                                                Gestión de Estado
+                                                                            </h4>
+                                                                            <p class="text-sm text-gray-600 mb-4">
+                                                                                Este embrión está criopreservado y disponible para transferencia o descarte. 
+                                                                                Puede cambiar su estado usando el botón de abajo.
+                                                                            </p>
+                                                                            
+                                                                            ${!embrion.transferir && !embrion.motivo_descarte ? `
                     <button onclick="abrirModalCambioEstado()" class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors">
                         <i class="fas fa-exchange-alt mr-2"></i>
                         Cambiar Estado
@@ -492,23 +491,23 @@
                             ${embrion.transferir ? 'Embrión marcado para transferir' : 'Embrión descartado'}
                         </span>
                     </div>`}
-                                                </div>` : `
-                                                <!-- Información de Estado Actual -->
-                                                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                                                    <h4 class="font-semibold text-gray-900 mb-2 flex items-center">
-                                                        <i class="fas fa-info-circle text-yellow-600 mr-2"></i>
-                                                        Estado Actual
-                                                    </h4>
-                                                    <p class="text-sm text-gray-600">
-                                                        ${embrion.motivo_descarte ? 
-                                                            'Este embrión ha sido descartado y no está disponible para uso.' :
-                                                            embrion.utilizado ? 
-                                                            'Este embrión ya ha sido utilizado en un tratamiento previo.' :
-                                                            embrion.transferir ? 
-                                                            'Este embrión está marcado para transferencia inmediata.' :
-                                                            'Este embrión está en desarrollo. Debe ser criopreservado antes de poder gestionar su estado.'}
-                                                    </p>
-                                                </div>`}
+                                                                        </div>` : `
+                                                                        <!-- Información de Estado Actual -->
+                                                                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                                                            <h4 class="font-semibold text-gray-900 mb-2 flex items-center">
+                                                                                <i class="fas fa-info-circle text-yellow-600 mr-2"></i>
+                                                                                Estado Actual
+                                                                            </h4>
+                                                                            <p class="text-sm text-gray-600">
+                                                                                ${embrion.motivo_descarte ? 
+                                                                                    'Este embrión ha sido descartado y no está disponible para uso.' :
+                                                                                    embrion.utilizado ? 
+                                                                                    'Este embrión ya ha sido utilizado en un tratamiento.' :
+                                                                                    embrion.transferir ? 
+                                                                                    'Este embrión está marcado para transferencia inmediata.' :
+                                                                                    'Este embrión está en desarrollo. Debe ser criopreservado antes de poder gestionar su estado.'}
+                                                                            </p>
+                                                                        </div>`}
             </div>`;
 
             } catch (error) {

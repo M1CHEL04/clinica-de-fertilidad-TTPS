@@ -1,140 +1,136 @@
 @extends('layouts.layoutInterno')
 @section('title', 'Seleccionar Embrión - Fertilia')
 
+@section('page-header')
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Seleccionar embrión a transferir</h1>
+            <p class="page-subtitle">
+                Paciente: {{ $paciente->nombre }} {{ $paciente->apellido }} · DNI: {{ $paciente->dni }}
+            </p>
+        </div>
+        <div>
+            <a href="{{ url()->previous() }}" class="btn-secondary">
+                <i class="fas fa-arrow-left mr-2"></i> Volver al tratamiento
+            </a>
+        </div>
+    </div>
+@endsection
+
 @section('content')
 
-<div class="max-w-4xl mx-auto">
-    
-    <!-- Encabezado -->
-    <div class="mb-6">
-        <h1 class="text-2xl font-semibold text-gray-800 flex items-center">
-            <i class="fas fa-seedling text-green-600 mr-2"></i>
-            Seleccionar embrión para transferencia
-        </h1>
-        <p class="text-gray-600 mt-1">
-            Paciente: <strong>{{ $paciente->nombre }} {{ $paciente->apellido }}</strong>  
-            (DNI: {{ $paciente->dni }})
-        </p>
-        
-    </div>
-
-    <a href="{{ url()->previous() }}" class="text-blue-600 hover:underline">Volver</a>
-
     <!-- Si no hay embriones -->
-    @if($embriones->isEmpty())
-        <div class="bg-gray-50 text-center py-10 rounded-lg border border-gray-200">
-            <i class="fas fa-egg-crack text-4xl text-gray-400 mb-3"></i>
-            <p class="text-gray-600 mb-2">Este paciente no tiene embriones disponibles.</p>
-            <a href="{{ url()->previous() }}" class="text-blue-600 hover:underline">Volver</a>
+    @if ($embriones->isEmpty())
+        <div class="card p-12 text-center">
+            <i class="fas fa-seedling text-6xl text-gray-300 mb-4"></i>
+            <p class="text-gray-600 text-lg">Este paciente no tiene embriones disponibles.</p>
         </div>
     @else
+        <!-- Lista de embriones -->
+        <form method="POST"
+            action="{{ session('rol') == 5 ? route('jefe.transferencia.guardar') : route('medico.transferencia.guardar') }}">
 
-    <!-- Lista de embriones -->
-    <form method="POST" 
-      action="{{ session('rol') == 5 
-                    ? route('jefe.transferencia.guardar') 
-                    : route('medico.transferencia.guardar') }}">
+            @csrf
+            <input type="hidden" name="paciente_id" value="{{ $paciente->id }}">
 
-        @csrf
-        <input type="hidden" name="paciente_id" value="{{ $paciente->id }}">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach ($embriones as $embrion)
+                    @php
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            @foreach($embriones as $embrion)
+                        $estaCriopreservado = $embrion->criopreservado == true;
+                        $tieneDescarte = !is_null($embrion->motivo_descarte);
+                        $estaUtilizado = $embrion->utilizado;
 
-                @php
-                    
-                    $estaCriopreservado = $embrion->criopreservado == true;
-                    $tieneDescarte = !is_null($embrion->motivo_descarte);
-                    $estaUtilizado = $embrion->utilizado;
+                        // → Embrión seleccionable solo si NO está criopreservado, NO descartado y NO utilizado
+                        $disabled = $estaCriopreservado || $tieneDescarte || $estaUtilizado;
+                    @endphp
 
-                    // → Embrión seleccionable solo si NO está criopreservado, NO descartado y NO utilizado
-                    $disabled = $estaCriopreservado || $tieneDescarte || $estaUtilizado;
-                @endphp
+                    <label class="block cursor-pointer">
 
-                <label class="block cursor-pointer">
+                        <input type="radio" name="embrion_id" value="{{ $embrion->id }}" class="peer hidden"
+                            @if ($disabled) disabled @endif required>
 
-                    <input 
-                        type="radio" 
-                        name="embrion_id" 
-                        value="{{ $embrion->id }}" 
-                        class="peer hidden"
-                        @if($disabled) disabled @endif
-                        required
-                    >
-
-                    <div class="
-                        border rounded-lg p-5 bg-white shadow-sm transition
-                        @if($disabled)
-                            opacity-50 cursor-not-allowed border-gray-300
+                        <div
+                            class="
+                        card p-4 transition-all
+                        @if ($disabled) opacity-50 cursor-not-allowed
                         @else
-                            peer-checked:border-blue-500 peer-checked:ring-2 ring-blue-300
-                        @endif
+                            hover:shadow-lg peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-300 @endif
                     ">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-2 flex items-center justify-between">
-                            <span>
-                                <i class="fas fa-circle text-blue-400 mr-1"></i>
-                                {{ $embrion->identificador }}
-                            </span>
+                            <div class="flex items-start justify-between mb-3">
+                                <h4 class="text-sm font-medium text-gray-900 truncate pr-2">
+                                    {{ $embrion->identificador }}
+                                </h4>
 
-                            <!-- Etiquetas de estado -->
-                            @if($estaUtilizado)
-                                <span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full">
-                                    Utilizado
-                                </span>
-                            @elseif($tieneDescarte)
-                                <span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full">
-                                    Descartado
-                                </span>
-                            @elseif($estaCriopreservado)
-                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                                    Criopreservado
-                                </span>
-                            @endif
-                        </h3>
+                                <!-- Etiquetas de estado -->
+                                @if ($estaUtilizado)
+                                    <span class="badge badge-danger">
+                                        Utilizado
+                                    </span>
+                                @elseif($tieneDescarte)
+                                    <span class="badge badge-danger">
+                                        Descartado
+                                    </span>
+                                @elseif($estaCriopreservado)
+                                    <span class="badge badge-info">
+                                        Criopreservado
+                                    </span>
+                                @else
+                                    <span class="badge badge-success">
+                                        Disponible
+                                    </span>
+                                @endif
+                            </div>
 
-                        <p class="text-sm text-gray-700 mb-1">
-                            <strong>Calidad:</strong> {{ $embrion->calidad_morfologica ?? 'Sin evaluar' }}
-                        </p>
+                            <div class="space-y-2 text-sm">
+                                <div>
+                                    <span class="font-medium text-gray-600">Calidad:</span>
+                                    <span class="text-gray-800">Grado
+                                        {{ $embrion->calidad_morfologica ?? 'Sin evaluar' }}</span>
+                                </div>
 
-                        <p class="text-sm text-gray-700 mb-1">
-                            <strong>PGT:</strong> 
-                            @if($embrion->realizo_pgt === 'si')
-                                <span class="text-green-600 font-medium">
-                                    Sí ({{ ucfirst($embrion->resultado_pgt) }})
-                                </span>
-                            @else
-                                <span class="text-gray-500">No</span>
-                            @endif
-                        </p>
+                                <div>
+                                    <span class="font-medium text-gray-600">PGT:</span>
+                                    @if ($embrion->realizo_pgt == true)
+                                        @if ($embrion->pgt_positivo)
+                                            <span class="text-red-600 font-medium">Positivo</span>
+                                        @else
+                                            <span class="text-green-600 font-medium">Negativo</span>
+                                        @endif
+                                        <span class="text-green-600 font-medium">
+                                            ({{ ucfirst($embrion->resultado_pgt) }})
+                                        </span>
+                                    @else
+                                        <span class="text-gray-500">No realizado</span>
+                                    @endif
+                                </div>
 
-                        @if ($embrion->semen_dni)
-                        <p class="text-sm text-gray-700 mb-1">
-                            <strong>Origen gametos:</strong> {{ ucfirst($embrion->semen_dni) }}
-                        </p>
-                        @else
-                        <p class="text-sm text-gray-700 mb-1">
-                            <strong>Origen gametos:</strong> No especificado
-                        </p>
-                        @endif
+                                <div>
+                                    <span class="font-medium text-gray-600">Origen gametos:</span>
+                                    @if ($embrion->semen_dni != null)
+                                        <span class="text-gray-800">Semen criopreservado</span>
+                                    @elseif($embrion->semen_fresco == true)
+                                        <span class="text-gray-800">Semen fresco</span>
+                                    @else
+                                        <span class="text-gray-800">Semen donado</span>
+                                    @endif
 
-                        @if($embrion->estado === 'disponible')
-                            <span class="inline-block mt-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                                Disponible
-                            </span>
-                        @endif
-                    </div>
-                </label>
-            @endforeach
-        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                @endforeach
+            </div>
 
-        <button type="submit" class="btn-primary mt-6">
-            <i class="fas fa-check mr-2"></i> Confirmar Transferencia
-        </button>
+            <div class="flex justify-end mt-6">
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-check mr-2"></i> Confirmar transferencia
+                </button>
+            </div>
 
-    </form>
+        </form>
 
     @endif
 
-</div>
 
 @endsection
