@@ -119,6 +119,7 @@
     @endif
 
     <form 
+    id="formPost"
     action="{{ session('rol') == 5
         ? route('jefe.tratamiento.guardar-post', $tratamiento->id)
         : route('tratamiento.guardar-post', $tratamiento->id) }}"
@@ -190,7 +191,7 @@
         @if(!$flujoTerminado && isset($post) && $post->vivo == 1 && $post->fecha_nacimiento === null)
             <div id="campoFecha">
                 <label class="font-semibold">Fecha de nacimiento</label>
-                <input type="date" name="fecha_nacimiento" class="w-full mt-1 border rounded-md p-2">
+                <input type="date" name="fecha_nacimiento" class="w-full mt-1 border rounded-md p-2" max="{{ date('Y-m-d') }}">
             </div>
         @endif
 
