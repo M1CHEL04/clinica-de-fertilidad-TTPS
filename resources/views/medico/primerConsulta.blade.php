@@ -236,7 +236,7 @@
                             @endif
                         </ul>
                     </div>
-
+                    {{-- {{ dd($tratamiento) }} --}}
                     {{-- FUMA --}}
                     <div class="mb-4">
                         <label for="fuma" class="form-label required">¿Fuma?</label>
@@ -247,6 +247,7 @@
                             <option value="no"
                                 {{ $tratamiento?->antecedentesPersonales?->fuma === 0 ? 'selected' : '' }}>No</option>
                         </select>
+                        
                     </div>
 
                     {{-- CAMPOS DE CANTIDAD SI FUMA --}}
@@ -558,7 +559,7 @@
                             <option value="">Seleccione...</option>
                             @foreach ($objetivos as $obj)
                                 <option value="{{ $obj->id }}"
-                                    {{ isset($tratamiento) && $tratamiento->objetivo_id == $obj->id ? 'selected' : '' }}>
+                                    >
                                     {{ $obj->nombre }}
                                 </option>
                             @endforeach

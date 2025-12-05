@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Tratamiento::class);
             $table->boolean('fuma');
-            $table->integer('cuanto_fuma')->nullable(); 
+            $table->float('cuanto_fuma')->nullable(); 
             $table->boolean('alcohol');
             $table->integer('frecuencia_alcohol')->nullable(); 
             $table->text('bebida_alcohol')->nullable();

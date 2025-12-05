@@ -156,6 +156,7 @@ class ConsultaController extends Controller
 
     public function store(Request $request)
     {
+
         $paciente = \App\Models\User::findOrFail($request->paciente_id);
 
         // Obtener el tratamiento activo
@@ -174,6 +175,7 @@ class ConsultaController extends Controller
         }
         // dd($request->all());
         // --- ANTECEDENTES PERSONALES ---
+        
         $antecedentesPersonales = $tratamiento->antecedentesPersonales()->firstOrNew([]);
         $antecedentesPersonales->fill([
             'fuma'               => $request->fuma === 'si' ? 1 : 0,
@@ -261,7 +263,7 @@ class ConsultaController extends Controller
                     'color_pelo' => $request->p_color_pelo,
                     'tipo_pelo' => $request->p_tipo_pelo,
                     'altura' => $request->p_altura,
-                    'complexion_corporal' => $request->p_complexion_corporal,
+                    'complexion_corporal' => $request->p_complexion,
                     'rasgos_etnicos' => $request->p_rasgos_etnicos,
                 ]);
                 $antecedentePareja->save();
@@ -358,7 +360,8 @@ class ConsultaController extends Controller
 
     public function update(Request $request, $tratamiento_id)
     {
-
+        //dd($request->p_complexion);
+        // dd($request->all());
         $tratamiento = \App\Models\Tratamiento::with([
             'antecedentesPersonales',
             'antecedentesFamiliares',
@@ -452,7 +455,7 @@ class ConsultaController extends Controller
             $antecedentePareja->color_pelo = $request->p_color_pelo;
             $antecedentePareja->tipo_pelo = $request->p_tipo_pelo;
             $antecedentePareja->altura = $request->p_altura;
-            $antecedentePareja->complexion_corporal = $request->p_complexion_corporal;
+            $antecedentePareja->complexion_corporal = $request->p_complexion;
             $antecedentePareja->rasgos_etnicos = $request->p_rasgos_etnicos;
 
             $antecedentePareja->save();

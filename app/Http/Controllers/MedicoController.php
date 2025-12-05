@@ -13,6 +13,8 @@ use App\Models\PostTransferencia;
 use Illuminate\Http\Request;
 use App\Http\Controllers\MailController;
 use App\Models\User;
+use App\Models\Ovocito;
+use App\Models\Embrion;
 
 class MedicoController extends Controller
 {
@@ -138,6 +140,49 @@ class MedicoController extends Controller
         // ✅ Evita error si no hay consultas (pasa array vacío)
         return view('medico.detalleTratamiento', compact('tratamiento', 'consultas', 'rol_id'));
     }
+
+
+     public function seleccionar($id)
+    {
+        $tratamiento = Tratamiento::findOrFail($id);
+        $paciente = $tratamiento->historiaClinica->paciente;
+        // Trae todos los ovocitos del paciente Y carga sus embriones
+        $ovocitos = Ovocito::with('embriones')
+            ->where('paciente_id', $paciente->id)
+            ->get();
+
+        // Aplanar la colección de embriones
+         $embriones = Embrion::whereHas('ovocito', function ($q) use ($paciente) {
+        $q->where('paciente_id', $paciente->id);
+    })->get();
+
+        return view('medico.seleccionarEmbrion', compact('embriones', 'tratamiento', 'paciente'));
+    }
+
+    public function guardar(Request $request)
+{
+    $request->validate([
+        'embrion_id' => 'required|exists:embriones,id',
+        'paciente_id' => 'required|exists:usuarios,id',
+    ]);
+
+    $embrion = Embrion::findOrFail($request->embrion_id);
+
+    // Validación extra opcional: que el embrión sea del paciente
+    if ($embrion->ovocito && $embrion->ovocito->paciente_id != $request->paciente_id) {
+        return back()->with('error', 'El embrión no pertenece a este paciente.');
+    }
+
+    // 🔥 Marcar como utilizado
+    $embrion->utilizado = true;
+    $embrion->save();
+
+    // Si querés registrar la transferencia en una tabla aparte, acá iría.
+
+    return redirect()
+        ->back()
+        ->with('success', 'La transferencia fue registrada correctamente. El embrión quedó marcado como utilizado.');
+}
 
     public function tratamientosDeUnPaciente($pacienteId)
     {
@@ -340,20 +385,26 @@ class MedicoController extends Controller
         if ($actual >= 8) {
             return back()->with('error', 'No se puede avanzar más la etapa.');
         }
+       
 
         $nuevoId = $actual + 1;
-
+        
+       
         $updateData = [
             'etapa_id' => $nuevoId,
             'updated_at' => now(),
         ];
+
+         if ($nuevoId == 8){
+            $updateData['estado_tratamiento_id'] = 2; 
+        }
 
         // Si la etapa actual es "Monitoreos", limpiar fechas
         if ($actual === 3) { // 3 = Monitoreos
             $updateData['fecha_sugerida_inicio'] = null;
             $updateData['fecha_sugerida_fin'] = null;
         }
-
+        
         DB::table('tratamientos')->where('id', $id)->update($updateData);
 
         return back()->with('success', 'Etapa actualizada a: ' . $this->etapas[$nuevoId]);

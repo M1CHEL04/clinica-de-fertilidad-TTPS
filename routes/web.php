@@ -146,6 +146,15 @@ Route::prefix('medico')->middleware([AuthMiddleware::class . ':medico'])->group(
     Route::post('paciente/{id}/tratamiento/dar-de-baja', [MedicoController::class, 'darDeBajaTratamiento'])
         ->name('medico.tratamiento.dar-baja');
 
+     Route::get('/embriones/{paciente_id}/seleccionar', 
+        [MedicoController::class, 'seleccionar'])
+        ->name('medico.embriones.seleccionar');
+
+    // Guardar la transferencia (POST)
+    Route::post('/transferencia/guardar',
+        [MedicoController::class, 'guardar'])
+        ->name('medico.transferencia.guardar');    
+
     Route::get(
         '/tratamiento/{id}/post-transferencia',
         [MedicoController::class, 'postTransferenciaForm']
@@ -365,6 +374,15 @@ Route::prefix('jefe')->middleware([AuthMiddleware::class . ':jefe'])->group(func
     Route::get('/home', [MedicoController::class, 'todosPacientes'])->name('jefe.home');
 
     Route::get('/usuarios', [AdminController::class, 'index'])->name('jefe.usuarios.index');
+
+     Route::get('/embriones/{paciente_id}/seleccionar', 
+        [MedicoController::class, 'seleccionar'])
+        ->name('jefe.embriones.seleccionar');
+
+    // Guardar la transferencia (POST)
+    Route::post('/transferencia/guardar',
+        [MedicoController::class, 'guardar'])
+        ->name('jefe.transferencia.guardar');   
 
     Route::get('paciente/{id}/tratamientos', [App\Http\Controllers\OperadorController::class, 'tratamientosDeUnPaciente']);
 

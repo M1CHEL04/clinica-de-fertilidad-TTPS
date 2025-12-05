@@ -22,14 +22,13 @@ class RegistroController extends Controller
             'fecha_nacimiento' => 'required|date',
             'dni'              => 'required|digits:8|unique:usuarios,dni',
             'ocupacion'        => 'required|string|max:255',
-            'posee_obra_social' => 'required|in:si,no',
         ];
 
         // Validaciones condicionales para obra social
-        if ($request->posee_obra_social === 'si') {
+       
             $rules['obra_social'] = 'required|integer';
             $rules['numero_afiliado'] = 'required|string|max:50';
-        }
+        
 
         $validator = Validator::make($request->all(), $rules);
 
@@ -47,8 +46,8 @@ class RegistroController extends Controller
             'dni' => $request->dni,
             'fecha_nacimiento' => $request->fecha_nacimiento,
             'ocupacion' => $request->ocupacion,
-            'obra_social_id' => $request->posee_obra_social === 'si' ? $request->obra_social : null,
-            'numero_afiliado' => $request->posee_obra_social === 'si' ? $request->numero_afiliado : null,
+            'obra_social_id' =>  $request->obra_social,
+            'numero_afiliado' =>  $request->numero_afiliado,
             'rol_id' => 1 // rol predeterminado (paciente)
         ];
 

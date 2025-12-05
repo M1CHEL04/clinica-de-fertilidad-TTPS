@@ -12,23 +12,41 @@ class AvisosController extends Controller
     $tratamiento = Tratamiento::findOrFail($id);
 
     // Email del paciente
-    $emailPaciente = $tratamiento->mail;
-
+    $emailPaciente = $tratamiento->historiaClinica->paciente->mail;
+    $nombre = $tratamiento->historiaClinica->paciente->nombre;
+    $apellido = $tratamiento->historiaClinica->paciente->apellido;
+    $drogas = $tratamiento->protocolosEstimulacion;
+    
     // URL de la API externa
     $url = "https://mvvuegssraetbyzeifov.supabase.co/functions/v1/send_email_v2";
 
     // Lo que queremos enviar (HTML simple)
     $html = "
-        <h2 style='color:#2563eb'>Orden Médica</h2>
-        <p>Estimado/a {$tratamiento->nombre} {$tratamiento->apellido},</p>
-        <p>El médico ha generado su orden médica correspondiente al tratamiento.</p>
-        <p>Saludos cordiales,<br>Fertilia</p>
+    <h2 style='color:#2563eb'>Orden Médica</h2>
+    <p>Estimado/a {$nombre} {$apellido},</p>
+    <p>El médico ha generado su orden médica correspondiente al tratamiento.</p>
+";
+$html .= "<h3>Indicaciones:</h3>";
+
+foreach ($drogas as $droga) {
+    $html .= "
+        <p>
+            <strong>Droga:</strong> {$droga->droga}<br>
+            <strong>Dosis:</strong> {$droga->dosis}<br>
+        </p>
+        <hr>
     ";
+}
+
+$html .= "
+    <p>Saludos cordiales,<br>Fertilia</p>
+";
+
 
     // Armamos el payload
     $payload = [
         "group" => 5, 
-        "toEmails" => ["filad48402@cexch.com"], //aca puse un mail temporal
+        "toEmails" => [$emailPaciente], //aca puse un mail temporal
         "subject" => "Orden Médica - ".$tratamiento->nombre." ".$tratamiento->apellido,
         "htmlBody" => $html
     ];

@@ -92,6 +92,7 @@ class TurnoController extends Controller
                 $HistoriaClinica = $paciente->historiasClinicas()->first();
 
                 //aca implementar el cobro
+            
                 $pago_id = $this->registrarOrdenPago($paciente->id, $paciente->obra_social_id);
 
                 Log::info('Resultado de registrar orden de pago (caso 2): ' . ($pago_id ? $pago_id : 'NULL/FALSE'));
@@ -193,7 +194,7 @@ class TurnoController extends Controller
                         ($tratamiento->fecha_sugerida_inicio !== null || $tratamiento->fecha_sugerida_fin !== null);
                 })
                 ->first();
-
+                
             if (!$tratamientoActivo || ($tratamientoActivo->fecha_sugerida_inicio === null && $tratamientoActivo->fecha_sugerida_fin === null)) {
                 return response()->json([
                     'success' => false,
@@ -258,6 +259,7 @@ class TurnoController extends Controller
     {
         try {
             Log::info('Iniciando registro de orden de pago para paciente: ' . $pacienteId . ' con obra social: ' . $obraSocialId);
+            
 
             $response = Http::post('https://ueozxvwsckonkqypfasa.supabase.co/functions/v1/registrar-orden-pago', [
                 'grupo' => 5,
