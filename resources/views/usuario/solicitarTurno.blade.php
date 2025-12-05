@@ -172,7 +172,9 @@
                 <!-- Botón de envío -->
                 <div class="mt-4 pt-3 border-t border-gray-200">
                     <button type="submit"
-                        class="btn-primary text-white px-6 py-3 rounded-lg font-medium text-center hover:shadow-md transition-all w-full">
+                        id="btn-solicitar"
+                        disabled
+                        class="btn-primary text-white px-6 py-3 rounded-lg font-medium text-center opacity-50 cursor-not-allowed hover:shadow-md transition-all w-full">
                         <i class="fas fa-calendar-check mr-2"></i>
                         Solicitar Turno
                     </button>
@@ -190,4 +192,30 @@
 
     <!-- Importar archivo JavaScript del calendario -->
     <script src="{{ asset('js/calendario.js') }}"></script>
+
+
+    <!-- Validar Turno -->
+    <script>
+        function validarTurno() {
+            const fecha = document.getElementById('fecha-seleccionada').value;
+            const hora = document.getElementById('hora-seleccionada').value;
+            const btn = document.getElementById('btn-solicitar');
+
+            if (fecha && hora) {
+                btn.disabled = false;
+                btn.classList.remove("opacity-50", "cursor-not-allowed");
+            } else {
+                btn.disabled = true;
+                btn.classList.add("opacity-50", "cursor-not-allowed");
+            }
+        }
+
+        // Observa cambios automáticos
+        document.getElementById('fecha-seleccionada').addEventListener('change', validarTurno);
+        document.getElementById('hora-seleccionada').addEventListener('change', validarTurno);
+
+        // Por si calendario.js setea valores por JS:
+        window.validarTurno = validarTurno;
+    </script>
+
 @endsection
