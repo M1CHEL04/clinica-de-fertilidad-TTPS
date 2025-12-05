@@ -28,6 +28,7 @@ class User extends Authenticatable
         'fecha_nacimiento',
         'ocupacion',
         'obra_social_id',
+        'proximo_turno',
         'numero_afiliado',
         'rol_id', // FK al rol
     ];

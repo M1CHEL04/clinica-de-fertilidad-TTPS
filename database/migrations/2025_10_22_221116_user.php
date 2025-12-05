@@ -30,6 +30,7 @@ return new class extends Migration
             $table->unsignedBigInteger('obra_social_id')->nullable();
             $table->string('obra_social_sigla')->nullable();
             $table->string('numero_afiliado')->nullable();
+            $table->date('proximo_turno')->nullable();
 
             // 🔗 Relación al rol
             $table->foreignId('rol_id')->nullable()
