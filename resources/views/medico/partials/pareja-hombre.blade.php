@@ -15,7 +15,7 @@
     {{-- DNI --}}
     <div class="row mb-3">
         <div class="col-md-4">
-            <label class="form-label">DNI</label>
+            <label class="form-label required" required>DNI</label>
             <input id="p_dni" type="number" name="p_dni" class="form-control" placeholder="Ej: 12345678">
         </div>
     </div>
@@ -53,7 +53,7 @@
 
     <div class="row">
         <div class="col-md-4 mb-3">
-            <label class="form-label">Color de ojos</label>
+            <label class="form-label required" required>Color de ojos</label>
             <select id="p_color_ojos" name="p_color_ojos" class="form-select">
                 <option value="" disabled selected>Seleccione un color de ojos</option>
                 @foreach ($coloresOjos as $color)
@@ -63,7 +63,7 @@
         </div>
 
         <div class="col-md-4 mb-3">
-            <label class="form-label">Color de pelo</label>
+            <label class="form-label required" required>Color de pelo</label>
             <select id="p_color_pelo" name="p_color_pelo" class="form-select">
                 <option value="" disabled selected>Seleccione un color de pelo</option>
                 @foreach ($coloresPelo as $color)
@@ -73,7 +73,7 @@
         </div>
 
         <div class="col-md-4 mb-3">
-            <label class="form-label">Tipo de pelo</label>
+            <label class="form-label required" required>Tipo de pelo</label>
             <select id="p_tipo_pelo" name="p_tipo_pelo" class="form-select">
                 <option value="" disabled selected>Seleccione un tipo de pelo</option>
                 @foreach ($tipoPelo as $tipo)
@@ -85,12 +85,12 @@
 
     <div class="row">
         <div class="col-md-4 mb-3">
-            <label class="form-label">Altura (en cm)</label>
+            <label class="form-label required" required>Altura (en cm)</label>
             <input id="p_altura" type="number" name="p_altura" class="form-control" placeholder="Ej: 178">
         </div>
 
         <div class="col-md-4 mb-3">
-            <label class="form-label">Complexión</label>
+            <label class="form-label required" required>Complexión</label>
             <select id="p_complexion_corporal" name="p_complexion" class="form-select">
                 <option value="" disabled selected>Seleccione una complexión</option>
                 @foreach ($complexiones as $complexion)
@@ -100,7 +100,7 @@
         </div>
 
         <div class="col-md-4 mb-3">
-            <label class="form-label">Rasgos étnicos</label>
+            <label class="form-label required" required>Rasgos étnicos</label>
             <select id="p_rasgos_etnicos" name="p_rasgos_etnicos" class="form-select">
                 <option value="" disabled selected>Seleccione rasgos étnicos</option>
                 @foreach ($rasgos as $rasgo)
