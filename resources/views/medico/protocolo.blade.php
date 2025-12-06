@@ -146,8 +146,14 @@
                         </div>
                     </div>
                 @else
-                    <form action="{{ route('tratamiento.subir-consentimiento', $tratamiento->id) }}" method="POST"
-                        enctype="multipart/form-data" class="space-y-6">
+                    <form 
+    action="{{ session('rol') == 5 
+        ? route('jefe.tratamiento.subir-consentimiento', $tratamiento->id) 
+        : route('tratamiento.subir-consentimiento', $tratamiento->id) 
+    }}" 
+    method="POST"
+>
+
                         @csrf
 
                         <div class="border border-gray-200 rounded-lg p-4">
@@ -182,8 +188,14 @@
                             la orden médica</p>
                     </div>
                 @else
-                    <form action="{{ route('tratamiento.enviar-orden-medica', $tratamiento->id) }}" method="POST"
-                        class="text-center">
+                    <form 
+    action="{{ session('rol') == 5 
+        ? route('jefe.tratamiento.enviar-orden-medica', $tratamiento->id) 
+        : route('tratamiento.enviar-orden-medica', $tratamiento->id) 
+    }}" 
+    method="POST"
+>
+
                         @csrf
                         <p class="text-gray-600 mb-4">El consentimiento ha sido cargado. Puede proceder a enviar la orden
                             médica.</p>

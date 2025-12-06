@@ -468,7 +468,7 @@ class ConsultaController extends Controller
             );
         }
 
-        $tratamiento->update(['etapa_id' => 1]);
+      
          if (session('rol') == 5){
             return redirect()
             ->route('jefe.tratamiento.detalle', $tratamiento->id)

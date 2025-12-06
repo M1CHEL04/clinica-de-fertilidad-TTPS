@@ -181,6 +181,7 @@
                                             .then(res => res.json())
                                             .then(data => {
                                                 tratamientos = data.tratamientos;
+                                                console.log(tratamientos);
                                                 pacienteNombre = '{{ $paciente->nombre }} {{ $paciente->apellido }}';
                                                 open = true;
                                             });

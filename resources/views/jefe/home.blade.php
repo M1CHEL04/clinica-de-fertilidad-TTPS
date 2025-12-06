@@ -151,8 +151,8 @@
                                         fetch('/jefe/paciente/{{ $paciente->paciente_id }}/tratamientos')
                                             .then(res => res.json())
                                             .then(data => {
-                                                console.log(data);
                                                 tratamientos = data.tratamientos;
+                                                console.log(tratamientos);
                                                 pacienteNombre = '{{ $paciente->nombre }} {{ $paciente->apellido }}';
                                                 open = true;
                                             });

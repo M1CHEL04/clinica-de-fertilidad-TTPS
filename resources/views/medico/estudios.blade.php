@@ -76,7 +76,12 @@
                     <i class="fas fa-microscope text-blue-600 mr-2"></i> Asignación de Estudios
                 </h3>
 
-                <form action="{{ route('estudios.store') }}" method="POST" class="space-y-6">
+                <form 
+    action="{{ session('rol') == 5 ? route('jefe.estudios.store') : route('estudios.store') }}" 
+    method="POST" 
+    class="space-y-6"
+>
+
                     @csrf
                     <input type="hidden" name="paciente_id" value="{{ $paciente->id }}">
 

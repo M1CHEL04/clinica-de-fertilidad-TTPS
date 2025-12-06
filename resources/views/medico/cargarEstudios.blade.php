@@ -53,8 +53,15 @@
                         <p class="text-gray-600">No hay estudios pendientes.</p>
                     </div>
                 @else
-                    <form action="{{ route('tratamiento.guardar-estudios', $tratamiento->id) }}" method="POST"
-                        class="space-y-6">
+                    <form 
+    action="{{ session('rol') == 5 
+        ? route('jefe.tratamiento.guardar-estudios', $tratamiento->id) 
+        : route('tratamiento.guardar-estudios', $tratamiento->id) 
+    }}" 
+    method="POST"
+>
+
+                       
                         @csrf
 
                         @foreach ($estudiosPendientes as $tipo => $grupo)

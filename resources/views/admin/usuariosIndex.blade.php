@@ -7,7 +7,7 @@
             <h1 class="page-title">Panel de administración</h1>
             <p class="page-subtitle">Gestión de usuarios internos del sistema</p>
         </div>
-        <a href="/admin/home" class="btn-primary inline-flex items-center">
+        <a href="/jefe/home" class="btn-primary inline-flex items-center">
             <i class="mr-2"></i> Volver atrás
         </a>
     </div>

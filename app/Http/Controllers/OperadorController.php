@@ -57,10 +57,10 @@ class OperadorController extends Controller
     public function tratamientosDeUnPaciente($pacienteId)
     {
         $tratamientos = DB::table('tratamientos')
-            ->leftJoin('historias_clinica', 'tratamientos.historia_clinica_id', '=', 'historias_clinica.id')
-            ->leftJoin('usuarios', 'historias_clinica.paciente_id', '=', 'usuarios.id')
-            ->leftJoin('estados_tratamiento', 'tratamientos.estado_tratamiento_id', '=', 'estados_tratamiento.id')
-            ->leftJoin('objetivos', 'objetivos.id', '=', 'tratamientos.objetivo_id')
+            ->join('historias_clinica', 'tratamientos.historia_clinica_id', '=', 'historias_clinica.id')
+            ->join('usuarios', 'historias_clinica.paciente_id', '=', 'usuarios.id')
+            ->join('estados_tratamiento', 'tratamientos.estado_tratamiento_id', '=', 'estados_tratamiento.id')
+            ->join('objetivos', 'objetivos.id', '=', 'tratamientos.objetivo_id')
             ->select(
                 'tratamientos.id',
                 'objetivos.nombre as objetivo',
