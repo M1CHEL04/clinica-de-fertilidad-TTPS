@@ -383,7 +383,7 @@ class OperadorController extends Controller
         $isOK = false;
         $eraMaduro = $estadoAnterior?->TipoEstadoOvocito?->nombre === 'Maduro';
         $estaCriopreservado = $ovocito->guardado;
-        if ($eraMaduro && $estaCriopreservado) {
+        if ($eraMaduro && $estaCriopreservado && $request->accion != 'criopreservar') {
             $isOK = $this->deallocateOvocyte($ovocito);
 
             if (!$isOK) {
@@ -403,6 +403,7 @@ class OperadorController extends Controller
             'tiempo_maduracion' => $tiempoMaduracion,
         ]);
         if ($isOK) return redirect()->back()->with('success', "Ovocito {$ovocito->identificador} actualizado correctamente. Ademas se retiro el ovocito de la zona de criopreservacion");
+        
         if ($request->accion == 'criopreservar' && !$estaCriopreservado) {
             $guardadoId = $this->registrarCriopreservacion($id);
 

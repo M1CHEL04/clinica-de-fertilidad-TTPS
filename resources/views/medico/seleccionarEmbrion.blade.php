@@ -9,10 +9,21 @@
                 Paciente: {{ $paciente->nombre }} {{ $paciente->apellido }} · DNI: {{ $paciente->dni }}
             </p>
         </div>
+
+        @php
+    $prefix = session('rol') == 3 
+        ? 'operador' 
+        : (session('rol') == 5 
+            ? 'jefe' 
+            : 'medico');
+@endphp
         <div>
-            <a href="{{ url()->previous() }}" class="btn-secondary">
-                <i class="fas fa-arrow-left mr-2"></i> Volver al tratamiento
-            </a>
+           <a 
+    href="{{ url("$prefix/paciente/$tratamiento->id/tratamiento") }}"
+    class="btn-secondary"
+>
+    <i class="fas fa-arrow-left mr-2"></i> Volver al tratamiento
+</a>
         </div>
     </div>
 @endsection

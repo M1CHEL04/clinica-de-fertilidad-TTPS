@@ -216,9 +216,9 @@
                                         @php
                                             $user = \App\Models\User::find($paciente->paciente_id); //polemico esto
                                             $dniPareja = $user ? $user->obtenerDniPareja() : null;
-
+                                            $objetivo = $user ? $user->historiasClinicas->tratamientos->last()->objetivo_id : null;
                                         @endphp
-                                        @if (auth()->user()->rol_id == 3 && $dniPareja)
+                                        @if (auth()->user()->rol_id == 3 && $dniPareja && $objetivo == 1)
                                             <button @click="openCryoModal({{ $paciente->paciente_id }})"
                                                 class="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg"
                                                 title="Criopreservar Semen de la Pareja">

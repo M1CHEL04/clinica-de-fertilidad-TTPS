@@ -152,6 +152,7 @@
         : route('tratamiento.subir-consentimiento', $tratamiento->id) 
     }}" 
     method="POST"
+    enctype="multipart/form-data"
 >
 
                         @csrf

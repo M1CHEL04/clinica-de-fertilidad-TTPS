@@ -63,7 +63,7 @@
 
         <div class="col-md-4 mb-3">
             <label class="form-label">Rasgos étnicos</label>
-            <select id="p_rasgos_etnicos" name="p_etnia" class="form-select">
+            <select id="p_rasgos_etnicos" name="p_rasgos_etnicos" class="form-select">
                 <option value="" disabled selected>Seleccione rasgos étnicos</option>
                 @foreach ($rasgos as $rasgo)
                     <option value="{{ $rasgo->value }}">{{ $rasgo->nombre }}</option>
