@@ -491,6 +491,9 @@ class OperadorController extends Controller
             ->whereHas('estado_ovocito.TipoEstadoOvocito', function ($query) {
                 $query->where('nombre', 'Maduro');
             })
+            ->whereHas('estado_ovocito.TipoEstadoOvocito', function ($query) {
+                $query->where('motivo_descarte', null);
+            })
             ->whereDoesntHave('embriones') // No han sido utilizados para crear embriones
             ->with(['estado_ovocito.TipoEstadoOvocito'])
             ->select('id', 'identificador', 'calidad_morfologica')
