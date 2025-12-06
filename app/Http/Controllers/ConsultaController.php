@@ -302,7 +302,7 @@ class ConsultaController extends Controller
                     'tipo_pelo' => $request->p_tipo_pelo,
                     'altura' => $request->p_altura,
                     'complexion_corporal' => $request->p_complexion,
-                    'rasgos_etnicos' => $request->p_etnia,
+                    'rasgos_etnicos' => $request->p_rasgos_etnicos,
                 ]);
                 $antecedentePareja->save();
 
@@ -334,7 +334,7 @@ class ConsultaController extends Controller
                 'tipo_pelo' => $request->p_tipo_pelo,
                 'altura' => $request->p_altura,
                 'complexion_corporal' => $request->p_complexion,
-                'rasgos_etnicos' => $request->p_etnia,
+                'rasgos_etnicos' => $request->rasgos_etnicos,
             ]);
         }
         if ($request->filled('p_antecedentes_genitales')) {

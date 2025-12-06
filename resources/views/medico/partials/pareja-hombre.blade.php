@@ -91,7 +91,7 @@
 
         <div class="col-md-4 mb-3">
             <label class="form-label">Complexión</label>
-            <select id="p_complexion" name="p_complexion" class="form-select">
+            <select id="p_complexion_corporal" name="p_complexion" class="form-select">
                 <option value="" disabled selected>Seleccione una complexión</option>
                 @foreach ($complexiones as $complexion)
                     <option value="{{ $complexion->value }}">{{ $complexion->nombre }}</option>
