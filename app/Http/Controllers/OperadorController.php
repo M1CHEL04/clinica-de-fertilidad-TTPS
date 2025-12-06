@@ -630,7 +630,7 @@ class OperadorController extends Controller
                                                 ]
                                             );
 
-                                            if (!$response->successful()) {
+                                            if ($response['exists'] == false) {
                                                 Log::error('Error al buscar la muestra: El dni no tiene muestra de semen criopreservado', [
                                                     'status' => $response->status(),
                                                     'body'   => $response->body()
