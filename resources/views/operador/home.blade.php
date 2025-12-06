@@ -216,7 +216,14 @@
                                         @php
                                             $user = \App\Models\User::find($paciente->paciente_id); //polemico esto
                                             $dniPareja = $user ? $user->obtenerDniPareja() : null;
-                                            $objetivo = $user ? $user->historiasClinicas->tratamientos->last()->objetivo_id : null;
+                                            
+                                            $historia = $user?->historiasClinicas;
+
+                                            // tratamiento más reciente
+                                            $tratamiento = $historia?->tratamientos()->latest()->first();
+
+                                            // objetivo
+                                            $objetivo = $tratamiento?->objetivo_id;
                                         @endphp
                                         @if (auth()->user()->rol_id == 3 && $dniPareja && $objetivo == 1)
                                             <button @click="openCryoModal({{ $paciente->paciente_id }})"
