@@ -409,17 +409,7 @@
                             </a>
                         @endif
 
-                        @if ($etapa4 || $etapa == 'transferencia')
-                            <a href="{{ route('jefe.embriones.seleccionar', $tratamiento->id) }}"
-                                class="btn-primary w-full flex items-center justify-center gap-2">
-                                <i class="fas fa-leaf"></i> Registrar transferencia
-                            </a>
-                        @else
-                            <button
-                                class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
-                                <i class="fas fa-seedling"></i> Registrar transferencia
-                            </button>
-                        @endif
+            
 
                         @if ($etapa4)
                             <a href="{{ route('jefe.tratamiento.post', $tratamiento->id) }}"
@@ -492,7 +482,17 @@
                         </a>
                     @endif
 
-
+                    @if ($etapa4 || $etapa == 'transferencia')
+            <a href="{{ route('operador.embriones.seleccionar', $tratamiento->id) }}"
+                class="btn-primary w-full flex items-center justify-center gap-2">
+                <i class="fas fa-leaf"></i> Registrar transferencia
+            </a>
+        @else
+            <button
+                class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
+                <i class="fas fa-seedling"></i> Registrar transferencia
+            </button>
+        @endif
 
                     @if ($etapa4)
                         <a href="{{ route('operador.tratamiento.post', $tratamiento->id) }}"
@@ -573,17 +573,7 @@
             </a>
         @endif
 
-        @if ($etapa4 || $etapa == 'transferencia')
-            <a href="{{ route('medico.embriones.seleccionar', $tratamiento->id) }}"
-                class="btn-primary w-full flex items-center justify-center gap-2">
-                <i class="fas fa-leaf"></i> Registrar transferencia
-            </a>
-        @else
-            <button
-                class="btn-primary w-full flex items-center justify-center gap-2 opacity-50 cursor-not-allowed pointer-events-none">
-                <i class="fas fa-seedling"></i> Registrar transferencia
-            </button>
-        @endif
+        
 
         @if ($etapa4)
             <a href="{{ route('tratamiento.post', $tratamiento->id) }}"
