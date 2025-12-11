@@ -142,7 +142,7 @@ class MedicoController extends Controller
     }
 
 
-     public function seleccionar($id)
+    public function seleccionar($id)
     {
         $tratamiento = Tratamiento::findOrFail($id);
         $paciente = $tratamiento->historiaClinica->paciente;
@@ -152,37 +152,88 @@ class MedicoController extends Controller
             ->get();
 
         // Aplanar la colección de embriones
-         $embriones = Embrion::whereHas('ovocito', function ($q) use ($paciente) {
-        $q->where('paciente_id', $paciente->id);
-    })->get();
+        // Solo embriones que no realizaron PGT o que realizaron PGT pero con resultado negativo
+        $embriones = Embrion::whereHas('ovocito', function ($q) use ($paciente) {
+            $q->where('paciente_id', $paciente->id);
+        })
+            ->where(function ($query) {
+                $query->where('realizo_PGT', false)
+                    ->orWhere(function ($q) {
+                        $q->where('realizo_PGT', true)
+                            ->where('pgt_positivo', false);
+                    });
+            })
+            ->get();
 
         return view('medico.seleccionarEmbrion', compact('embriones', 'tratamiento', 'paciente'));
     }
 
     public function guardar(Request $request)
-{
-    $request->validate([
-        'embrion_id' => 'required|exists:embriones,id',
-        'paciente_id' => 'required|exists:usuarios,id',
-    ]);
+    {
+        $request->validate([
+            'embriones_ids' => 'required|array|min:1|max:3',
+            'embriones_ids.*' => 'required|exists:embriones,id',
+            'paciente_id' => 'required|exists:usuarios,id',
+        ]);
 
-    $embrion = Embrion::findOrFail($request->embrion_id);
+        $embrionesIds = $request->embriones_ids;
+        $pacienteId = $request->paciente_id;
+        $embrionesActualizados = [];
+        $errores = [];
 
-    // Validación extra opcional: que el embrión sea del paciente
-    if ($embrion->ovocito && $embrion->ovocito->paciente_id != $request->paciente_id) {
-        return back()->with('error', 'El embrión no pertenece a este paciente.');
+        foreach ($embrionesIds as $embrionId) {
+            $embrion = Embrion::findOrFail($embrionId);
+
+            // Validación: que el embrión sea del paciente
+            if ($embrion->ovocito && $embrion->ovocito->paciente_id != $pacienteId) {
+                $errores[] = "El embrión {$embrion->identificador} no pertenece a este paciente.";
+                continue;
+            }
+
+            // Validación: que no esté ya utilizado
+            if ($embrion->utilizado) {
+                $errores[] = "El embrión {$embrion->identificador} ya fue utilizado anteriormente.";
+                continue;
+            }
+
+            // Validación: que no esté descartado
+            if (!is_null($embrion->motivo_descarte)) {
+                $errores[] = "El embrión {$embrion->identificador} está descartado.";
+                continue;
+            }
+
+            // Validación: que no esté criopreservado
+            if ($embrion->criopreservado) {
+                $errores[] = "El embrión {$embrion->identificador} está criopreservado.";
+                continue;
+            }
+
+            // Marcar como utilizado
+            $embrion->utilizado = true;
+            $embrion->save();
+
+            $embrionesActualizados[] = $embrion->identificador;
+        }
+
+        // Si hubo errores, retornar con mensaje de error
+        if (!empty($errores)) {
+            $mensajeError = 'Errores al procesar la transferencia: ' . implode(' | ', $errores);
+            if (!empty($embrionesActualizados)) {
+                $mensajeError .= ' Sin embargo, los siguientes embriones fueron marcados como utilizados: ' . implode(', ', $embrionesActualizados);
+            }
+            return back()->with('error', $mensajeError);
+        }
+
+        // Si todo salió bien
+        $cantidad = count($embrionesActualizados);
+        $mensaje = $cantidad === 1
+            ? "La transferencia fue registrada correctamente. El embrión {$embrionesActualizados[0]} quedó marcado como utilizado."
+            : "La transferencia fue registrada correctamente. Se marcaron como utilizados {$cantidad} embriones: " . implode(', ', $embrionesActualizados) . ".";
+
+        return redirect()
+            ->back()
+            ->with('success', $mensaje);
     }
-
-    // 🔥 Marcar como utilizado
-    $embrion->utilizado = true;
-    $embrion->save();
-
-    // Si querés registrar la transferencia en una tabla aparte, acá iría.
-
-    return redirect()
-        ->back()
-        ->with('success', 'La transferencia fue registrada correctamente. El embrión quedó marcado como utilizado.');
-}
 
     public function tratamientosDeUnPaciente($pacienteId)
     {
@@ -385,18 +436,18 @@ class MedicoController extends Controller
         if ($actual >= 8) {
             return back()->with('error', 'No se puede avanzar más la etapa.');
         }
-       
+
 
         $nuevoId = $actual + 1;
-        
-       
+
+
         $updateData = [
             'etapa_id' => $nuevoId,
             'updated_at' => now(),
         ];
 
-         if ($nuevoId == 8){
-            $updateData['estado_tratamiento_id'] = 2; 
+        if ($nuevoId == 8) {
+            $updateData['estado_tratamiento_id'] = 2;
         }
 
         // Si la etapa actual es "Monitoreos", limpiar fechas
@@ -404,7 +455,7 @@ class MedicoController extends Controller
             $updateData['fecha_sugerida_inicio'] = null;
             $updateData['fecha_sugerida_fin'] = null;
         }
-        
+
         DB::table('tratamientos')->where('id', $id)->update($updateData);
 
         return back()->with('success', 'Etapa actualizada a: ' . $this->etapas[$nuevoId]);

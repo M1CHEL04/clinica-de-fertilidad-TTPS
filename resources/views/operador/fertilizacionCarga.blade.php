@@ -285,13 +285,13 @@
                     <div class="space-y-2">
                         <label class="flex items-center p-2 bg-gray-50 rounded border cursor-pointer hover:bg-gray-100">
                             <input type="radio" name="embriones[${ovocitoId}][resultado_pgt]" value="positivo" 
-                                   class="mr-3" required>
-                            <span class="text-sm text-green-700 font-medium">Positivo</span>
+                                   class="mr-3 resultado-pgt-radio" data-ovocito="${ovocitoId}" required>
+                            <span class="text-sm text-red-700 font-medium">Positivo</span>
                         </label>
                         <label class="flex items-center p-2 bg-gray-50 rounded border cursor-pointer hover:bg-gray-100">
                             <input type="radio" name="embriones[${ovocitoId}][resultado_pgt]" value="negativo" 
-                                   class="mr-3" required>
-                            <span class="text-sm text-red-700 font-medium">Negativo</span>
+                                   class="mr-3 resultado-pgt-radio" data-ovocito="${ovocitoId}" required>
+                            <span class="text-sm text-green-700 font-medium">Negativo</span>
                         </label>
                     </div>
                 </div>
@@ -382,6 +382,15 @@
                     manejarCambioPGT(ovocitoId, this.value);
                 });
             });
+
+            // Event listeners para radio buttons de resultado PGT
+            const radioButtonsResultadoPGT = document.querySelectorAll(
+                `input[name="embriones[${ovocitoId}][resultado_pgt]"]`);
+            radioButtonsResultadoPGT.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    manejarCambioResultadoPGT(ovocitoId, this.value);
+                });
+            });
         }
 
         /* -------------------------
@@ -447,9 +456,58 @@
                     radio.checked = false;
                     radio.required = false;
                 });
+                // Limpiar también el descarte si estaba configurado por PGT positivo
+                const selectAccion = document.querySelector(`select[name="embriones[${ovocitoId}][accion]"]`);
+                if (selectAccion && selectAccion.value === 'descartar') {
+                    selectAccion.disabled = false;
+                    manejarCambioAccion(ovocitoId, '');
+                }
             }
         }
 
+        /* -------------------------
+           MANEJAR CAMBIO RESULTADO PGT
+        ------------------------- */
+        function manejarCambioResultadoPGT(ovocitoId, resultado) {
+            const selectAccion = document.querySelector(`select[name="embriones[${ovocitoId}][accion]"]`);
+            const motivoDescarteDiv = document.getElementById(`motivo_descarte_${ovocitoId}`);
+            const motivoDescarteTextarea = document.querySelector(
+                `textarea[name="embriones[${ovocitoId}][motivo_descarte]"]`);
+
+            if (resultado === 'positivo') {
+                // Forzar la selección de "descartar"
+                selectAccion.value = 'descartar';
+
+                // Remover el atributo disabled del select antes de enviar el formulario
+                selectAccion.removeAttribute('disabled');
+
+                // Mostrar el campo de motivo de descarte directamente
+                motivoDescarteDiv.classList.remove('hidden');
+                motivoDescarteTextarea.required = true;
+
+                // Pre-llenar el motivo si está vacío
+                if (!motivoDescarteTextarea.value.trim()) {
+                    motivoDescarteTextarea.value = 'PGT positivo - Embrión con alteraciones genéticas';
+                }
+
+                // Deshabilitar después para que el usuario no pueda cambiar
+                setTimeout(() => {
+                    selectAccion.setAttribute('disabled', 'disabled');
+                }, 10);
+
+            } else if (resultado === 'negativo') {
+                // Permitir cambiar la acción
+                selectAccion.removeAttribute('disabled');
+
+                // Si el descarte estaba por PGT positivo, limpiarlo
+                if (motivoDescarteTextarea.value.includes('PGT positivo')) {
+                    selectAccion.value = '';
+                    motivoDescarteDiv.classList.add('hidden');
+                    motivoDescarteTextarea.required = false;
+                    motivoDescarteTextarea.value = '';
+                }
+            }
+        }
         /* -------------------------
            REMOVER EMBRIÓN
         ------------------------- */
@@ -489,6 +547,12 @@
            VALIDACIÓN DEL FORMULARIO
         ------------------------- */
         document.getElementById('formFertilizacion').addEventListener('submit', function(e) {
+            // Habilitar todos los selects deshabilitados antes de enviar
+            const selectsDeshabilitados = this.querySelectorAll('select[disabled]');
+            selectsDeshabilitados.forEach(select => {
+                select.removeAttribute('disabled');
+            });
+
             if (ovocitosSeleccionados.length === 0) {
                 e.preventDefault();
                 alert('Debe seleccionar un ovocito para fertilizar');

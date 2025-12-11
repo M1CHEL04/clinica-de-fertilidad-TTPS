@@ -403,7 +403,7 @@ class OperadorController extends Controller
             'tiempo_maduracion' => $tiempoMaduracion,
         ]);
         if ($isOK) return redirect()->back()->with('success', "Ovocito {$ovocito->identificador} actualizado correctamente. Ademas se retiro el ovocito de la zona de criopreservacion");
-        
+
         if ($request->accion == 'criopreservar' && !$estaCriopreservado) {
             $guardadoId = $this->registrarCriopreservacion($id);
 
