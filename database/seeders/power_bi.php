@@ -461,6 +461,35 @@ class power_bi extends Seeder
         }
 
 
+        /*
+         * FACT PAGOS
+         * migración: fact_pagos (pago_sk, pago_id, tratamiento_sk, paciente_sk, monto, metodo_pago, estado, referencia_externa, fecha_sk)
+         */
+        DB::table('fact_pagos')->truncate();
+        for ($i = 1; $i <= 250; $i++) {
+            $fechaObj = $faker->dateTimeBetween('2023-01-01', '2027-01-01');
+            $fecha = $fechaObj->format('Y-m-d');
+            if (!isset($tiempoSK[$fecha])) continue;
+
+            $estado = $faker->randomElement(['pagado', 'pendiente', 'cancelado']);
+            $monto = $faker->numberBetween(50000, 500000); // en centavos, divide por 100 para pesos
+
+            DB::table('fact_pagos')->insert([
+                'pago_sk'              => $i,
+                'pago_id'              => 'PAG-' . str_pad($i, 6, '0', STR_PAD_LEFT),
+                'tratamiento_sk'       => rand(1, 200),
+                'paciente_sk'          => rand(1, 50),
+                'monto'                => $monto / 100,
+                'metodo_pago'          => $faker->randomElement(['tarjeta_credito', 'transferencia', 'efectivo', 'tarjeta_debito']),
+                'estado'               => $estado,
+                'referencia_externa'   => $faker->boolean(70) ? 'API-' . $faker->uuid() : null,
+                'fecha_sk'             => $tiempoSK[$fecha],
+                'created_at'           => now(),
+                'updated_at'           => now(),
+            ]);
+        }
+
+
         // Reactivar FK checks
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 

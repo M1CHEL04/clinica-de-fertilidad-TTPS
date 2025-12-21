@@ -275,10 +275,27 @@ return new class extends Migration
             $table->unsignedBigInteger('fecha_sk');
             $table->timestamps();
         });
+
+        // -------------------------------
+        // Fact Pagos
+        // -------------------------------
+        Schema::create('fact_pagos', function (Blueprint $table) {
+            $table->id('pago_sk');
+            $table->string('pago_id');
+            $table->unsignedBigInteger('tratamiento_sk');
+            $table->unsignedBigInteger('paciente_sk');
+            $table->decimal('monto', 10, 2);
+            $table->string('metodo_pago')->nullable(); // tarjeta, transferencia, efectivo, etc.
+            $table->string('estado')->default('pagado'); // pagado, pendiente, cancelado
+            $table->string('referencia_externa')->nullable(); // ID de la API de pagos
+            $table->unsignedBigInteger('fecha_sk');
+            $table->timestamps();
+        });
     }
 
     public function down()
     {
+        Schema::dropIfExists('fact_pagos');
         Schema::dropIfExists('fact_post_transferencias');
         Schema::dropIfExists('fact_embriones');
         Schema::dropIfExists('fact_ovocitos');
