@@ -23,5 +23,6 @@ class DatabaseSeeder extends Seeder
         $this->call(\Database\Seeders\TipoPeloSeeder::class);
         $this->call(\Database\Seeders\ColorOjosSeeder::class);
         $this->call(\Database\Seeders\ColorPeloSeeder::class);
+        $this->call(\Database\Seeders\power_bi::class);
     }
 }
